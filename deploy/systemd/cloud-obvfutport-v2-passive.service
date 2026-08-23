@@ -1,0 +1,21 @@
+[Unit]
+Description=OBVFUTPORT V2 passive compact incremental shadow runner
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/cloud-deploy-candidates/obv-futures-portable-v2
+Environment=PYTHONUNBUFFERED=1
+Environment=OBVFUTPORT_V2_ROOT=/opt/cloud-deploy-candidates/obv-futures-portable-v2
+ExecStart=/opt/cloud-deploy-candidates/obv-futures-portable-v2/scripts/run_passive.sh
+Restart=always
+RestartSec=10
+Nice=10
+CPUQuota=25%
+MemoryMax=900M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+

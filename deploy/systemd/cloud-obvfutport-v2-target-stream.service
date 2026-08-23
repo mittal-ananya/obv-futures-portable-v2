@@ -1,0 +1,20 @@
+[Unit]
+Description=OBVFUTPORT V2 OBV-safe compact target stream extractor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/cloud-deploy-candidates/obv-futures-portable-v2
+Environment=PYTHONUNBUFFERED=1
+Environment=OBVFUTPORT_V2_ROOT=/opt/cloud-deploy-candidates/obv-futures-portable-v2
+ExecStart=/opt/cloud-deploy-candidates/obv-futures-portable-v2/scripts/run_target_stream.sh
+Restart=always
+RestartSec=10
+Nice=10
+CPUQuota=35%
+MemoryMax=350M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

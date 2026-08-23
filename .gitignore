@@ -1,0 +1,29 @@
+# Runtime/state outputs
+state/
+tmp/
+logs/
+reports/
+backups/
+
+# Heavy market/replay data
+*.jsonl
+*.parquet
+*.pkl
+*.pkl.gz
+*.tar
+*.tar.gz
+*.zip
+
+# Python/runtime noise
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Local editor/system files
+.DS_Store
+*.swp
+
