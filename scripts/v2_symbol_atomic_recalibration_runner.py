@@ -125,6 +125,7 @@ def run_signature(args: argparse.Namespace) -> dict[str, Any]:
             "joint_scorer": sha256_file(scorer_path),
         },
         "date_range": {"start_date": args.start_date, "end_date": args.end_date},
+        "contract_as_of_iso": args.contract_as_of_iso,
         "skip_weekends": not args.no_skip_weekends,
         "grid": {
             "primary_short_thresholds": args.primary_short_thresholds,
@@ -221,6 +222,7 @@ def gate_args_for_symbol(args: argparse.Namespace, symbol: str, output_dir: Path
         index_root=args.index_root,
         reuse_index=args.reuse_index,
         require_index=args.require_index,
+        contract_as_of_iso=args.contract_as_of_iso,
         require_branch_coverage=False,
         targeted_branch_proof=False,
         current_runtime_combos_only=False,
@@ -375,7 +377,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     dates = gate.date_range(args.start_date, args.end_date, skip_weekends=not args.no_skip_weekends)
 
     root_runner_dir = output_dir / "_run_setup"
-    root_runner = gate.prepare_runner(config_path, root_runner_dir, retain_seconds=False)
+    root_runner = gate.prepare_runner(
+        config_path,
+        root_runner_dir,
+        retain_seconds=False,
+        contract_as_of_iso=args.contract_as_of_iso,
+    )
     requested_symbols = parse_symbols(args.symbols)
     metas = gate.selected_metas(root_runner, requested_symbols, args.max_symbols)
     symbols = [meta.symbol for meta in metas]
@@ -412,7 +419,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
     branch_proof = {"enabled": False, "ok": None}
     if not args.skip_targeted_branch_proof:
-        branch_runner = gate.prepare_runner(config_path, output_dir / "_branch_proof", retain_seconds=False)
+        branch_runner = gate.prepare_runner(
+            config_path,
+            output_dir / "_branch_proof",
+            retain_seconds=False,
+            contract_as_of_iso=args.contract_as_of_iso,
+        )
         branch_proof = gate.targeted_branch_proof(branch_runner)
         atomic_write_json(output_dir / "targeted_branch_proof.json", json_clean(branch_proof))
         append_progress(output_dir, {"event": "targeted_branch_proof", "ok": bool(branch_proof.get("ok"))})
@@ -541,7 +553,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         symbol_dir = output_dir / "_symbol_work" / symbol
         try:
             symbol_args = gate_args_for_symbol(args, symbol, symbol_dir)
-            runner = gate.prepare_runner(config_path, symbol_dir, retain_seconds=True)
+            runner = gate.prepare_runner(
+                config_path,
+                symbol_dir,
+                retain_seconds=True,
+                contract_as_of_iso=args.contract_as_of_iso,
+            )
             contexts = gate.build_symbol_contexts(
                 runner=runner,
                 config=config,
@@ -771,6 +788,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--index-root", default="")
     parser.add_argument("--reuse-index", action="store_true")
     parser.add_argument("--require-index", action="store_true")
+    parser.add_argument(
+        "--contract-as-of-iso",
+        default="",
+        help="Pin contract lifecycle selection for historical proof/recalibration runs.",
+    )
     parser.add_argument("--skip-targeted-branch-proof", action="store_true")
     parser.add_argument("--keep-symbol-work", action="store_true")
     parser.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True)

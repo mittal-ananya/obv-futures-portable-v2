@@ -1011,6 +1011,20 @@ def _compact_update_tranche3_for_candidate(
         t3["last_checked_epoch"] = int(trigger_row["epoch_second"])
         position["tranche3"] = t3
         return position, events
+    if entry_mode == "pullback":
+        fill_price = float(entry_fill_price)
+        if side == "long" and not (hard_sl_price < fill_price < float(entry_price)):
+            t3["status"] = "pullback_entry_fill_outside_entry_sl_bounds"
+            t3["last_checked_epoch"] = int(trigger_row["epoch_second"])
+            t3["rejected_entry_fill_price"] = fill_price
+            position["tranche3"] = t3
+            return position, events
+        if side == "short" and not (float(entry_price) < fill_price < hard_sl_price):
+            t3["status"] = "pullback_entry_fill_outside_entry_sl_bounds"
+            t3["last_checked_epoch"] = int(trigger_row["epoch_second"])
+            t3["rejected_entry_fill_price"] = fill_price
+            position["tranche3"] = t3
+            return position, events
     entry_epoch = int(entry_fill.get("epoch_second") or trigger_row.get("epoch_second") or 0)
     entry_reason = (
         f"tranche3_pullback_{activation_clocks}c_{float(pullback_r):g}R"

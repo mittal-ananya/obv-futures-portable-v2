@@ -38,6 +38,8 @@ Daily EOD is incremental by default:
 - Rebuild Matrix from the corrected selected-leg ledger using the bridge's
   historical `--once` mode after reset; the service tail mode intentionally skips
   historical rows and is not sufficient for EOD rebuilds.
+- Pin historical research/recalibration proof runs with `--contract-as-of-iso`
+  when replaying a pre-rollover date range after rollover has already occurred.
 - Generate a state manifest after every install/update.
 - Do not run a full Aug10 onward replay unless the user explicitly approves after
   a detailed explanation.
@@ -65,10 +67,12 @@ heavy artifacts instead.
 
 Current quarantined cleanup plan:
 
-- Keep IOC, MAXHEALTH, and WAAREEENER on current v2 baseline until the end of
-  the operational setup.
+- Keep IOC, MAXHEALTH, and WAAREEENER on current v2 baseline until their focused
+  proof and state install are explicitly completed.
 - Patch duplicate-second ordering once in the indexed execution path, then test
   only IOC and MAXHEALTH.
-- Patch T3 pullback-short bounds, then test only WAAREEENER.
+- WAAREEENER proof passed on 2026-08-24 after adding fill-bound validation; it
+  still needs a controlled WAAREEENER-only state/dashboard/Matrix install before
+  leaving baseline in production.
 - Do not rerun successful symbols unless the patch changes shared candidate
   semantics.

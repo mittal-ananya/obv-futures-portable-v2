@@ -35,6 +35,7 @@ if str(SRC_ROOT) not in sys.path:
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 
+import obvfut_portable_v2.passive_runner as passive_runner_module  # noqa: E402
 from obvfut_portable_v2.passive_runner import (  # noqa: E402
     OnlineObvState,
     PassiveV2Runner,
@@ -243,7 +244,22 @@ def missing_index_files(index_root: Path, dates: list[str], target_keys: Iterabl
     return missing
 
 
-def prepare_runner(config_path: Path, output_dir: Path, *, retain_seconds: bool = True) -> PassiveV2Runner:
+def parse_contract_as_of(raw: str | None) -> datetime | None:
+    if not raw:
+        return None
+    parsed = datetime.fromisoformat(str(raw))
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=passive_runner_module.IST)
+    return parsed.astimezone(passive_runner_module.IST)
+
+
+def prepare_runner(
+    config_path: Path,
+    output_dir: Path,
+    *,
+    retain_seconds: bool = True,
+    contract_as_of_iso: str | None = None,
+) -> PassiveV2Runner:
     cfg = read_json(config_path, {})
     tmp_state = output_dir / "_runner_state"
     tmp_state.mkdir(parents=True, exist_ok=True)
@@ -258,7 +274,15 @@ def prepare_runner(config_path: Path, output_dir: Path, *, retain_seconds: bool 
     cfg["active_second_row_retention_seconds"] = retention
     tmp_config = output_dir / "_runtime_canonical_joint_gate.json"
     atomic_write_json(tmp_config, cfg)
-    return PassiveV2Runner(tmp_config)
+    contract_as_of = parse_contract_as_of(contract_as_of_iso)
+    if contract_as_of is None:
+        return PassiveV2Runner(tmp_config)
+    original_now_ist = passive_runner_module.now_ist
+    passive_runner_module.now_ist = lambda: contract_as_of
+    try:
+        return PassiveV2Runner(tmp_config)
+    finally:
+        passive_runner_module.now_ist = original_now_ist
 
 
 def selected_metas(runner: PassiveV2Runner, symbols: list[str], max_symbols: int | None) -> list[Any]:
@@ -985,7 +1009,12 @@ def run_build_index(args: argparse.Namespace) -> dict[str, Any]:
     config_path = Path(args.config)
     config = read_json(config_path, {})
     dates = date_range(args.start_date, args.end_date, skip_weekends=not args.no_skip_weekends)
-    runner = prepare_runner(config_path, output_dir, retain_seconds=False)
+    runner = prepare_runner(
+        config_path,
+        output_dir,
+        retain_seconds=False,
+        contract_as_of_iso=getattr(args, "contract_as_of_iso", None),
+    )
     symbols = parse_csv(args.symbols) or DEFAULT_FORENSIC_SYMBOLS
     metas = selected_metas(runner, symbols, args.max_symbols)
     target_keys = sorted({meta.signal_key for meta in metas} | {meta.execution_key for meta in metas})
@@ -1672,7 +1701,12 @@ def targeted_branch_proof(runner: PassiveV2Runner) -> dict[str, Any]:
 def run_branch_proof(args: argparse.Namespace) -> dict[str, Any]:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    runner = prepare_runner(Path(args.config), output_dir, retain_seconds=False)
+    runner = prepare_runner(
+        Path(args.config),
+        output_dir,
+        retain_seconds=False,
+        contract_as_of_iso=getattr(args, "contract_as_of_iso", None),
+    )
     report = {
         "schema": "obvfutport_v2.branch_proof_report.v1",
         "started_at_ist": epoch_ist_iso(time.time()),
@@ -1693,7 +1727,12 @@ def run_manifest(args: argparse.Namespace) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     config_path = Path(args.config)
     config = read_json(config_path, {})
-    runner = prepare_runner(config_path, output_dir, retain_seconds=False)
+    runner = prepare_runner(
+        config_path,
+        output_dir,
+        retain_seconds=False,
+        contract_as_of_iso=getattr(args, "contract_as_of_iso", None),
+    )
     target_keys = sorted(getattr(runner, "target_set", set()) or getattr(runner, "targets", []))
     dates = date_range(args.start_date, args.end_date, skip_weekends=not args.no_skip_weekends)
     manifest = build_input_manifest(
@@ -1732,7 +1771,12 @@ def run_gate(args: argparse.Namespace) -> dict[str, Any]:
         "static_contract_audit": audit_static_contract(),
     }
     with stage_timer(report, "input_manifest"):
-        manifest_runner = prepare_runner(config_path, output_dir, retain_seconds=False)
+        manifest_runner = prepare_runner(
+            config_path,
+            output_dir,
+            retain_seconds=False,
+            contract_as_of_iso=getattr(args, "contract_as_of_iso", None),
+        )
         target_keys = sorted(getattr(manifest_runner, "target_set", set()) or getattr(manifest_runner, "targets", []))
         manifest = build_input_manifest(
             config=config,
@@ -1750,7 +1794,12 @@ def run_gate(args: argparse.Namespace) -> dict[str, Any]:
         return report
     symbols = parse_csv(args.symbols) or DEFAULT_FORENSIC_SYMBOLS
     with stage_timer(report, "runner_and_context_build"):
-        runner = prepare_runner(config_path, output_dir, retain_seconds=True)
+        runner = prepare_runner(
+            config_path,
+            output_dir,
+            retain_seconds=True,
+            contract_as_of_iso=getattr(args, "contract_as_of_iso", None),
+        )
         metas = selected_metas(runner, symbols, args.max_symbols)
         contexts = build_symbol_contexts(runner=runner, config=config, metas=metas, dates=dates, args=args)
     index_root = Path(str(getattr(args, "index_root", "") or ""))
@@ -1824,6 +1873,11 @@ def main() -> int:
     parser.add_argument("--index-root", default="")
     parser.add_argument("--reuse-index", action="store_true")
     parser.add_argument("--require-index", action="store_true")
+    parser.add_argument(
+        "--contract-as-of-iso",
+        default="",
+        help="Pin contract lifecycle selection for historical proofs, e.g. 2026-08-21T15:24:00+05:30.",
+    )
     parser.add_argument("--require-branch-coverage", action="store_true")
     parser.add_argument("--targeted-branch-proof", action="store_true")
     parser.add_argument("--current-runtime-combos-only", action="store_true")
