@@ -1,0 +1,75 @@
+{
+  "candidate_roots": [
+    "state/reports/quarantine_20260824"
+  ],
+  "comparable_symbol_count": 1,
+  "expected_aggregate": {
+    "T1": {
+      "closed": 4,
+      "net_rupees": -14082.52,
+      "rows": 4,
+      "success_rate_pct": 0.0,
+      "wins": 0
+    },
+    "T2": {
+      "closed": 4,
+      "net_rupees": -13988.12,
+      "rows": 4,
+      "success_rate_pct": 0.0,
+      "wins": 0
+    },
+    "T3": {
+      "closed": 2,
+      "net_rupees": -4945.23,
+      "rows": 2,
+      "success_rate_pct": 0.0,
+      "wins": 0
+    }
+  },
+  "failing_symbol_count": 0,
+  "failing_symbols": [],
+  "installed_aggregate": {
+    "T1": {
+      "closed": 4,
+      "net_rupees": -14082.52,
+      "rows": 4,
+      "success_rate_pct": 0.0,
+      "wins": 0
+    },
+    "T2": {
+      "closed": 4,
+      "net_rupees": -13988.12,
+      "rows": 4,
+      "success_rate_pct": 0.0,
+      "wins": 0
+    },
+    "T3": {
+      "closed": 2,
+      "net_rupees": -4945.23,
+      "rows": 2,
+      "success_rate_pct": 0.0,
+      "wins": 0
+    }
+  },
+  "ok": true,
+  "quarantined_symbols": [
+    "IOC",
+    "MAXHEALTH"
+  ],
+  "requested_symbols": [
+    "WAAREEENER"
+  ],
+  "schema": "obvfutport_v2.selected_candidate_install_audit.v1",
+  "state_dir": "state",
+  "symbol_results": [
+    {
+      "expected_rows": 10,
+      "installed_rows": 10,
+      "issue_count": 0,
+      "issues": [],
+      "ok": true,
+      "symbol": "WAAREEENER"
+    }
+  ],
+  "updated_epoch": 1787589528.1476798
+}

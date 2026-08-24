@@ -1,0 +1,134 @@
+{
+  "backup": {
+    "adaptive_override": 1,
+    "decision_events": {
+      "2026-08-10": 1,
+      "2026-08-11": 1,
+      "2026-08-12": 1,
+      "2026-08-13": 1,
+      "2026-08-14": 1,
+      "2026-08-17": 1,
+      "2026-08-18": 1,
+      "2026-08-19": 1,
+      "2026-08-20": 1,
+      "2026-08-21": 1,
+      "2026-08-24": 1
+    },
+    "symbols": {
+      "WAAREEENER": 1
+    }
+  },
+  "backup_dir": "state/backups/pre_symbol_patch_WAAREEENER_20260824_163828",
+  "dates": [
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-12",
+    "2026-08-13",
+    "2026-08-14",
+    "2026-08-17",
+    "2026-08-18",
+    "2026-08-19",
+    "2026-08-20",
+    "2026-08-21",
+    "2026-08-24"
+  ],
+  "dry_run": false,
+  "end_date": "2026-08-24",
+  "install": {
+    "decision_events": {
+      "2026-08-10": {
+        "prod_after": 3,
+        "prod_before": 3,
+        "removed_symbol_rows": 0,
+        "source_symbol_rows": 0
+      },
+      "2026-08-11": {
+        "prod_after": 476,
+        "prod_before": 473,
+        "removed_symbol_rows": 1,
+        "source_symbol_rows": 4
+      },
+      "2026-08-12": {
+        "prod_after": 259,
+        "prod_before": 259,
+        "removed_symbol_rows": 1,
+        "source_symbol_rows": 1
+      },
+      "2026-08-13": {
+        "prod_after": 186,
+        "prod_before": 185,
+        "removed_symbol_rows": 0,
+        "source_symbol_rows": 1
+      },
+      "2026-08-14": {
+        "prod_after": 182,
+        "prod_before": 182,
+        "removed_symbol_rows": 0,
+        "source_symbol_rows": 0
+      },
+      "2026-08-17": {
+        "prod_after": 183,
+        "prod_before": 183,
+        "removed_symbol_rows": 0,
+        "source_symbol_rows": 0
+      },
+      "2026-08-18": {
+        "prod_after": 148,
+        "prod_before": 148,
+        "removed_symbol_rows": 0,
+        "source_symbol_rows": 0
+      },
+      "2026-08-19": {
+        "prod_after": 287,
+        "prod_before": 284,
+        "removed_symbol_rows": 2,
+        "source_symbol_rows": 5
+      },
+      "2026-08-20": {
+        "prod_after": 147,
+        "prod_before": 146,
+        "removed_symbol_rows": 0,
+        "source_symbol_rows": 1
+      },
+      "2026-08-21": {
+        "prod_after": 183,
+        "prod_before": 183,
+        "removed_symbol_rows": 0,
+        "source_symbol_rows": 0
+      },
+      "2026-08-24": {
+        "prod_after": 342,
+        "prod_before": 342,
+        "removed_symbol_rows": 0,
+        "source_symbol_rows": 0
+      }
+    },
+    "override": {
+      "after_sha256": "07c54f85d72b87ce042b3e74d9c167ddc88ec6b03eb215ae576e3cd264480c5e",
+      "before_sha256": "abeddd68e3677cd735368e7db6ffc57c3086a231e34f5df1bc2ee6fcd8e5917d",
+      "copied": 1,
+      "source": "/tmp/obvfutport_v2_waareeener_install_20260824_163638/v2_symbol_overrides_latest_waareeener.json",
+      "target": "state/adaptive_calibration/v2_symbol_overrides_latest.json"
+    },
+    "symbols": {
+      "WAAREEENER": {
+        "after_ledger_sha256": "6874b31940795dd44331b42cd20774220c1dc4fe1077342f12044e835250791b",
+        "before_ledger_sha256": "8f1eb2595ae0a562d44f6b2df8fdaded7453a915dc0551a7401680de7cf2d208",
+        "copied": 1,
+        "source_ledger_rows": 12
+      }
+    }
+  },
+  "missing_sources": [],
+  "ok": true,
+  "prod_state": "state",
+  "schema": "obvfutport_v2.symbol_patch_install.v1",
+  "source_replay_ok": true,
+  "source_replay_partial": false,
+  "source_state": "/tmp/obvfutport_v2_waareeener_install_20260824_163638/filtered/symbol_runs/shard_00_WAAREEENER",
+  "start_date": "2026-08-10",
+  "symbols": [
+    "WAAREEENER"
+  ],
+  "updated_epoch": 1787589511.1281562
+}
