@@ -12,6 +12,8 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import subprocess
+import sys
 import time
 from datetime import date, datetime
 from pathlib import Path
@@ -59,6 +61,43 @@ def copy_file_replace(source: Path, target: Path) -> int:
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source, target)
     return 1
+
+
+def run_selected_candidate_gate(
+    *,
+    source_state: Path,
+    candidate_roots: list[str],
+    quarantined_symbols: str,
+    symbols: str,
+    output: Path,
+) -> dict[str, Any]:
+    script = Path(__file__).resolve().parent / "audit_v2_selected_candidate_install.py"
+    cmd = [
+        sys.executable,
+        str(script),
+        "--state-dir",
+        str(source_state),
+        "--quarantined-symbols",
+        quarantined_symbols,
+        "--output",
+        str(output),
+    ]
+    if symbols:
+        cmd.extend(["--symbols", symbols])
+    for root in candidate_roots:
+        cmd.extend(["--candidate-root", root])
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    payload = read_json(output, {})
+    if not isinstance(payload, dict) or not payload:
+        payload = {
+            "schema": "obvfutport_v2.selected_candidate_install_audit.subprocess.v1",
+            "ok": False,
+            "reason": "selected_candidate_gate_report_missing",
+        }
+    payload["returncode"] = proc.returncode
+    payload["stdout_tail"] = proc.stdout[-4000:]
+    payload["stderr_tail"] = proc.stderr[-4000:]
+    return payload
 
 
 def backup_current(prod_state: Path, backup_dir: Path, dates: list[str]) -> dict[str, Any]:
@@ -120,6 +159,10 @@ def main() -> int:
     parser.add_argument("--end-date", required=True)
     parser.add_argument("--report-name", default="")
     parser.add_argument("--require-symbol-count", type=int, default=212)
+    parser.add_argument("--selected-candidate-root", action="append", default=[])
+    parser.add_argument("--selected-candidate-symbols", default="")
+    parser.add_argument("--quarantined-symbols", default="IOC,MAXHEALTH,WAAREEENER")
+    parser.add_argument("--require-selected-candidate-match", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -130,9 +173,21 @@ def main() -> int:
     source_ok = bool(archive_report.get("ok")) and not bool(archive_report.get("partial"))
     symbols = sorted((source_state / "instruments").glob("*")) if (source_state / "instruments").exists() else []
     symbol_count = sum(1 for path in symbols if path.is_dir())
-    ok = source_ok and symbol_count >= int(args.require_symbol_count)
-
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    selected_gate: dict[str, Any] = {}
+    selected_gate_ok = True
+    if args.require_selected_candidate_match or args.selected_candidate_root:
+        selected_gate_path = prod_state / "reports" / f"selected_candidate_install_gate_{stamp}.json"
+        selected_gate = run_selected_candidate_gate(
+            source_state=source_state,
+            candidate_roots=list(args.selected_candidate_root),
+            quarantined_symbols=str(args.quarantined_symbols),
+            symbols=str(args.selected_candidate_symbols),
+            output=selected_gate_path,
+        )
+        selected_gate_ok = bool(selected_gate.get("ok"))
+    ok = source_ok and symbol_count >= int(args.require_symbol_count) and selected_gate_ok
+
     backup_dir = prod_state / "backups" / f"pre_v2_reseed_install_{stamp}"
     backup = {}
     install_report: dict[str, Any] = {}
@@ -152,6 +207,9 @@ def main() -> int:
         "source_replay_partial": bool(archive_report.get("partial")),
         "source_symbol_count": symbol_count,
         "required_symbol_count": int(args.require_symbol_count),
+        "selected_candidate_gate_required": bool(args.require_selected_candidate_match or args.selected_candidate_root),
+        "selected_candidate_gate_ok": selected_gate_ok,
+        "selected_candidate_gate": selected_gate,
         "backup_dir": str(backup_dir) if not args.dry_run else None,
         "backup": backup,
         "install": install_report,

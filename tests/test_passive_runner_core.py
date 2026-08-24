@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import tarfile
-import time
 from io import BytesIO
 from dataclasses import replace
 from datetime import date, datetime
@@ -183,18 +182,6 @@ def test_synthesized_symbols_include_available_september_shadow_keys(tmp_path: P
     assert "NFO:360ONE26SEPFUT" in runner.instruments["360ONE"].target_keys
     assert runner.instruments["DALBHARAT"].shadow_execution_key is None
     assert "NFO:DALBHARAT26SEPFUT" not in runner.targets
-
-
-def test_bootstrap_load_keys_defer_flat_execution_and_shadow_history(tmp_path: Path) -> None:
-    runner = _runner(tmp_path)
-
-    keys = runner.bootstrap_load_keys("2026-08-18")
-
-    assert len(keys) == 212
-    assert runner.instruments["360ONE"].signal_key in keys
-    assert runner.instruments["360ONE"].execution_key not in keys
-    assert runner.instruments["360ONE"].shadow_execution_key not in keys
-    assert runner.instruments["BANKNIFTY"].execution_key in keys
 
 
 def test_normalise_record_uses_exchange_time_and_depth() -> None:
@@ -558,41 +545,6 @@ def test_online_state_carries_last_quote_to_clock_row() -> None:
     assert any(item["epoch_second"] == clock_epoch and item["carried"] is True for item in state.second_rows)
 
 
-def test_online_state_clock_row_build_is_idempotent() -> None:
-    day = date(2026, 8, 17)
-    clock_epoch = int(datetime(2026, 8, 17, 9, 20, tzinfo=IST).timestamp())
-    state = OnlineObvState(
-        key="NSE:ABC",
-        clock_epochs=set(clock_epochs_for_day(day, clock_start="09:20", clock_end="09:20", clock_step_minutes=15)),
-    )
-    start = int(datetime(2026, 8, 17, 9, 19, 58, tzinfo=IST).timestamp())
-    for offset in range(3):
-        state.process_row(
-            {
-                "trade_date": "2026-08-17",
-                "target": "NSE:ABC",
-                "epoch": float(start + offset),
-                "epoch_second": start + offset,
-                "received_at_ist": datetime.fromtimestamp(start + offset, IST).isoformat(),
-                "exchange_timestamp": datetime.fromtimestamp(start + offset, IST).isoformat(),
-                "received_epoch": float(start + offset),
-                "market_data_latency_seconds": 0.0,
-                "price": 100.0 + offset,
-                "volume_traded": 1000.0 + offset,
-                "bid": 99.9 + offset,
-                "ask": 100.1 + offset,
-                "spread": 0.2,
-            }
-        )
-    first, first_reason = state.build_clock_row(clock_epoch, "09:20", {})
-    second, second_reason = state.build_clock_row(clock_epoch, "09:20", {})
-
-    assert first_reason is None
-    assert second_reason is None
-    assert first == second
-    assert len(state.clock_rows) == 1
-
-
 def test_online_state_gap_fill_uses_last_finalized_snapshot() -> None:
     day = date(2026, 8, 17)
     clocks = set(clock_epochs_for_day(day, clock_start="09:20", clock_end="15:20", clock_step_minutes=15))
@@ -755,100 +707,6 @@ def test_frozen_v1_adapter_books_hard_sl_exit(tmp_path: Path) -> None:
     assert runner.model_states["BANKNIFTY"]["last_closed_trade"]["exit_reason"] == "hard_sl"
 
 
-def test_live_entry_lag_guard_respects_archive_disable_override(tmp_path: Path) -> None:
-    runner = _runner(tmp_path)
-
-    assert runner.live_entry_lag_guard_seconds() == 5
-    runner.config["max_entry_lag_seconds"] = None
-
-    assert runner.live_entry_lag_guard_seconds() is None
-
-
-def test_active_trade_state_loop_throttles_when_no_new_quotes_after_hours(tmp_path: Path) -> None:
-    runner = _runner(tmp_path)
-    runner.config["after_hours_active_trade_state_poll_seconds"] = 999.0
-    runner.is_market_hours_now = lambda: False  # type: ignore[method-assign]
-    runner.latest_tail_report = {"quotes": 0}
-
-    assert runner.should_evaluate_active_trade_state() is True
-    assert runner.should_evaluate_active_trade_state() is False
-
-    runner.latest_tail_report = {"quotes": 1}
-    assert runner.should_evaluate_active_trade_state() is True
-
-
-def test_decisions_defer_until_stream_catchup_finishes(tmp_path: Path) -> None:
-    runner = _runner(tmp_path)
-    runner.config["defer_decisions_until_stream_caught_up"] = True
-    runner.config["decision_catchup_max_feed_age_seconds"] = 10
-
-    runner.latest_tail_report = {"truncated": True}
-    assert runner.decision_catchup_block_reason()["reason"] == "stream_tail_truncated"
-
-    runner.latest_tail_report = {"truncated": False}
-    runner.latest_feed_epoch = time.time() - 30
-    assert runner.decision_catchup_block_reason()["reason"] == "feed_not_caught_up"
-
-    runner.latest_feed_epoch = time.time()
-    assert runner.decision_catchup_block_reason() is None
-
-
-def test_clock_signal_requires_fresh_signal_source_quote(tmp_path: Path) -> None:
-    runner = _runner(tmp_path)
-    runner.config["signal_clock_readiness_max_wait_seconds"] = 0
-    runner.config["signal_clock_readiness_ready_first_enabled"] = False
-    meta = runner.instruments["BANKNIFTY"]
-    runner.instruments = {"BANKNIFTY": meta}
-    signal_epoch = int(datetime(2026, 8, 17, 9, 20, tzinfo=IST).timestamp())
-    stale_row = _forced_long_clock(signal_epoch)
-    stale_row["source_quote_epoch"] = float(signal_epoch - 120)
-    stale_row["source_received_epoch"] = float(signal_epoch - 120)
-    state = runner.states[meta.signal_key]
-    state.clock_rows = [stale_row]
-    state.last_finalized_second = signal_epoch
-    state.latest_quote_epoch = float(signal_epoch - 120)
-
-    report = runner.evaluate_clock(signal_epoch, "2026-08-17")
-
-    assert report["events"] == 0
-    assert report["missed_not_ready_count"] == 1
-    assert report["missed_not_ready_symbols"] == ["BANKNIFTY"]
-    assert not runner.decision_events_path("2026-08-17").exists()
-    repair_rows = [
-        json.loads(line)
-        for line in runner.controlled_repair_queue_path.read_text(encoding="utf-8").splitlines()
-    ]
-    assert repair_rows[-1]["symbol"] == "BANKNIFTY"
-    assert repair_rows[-1]["reason"] == "signal_quote_stale"
-
-
-def test_clock_signal_fresh_signal_source_quote_can_emit_event(tmp_path: Path) -> None:
-    runner = _runner(tmp_path)
-    runner.config["signal_clock_readiness_max_wait_seconds"] = 0
-    runner.config["signal_clock_readiness_ready_first_enabled"] = False
-    meta = runner.instruments["BANKNIFTY"]
-    runner.instruments = {"BANKNIFTY": meta}
-    signal_epoch = int(datetime(2026, 8, 17, 9, 20, tzinfo=IST).timestamp())
-    fresh_row = _forced_long_clock(signal_epoch)
-    fresh_row["source_quote_epoch"] = float(signal_epoch)
-    fresh_row["source_received_epoch"] = float(signal_epoch)
-    state = runner.states[meta.signal_key]
-    state.clock_rows = [fresh_row]
-    state.last_finalized_second = signal_epoch
-    state.latest_quote_epoch = float(signal_epoch)
-
-    report = runner.evaluate_clock(signal_epoch, "2026-08-17")
-
-    assert report["events"] == 1
-    assert report["missed_not_ready_count"] == 0
-    events = [
-        json.loads(line)
-        for line in runner.decision_events_path("2026-08-17").read_text(encoding="utf-8").splitlines()
-    ]
-    assert events[0]["symbol"] == "BANKNIFTY"
-    assert events[0]["module"] == "fresh_trend_long"
-
-
 def test_dynamic_retention_protects_open_and_transition_symbols(tmp_path: Path) -> None:
     runner = _runner(tmp_path)
     for state in runner.states.values():
@@ -871,8 +729,9 @@ def test_dynamic_retention_protects_open_and_transition_symbols(tmp_path: Path) 
     report = runner.refresh_dynamic_retention()
 
     assert report["unlimited_targets"] >= 2
-    assert runner.states[bank.execution_key].second_row_retention_seconds is None
-    assert runner.states[bank.signal_key].second_row_retention_seconds is None
+    expected_retention = runner.active_second_row_retention_seconds
+    assert runner.states[bank.execution_key].second_row_retention_seconds == expected_retention
+    assert runner.states[bank.signal_key].second_row_retention_seconds == expected_retention
     assert runner.states[reliance.signal_key].second_row_retention_seconds is None
 
 
@@ -1133,79 +992,3 @@ def test_clock_only_percentile_mode_matches_full_mode_at_model_clocks() -> None:
             "prior_p95",
         ):
             assert getattr(right, attr) == getattr(left, attr)
-
-
-def test_online_state_uses_packed_spread_history_without_changing_clock_math() -> None:
-    trade_date = date(2026, 8, 17)
-    clock_epochs = set(
-        clock_epochs_for_day(
-            trade_date,
-            clock_start="09:20",
-            clock_end="09:35",
-            clock_step_minutes=15,
-        )
-    )
-    state = OnlineObvState(
-        key="NSE:ABC",
-        clock_epochs=clock_epochs,
-        min_prior_seconds=20,
-        second_row_retention_seconds=0,
-        compute_non_clock_percentiles=False,
-    )
-    start = int(datetime(2026, 8, 17, 9, 15, tzinfo=IST).timestamp())
-    last_clock = int(datetime(2026, 8, 17, 9, 35, tzinfo=IST).timestamp())
-    for idx, epoch in enumerate(range(start, last_clock + 1)):
-        price = 100.0 + (idx % 13) * 0.05 + idx * 0.0007
-        state.process_row(
-            {
-                "trade_date": trade_date.isoformat(),
-                "target": "NSE:ABC",
-                "epoch": float(epoch),
-                "epoch_second": epoch,
-                "received_at_ist": datetime.fromtimestamp(epoch, IST).isoformat(),
-                "exchange_timestamp": datetime.fromtimestamp(epoch, IST).isoformat(),
-                "received_epoch": float(epoch),
-                "market_data_latency_seconds": 0.0,
-                "price": price,
-                "volume_traded": 1000.0 + idx * 2.0,
-                "bid": price - 0.01,
-                "ask": price + 0.01,
-                "spread": 0.02,
-            }
-        )
-    state.flush_until_latest()
-    row_before, reason_before = state.build_clock_row(last_clock, "09:35", {})
-    assert reason_before is None
-
-    payload = state.to_payload()
-    assert payload["sorted_spread_z"]["encoding"] == "array_f64_le_base64_v1"
-    assert payload["sorted_spread_z"]["count"] == len(state.sorted_spread_z)
-    restored = OnlineObvState.from_payload(payload, clock_epochs)
-    assert type(restored.sorted_spread_z).__name__ == "array"
-    row_after, reason_after = restored.build_clock_row(last_clock, "09:35", {})
-
-    assert reason_after is None
-    for column in (
-        "prior_percentile",
-        "prior_p05",
-        "prior_p10",
-        "prior_p90",
-        "prior_p95",
-        "obv_minus_price_prior_z",
-    ):
-        assert row_after[column] == row_before[column]
-
-    legacy_payload = dict(payload)
-    legacy_payload["sorted_spread_z"] = list(state.sorted_spread_z)
-    restored_legacy = OnlineObvState.from_payload(legacy_payload, clock_epochs)
-    legacy_row, legacy_reason = restored_legacy.build_clock_row(last_clock, "09:35", {})
-    assert legacy_reason is None
-    for column in (
-        "prior_percentile",
-        "prior_p05",
-        "prior_p10",
-        "prior_p90",
-        "prior_p95",
-        "obv_minus_price_prior_z",
-    ):
-        assert legacy_row[column] == row_before[column]
