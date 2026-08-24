@@ -2751,6 +2751,88 @@ class PassiveV2Runner:
     def ledger_path(self, symbol: str) -> Path:
         return self.instrument_dir(symbol) / "ledger.jsonl"
 
+    def _fallback_position_signal_id(
+        self,
+        *,
+        meta: InstrumentMeta,
+        symbol: str,
+        position: dict[str, Any],
+        side: str,
+    ) -> str:
+        signal_epoch = int(as_float(position.get("signal_epoch")) or as_float(position.get("entry_epoch")) or 0)
+        return canonical_signal_id(
+            strategy_id=self.strategy_id,
+            instrument_id=symbol,
+            side=side,
+            module=str(position.get("source") or "unknown_entry"),
+            signal_epoch=signal_epoch,
+            signal_source=meta.signal_source,
+            signal_instrument_key=meta.signal_key,
+            execution_instrument_key=str(position.get("instrument_key") or meta.execution_key),
+        )
+
+    def resolve_position_identity(
+        self,
+        *,
+        symbol: str,
+        meta: InstrumentMeta,
+        position: dict[str, Any],
+        side: str,
+    ) -> tuple[str, str]:
+        position_id = str(position.get("position_id") or "").strip()
+        signal_id = str(position.get("signal_id") or "").strip()
+        if position_id or signal_id:
+            return position_id or signal_id, signal_id or position_id
+
+        entry_epoch = int(as_float(position.get("entry_epoch")) or 0)
+        entry_time = str(position.get("entry_time") or "")
+        matched: dict[str, Any] | None = None
+        for event in iter_jsonl(self.ledger_path(symbol)):
+            if event.get("event") != "paper_entry":
+                continue
+            candidate = event.get("position") if isinstance(event.get("position"), dict) else {}
+            candidate_epoch = int(as_float(candidate.get("entry_epoch") or event.get("entry_epoch")) or 0)
+            candidate_time = str(candidate.get("entry_time") or event.get("entry_time") or "")
+            candidate_side = str(candidate.get("side") or event.get("side") or "").lower()
+            if candidate_side and candidate_side != side.lower():
+                continue
+            if entry_epoch and candidate_epoch == entry_epoch:
+                matched = {**event, "position": candidate}
+            elif entry_time and candidate_time == entry_time:
+                matched = {**event, "position": candidate}
+        if matched:
+            candidate = matched.get("position") if isinstance(matched.get("position"), dict) else {}
+            position_id = str(candidate.get("position_id") or matched.get("position_id") or "").strip()
+            signal_id = str(candidate.get("signal_id") or matched.get("signal_id") or "").strip()
+            if position_id or signal_id:
+                return position_id or signal_id, signal_id or position_id
+
+        signal_id = self._fallback_position_signal_id(meta=meta, symbol=symbol, position=position, side=side)
+        return f"{signal_id}:position", signal_id
+
+    def rollover_position_identity(
+        self,
+        *,
+        symbol: str,
+        rollover_id: str,
+        side: str,
+        entry_epoch: int,
+        from_position_id: str,
+        to_meta: InstrumentMeta,
+    ) -> tuple[str, str]:
+        parts = [
+            self.strategy_id,
+            symbol,
+            side,
+            str(entry_epoch),
+            rollover_id,
+            from_position_id,
+            to_meta.execution_key,
+        ]
+        digest = hashlib.sha1("|".join(parts).encode("utf-8")).hexdigest()[:16]
+        signal_id = f"{self.strategy_id}:{symbol}:{side}:{entry_epoch}:roll:{digest}"
+        return f"{signal_id}:position", signal_id
+
     def load_model_state(self, symbol: str) -> dict[str, Any]:
         payload = read_json(self.model_state_path(symbol), {})
         return dict(payload) if isinstance(payload, dict) else {}
@@ -5765,6 +5847,14 @@ class PassiveV2Runner:
 
             position = dict(state["position"])
             side = str(position["side"])
+            source_position_id, source_signal_id = self.resolve_position_identity(
+                symbol=symbol,
+                meta=from_meta,
+                position=position,
+                side=side,
+            )
+            position["position_id"] = source_position_id
+            position["signal_id"] = source_signal_id
             entry_price = float(position["entry_price"])
             entry_fill_price = as_float(position.get("entry_fill_price")) or entry_price
             roll_exit_fill = v1_portfolio.execution_fill_from_row(
@@ -5824,6 +5914,8 @@ class PassiveV2Runner:
                 "event": "paper_exit",
                 "exit_reason": "lifecycle_rollover",
                 "rollover_id": rollover_id,
+                "position_id": source_position_id,
+                "signal_id": source_signal_id,
                 "side": side,
                 "instrument_key": from_meta.execution_key,
                 "contract_label": from_meta.execution_contract_label,
@@ -5843,6 +5935,7 @@ class PassiveV2Runner:
                 "exit_time": epoch_ist_iso(from_epoch),
                 "exit_row_time": from_row.get("received_at_ist"),
                 "exit_epoch": from_epoch,
+                "event_epoch": from_epoch,
                 "model_gross_points": v1_portfolio._signed_position_points(side, entry_price, roll_exit_price),
                 "gross_points": gross,
                 "gross_rupees": accounting["gross_rupees"],
@@ -5898,6 +5991,8 @@ class PassiveV2Runner:
                 "module": "lifecycle_rollover",
                 "side": side,
                 "rollover_id": rollover_id,
+                "from_position_id": source_position_id,
+                "from_signal_id": source_signal_id,
                 "roll_epoch": roll_epoch,
                 "roll_time_ist": active.get("roll_time_ist"),
                 "from_instrument_key": from_meta.execution_key,
@@ -5916,8 +6011,18 @@ class PassiveV2Runner:
                 if roll_entry_ltp_price is not None and roll_exit_ltp_price is not None
                 else None,
             }
+            rolled_position_id, rolled_signal_id = self.rollover_position_identity(
+                symbol=symbol,
+                rollover_id=rollover_id,
+                side=side,
+                entry_epoch=to_epoch,
+                from_position_id=source_position_id,
+                to_meta=to_meta,
+            )
             new_position = {
                 "side": side,
+                "position_id": rolled_position_id,
+                "signal_id": rolled_signal_id,
                 "instrument_key": to_meta.execution_key,
                 "contract_label": to_meta.execution_contract_label,
                 "lifecycle_start_date": to_meta.lifecycle_start_date,
@@ -5927,6 +6032,8 @@ class PassiveV2Runner:
                 "signal_contract_label": to_meta.signal_contract_label,
                 "source": "lifecycle_rollover",
                 "source_rollover_id": rollover_id,
+                "roll_from_position_id": source_position_id,
+                "roll_from_signal_id": source_signal_id,
                 "roll_from_instrument_key": from_meta.execution_key,
                 "roll_from_exit_price": roll_exit_price,
                 "roll_from_exit_ltp_price": roll_exit_ltp_price,
@@ -5972,6 +6079,18 @@ class PassiveV2Runner:
             )
             entry_event = {
                 "event": "paper_entry",
+                "position_id": rolled_position_id,
+                "signal_id": rolled_signal_id,
+                "side": side,
+                "source": "lifecycle_rollover",
+                "instrument_key": to_meta.execution_key,
+                "contract_label": to_meta.execution_contract_label,
+                "signal_source": to_meta.signal_source,
+                "signal_instrument_key": to_meta.signal_key,
+                "signal_contract_label": to_meta.signal_contract_label,
+                "entry_epoch": to_epoch,
+                "entry_time": epoch_ist_iso(to_epoch),
+                "event_epoch": to_epoch,
                 "position": new_position,
                 "rollover_id": rollover_id,
                 "created_at_ist": now_ist().isoformat(),
@@ -5979,6 +6098,15 @@ class PassiveV2Runner:
             roll_event = {
                 "event": "paper_rollover",
                 "rollover_id": rollover_id,
+                "position_id": rolled_position_id,
+                "signal_id": rolled_signal_id,
+                "from_position_id": source_position_id,
+                "from_signal_id": source_signal_id,
+                "to_position_id": rolled_position_id,
+                "to_signal_id": rolled_signal_id,
+                "event_epoch": to_epoch,
+                "entry_epoch": to_epoch,
+                "exit_epoch": from_epoch,
                 "side": side,
                 "from_instrument_key": from_meta.execution_key,
                 "to_instrument_key": to_meta.execution_key,
