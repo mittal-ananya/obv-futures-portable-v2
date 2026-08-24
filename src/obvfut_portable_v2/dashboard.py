@@ -105,6 +105,42 @@ def safe_float(value: Any) -> float | None:
         return None
 
 
+def truthy(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+    return False
+
+
+def entry_stale_reason(source: dict[str, Any], parent: dict[str, Any] | None = None) -> str:
+    parent = parent or {}
+    value = (
+        source.get("entry_stale_reason")
+        or source.get("stale_entry_reason")
+        or source.get("stale_reason")
+        or parent.get("entry_stale_reason")
+        or parent.get("stale_entry_reason")
+        or parent.get("stale_reason")
+    )
+    return str(value or "")
+
+
+def is_stale_entry(source: dict[str, Any], parent: dict[str, Any] | None = None) -> bool:
+    parent = parent or {}
+    reason = entry_stale_reason(source, parent)
+    return (
+        truthy(source.get("entry_stale"))
+        or truthy(source.get("stale_entry"))
+        or truthy(parent.get("entry_stale"))
+        or truthy(parent.get("stale_entry"))
+        or reason in {"stale_live_entry", "stale_entry_rejected"}
+        or reason.startswith("stale_")
+    )
+
+
 def parse_epoch(value: Any) -> int | None:
     try:
         if value is None:
@@ -316,6 +352,9 @@ def normalize_row(
         "performance_variant": source.get("performance_variant") or parent.get("performance_variant"),
         "threshold_source": source.get("threshold_source") or parent.get("threshold_source"),
         "threshold_synthesized": bool(source.get("threshold_synthesized") or parent.get("threshold_synthesized")),
+        "entry_stale": is_stale_entry(source, parent),
+        "entry_stale_reason": entry_stale_reason(source, parent) or None,
+        "entry_staleness_seconds": safe_float(source.get("entry_staleness_seconds") or parent.get("entry_staleness_seconds")),
         **adaptive_fields(symbol, source, parent),
     }
 
@@ -325,6 +364,7 @@ def load_rows() -> dict[str, Any]:
     margins = load_margin_lookup()
     adaptive_lookup = load_adaptive_lookup()
     rows_by_tranche: dict[str, list[dict[str, Any]]] = {"T1": [], "T2": [], "T3": []}
+    stale_suppressed_open_positions: list[dict[str, Any]] = []
     seen: set[tuple[Any, ...]] = set()
     instrument_dirs = [p for p in sorted((STATE_DIR / "instruments").glob("*")) if p.is_dir()]
 
@@ -355,38 +395,72 @@ def load_rows() -> dict[str, Any]:
         seen.add(key)
         rows_by_tranche.setdefault(str(row.get("tranche")), []).append(row)
 
+    def record_stale_open_position(symbol: str, position: dict[str, Any]) -> None:
+        ttsl = position.get("two_lot_ttsl") if isinstance(position.get("two_lot_ttsl"), dict) else {}
+        tranche2 = ttsl.get("tranche2") if isinstance(ttsl.get("tranche2"), dict) else {}
+        tranche3 = position.get("tranche3") if isinstance(position.get("tranche3"), dict) else {}
+        has_t2 = bool(tranche2 and tranche2.get("status") != "closed")
+        has_t3 = bool(tranche3 and parse_epoch(tranche3.get("entry_epoch")) is not None and tranche3.get("status") != "closed")
+        tranches = ["T1"]
+        if has_t2:
+            tranches.append("T2")
+        if has_t3:
+            tranches.append("T3")
+        stale_suppressed_open_positions.append(
+            {
+                "symbol": symbol,
+                "position_id": position.get("position_id"),
+                "signal_id": position.get("signal_id"),
+                "side": position.get("side"),
+                "entry_time": position.get("entry_time"),
+                "entry_epoch": parse_epoch(position.get("entry_epoch")),
+                "entry_price": safe_float(position.get("entry_price")),
+                "entry_fill_price": safe_float(position.get("entry_fill_price")),
+                "entry_stale": True,
+                "entry_stale_reason": entry_stale_reason(position) or "stale_live_entry",
+                "entry_staleness_seconds": safe_float(position.get("entry_staleness_seconds")),
+                "has_t1": True,
+                "has_t2": has_t2,
+                "has_t3": has_t3,
+                "tranches": tranches,
+            }
+        )
+
     for instrument_dir in instrument_dirs:
         symbol = instrument_dir.name
         model = read_json(instrument_dir / "model_state.json", {})
         if isinstance(model, dict):
             position = model.get("position")
             if isinstance(position, dict) and position:
-                add(normalize_row(symbol=symbol, tranche="T1", source=position, status="open", margins=margins))
-                ttsl = position.get("two_lot_ttsl") if isinstance(position.get("two_lot_ttsl"), dict) else {}
-                tranche2 = ttsl.get("tranche2") if isinstance(ttsl.get("tranche2"), dict) else {}
-                if tranche2 and tranche2.get("status") != "closed":
-                    add(
-                        normalize_row(
-                            symbol=symbol,
-                            tranche="T2",
-                            source=tranche2,
-                            status="open",
-                            margins=margins,
-                            parent=position,
+                if is_stale_entry(position):
+                    record_stale_open_position(symbol, position)
+                else:
+                    add(normalize_row(symbol=symbol, tranche="T1", source=position, status="open", margins=margins))
+                    ttsl = position.get("two_lot_ttsl") if isinstance(position.get("two_lot_ttsl"), dict) else {}
+                    tranche2 = ttsl.get("tranche2") if isinstance(ttsl.get("tranche2"), dict) else {}
+                    if tranche2 and tranche2.get("status") != "closed":
+                        add(
+                            normalize_row(
+                                symbol=symbol,
+                                tranche="T2",
+                                source=tranche2,
+                                status="open",
+                                margins=margins,
+                                parent=position,
+                            )
                         )
-                    )
-                tranche3 = position.get("tranche3") if isinstance(position.get("tranche3"), dict) else {}
-                if tranche3 and parse_epoch(tranche3.get("entry_epoch")) is not None and tranche3.get("status") != "closed":
-                    add(
-                        normalize_row(
-                            symbol=symbol,
-                            tranche="T3",
-                            source=tranche3,
-                            status="open",
-                            margins=margins,
-                            parent=position,
+                    tranche3 = position.get("tranche3") if isinstance(position.get("tranche3"), dict) else {}
+                    if tranche3 and parse_epoch(tranche3.get("entry_epoch")) is not None and tranche3.get("status") != "closed":
+                        add(
+                            normalize_row(
+                                symbol=symbol,
+                                tranche="T3",
+                                source=tranche3,
+                                status="open",
+                                margins=margins,
+                                parent=position,
+                            )
                         )
-                    )
 
         for event in iter_jsonl(instrument_dir / "ledger.jsonl"):
             event_type = event.get("event")
@@ -427,6 +501,10 @@ def load_rows() -> dict[str, Any]:
         "instrument_dirs": len(instrument_dirs),
         "instrument_symbols": [path.name for path in instrument_dirs],
         "adaptive_lookup": adaptive_lookup,
+        "stale_suppressed_open_positions": sorted(
+            stale_suppressed_open_positions,
+            key=lambda r: (str(r.get("symbol")), parse_epoch(r.get("entry_epoch")) or 0),
+        ),
         "rows_by_tranche": {k: sorted(v, key=lambda r: (r.get("entry_epoch") or 0, r.get("exit_epoch") or 0)) for k, v in rows_by_tranche.items()},
         "rows": sorted(all_rows, key=lambda r: (r.get("entry_epoch") or 0, r.get("tranche") or "", r.get("exit_epoch") or 0)),
     }
@@ -497,6 +575,15 @@ def build_snapshot() -> dict[str, Any]:
     by_tranche = loaded["rows_by_tranche"]
     summary = summarize(rows)
     tranche_summary = {tranche: summarize(items) for tranche, items in by_tranche.items()}
+    stale_suppressed_open_positions = loaded.get("stale_suppressed_open_positions", [])
+    stale_suppressed_by_tranche = {
+        "T1": sum(1 for item in stale_suppressed_open_positions if item.get("has_t1")),
+        "T2": sum(1 for item in stale_suppressed_open_positions if item.get("has_t2")),
+        "T3": sum(1 for item in stale_suppressed_open_positions if item.get("has_t3")),
+    }
+    summary["stale_suppressed_open_count"] = len(stale_suppressed_open_positions)
+    for tranche, count in stale_suppressed_by_tranche.items():
+        tranche_summary.setdefault(tranche, {})["stale_suppressed_open_count"] = count
     margins = margin_timeline(rows)
     by_symbol: dict[str, dict[str, Any]] = {}
     for symbol in loaded.get("instrument_symbols", []):
@@ -537,6 +624,9 @@ def build_snapshot() -> dict[str, Any]:
         "margin": margins,
         "rows": rows,
         "open_positions": sorted([r for r in rows if r.get("status") == "open"], key=lambda r: (str(r.get("symbol")), str(r.get("tranche")))),
+        "stale_suppressed_open_positions": stale_suppressed_open_positions,
+        "stale_suppressed_by_tranche": stale_suppressed_by_tranche,
+        "stale_suppressed_open_count": len(stale_suppressed_open_positions),
         "transactions": sorted([r for r in rows if r.get("status") == "closed"], key=lambda r: (r.get("exit_epoch") or 0, r.get("entry_epoch") or 0), reverse=True),
         "symbols": sorted(by_symbol.values(), key=lambda item: item["symbol"]),
         "runner_status": status,
@@ -678,6 +768,10 @@ def dashboard_html() -> str:
       <h2>Tranche Performance</h2>
       <div class="table-wrap"><table id="trancheTable"></table></div>
     </section>
+    <section>
+      <h2>Suppressed Stale Entries</h2>
+      <div class="table-wrap"><table id="staleTable"></table></div>
+    </section>
     <footer>V2 dashboard reads only OBVFUTPORT-v2 state and does not write ledgers, orders, Compass, or v1 state.</footer>
   </main>
   <script>
@@ -720,6 +814,7 @@ def dashboard_html() -> str:
         card('Peak Margin', money(m.peak_margin_rupees)),
         card('Closed Success', pct(s.success_rate_pct)),
         card('Open Legs', String(s.open)),
+        card('Suppressed Stale Opens', String(snapshot.stale_suppressed_open_count || 0), 'small'),
         card('Closed Legs', String(s.closed)),
         card('Symbols', String(snapshot.instrument_count)),
         card('Adaptive Symbols', String(adaptiveSymbols)),
@@ -736,6 +831,25 @@ def dashboard_html() -> str:
         <td>${pct(s.avg_net_pct_margin)}</td><td>${pct(s.median_net_pct_margin)}</td></tr>`).join('');
       document.getElementById('trancheTable').innerHTML =
         `<thead><tr><th>Tranche</th><th>Closed</th><th>Open</th><th>Success</th><th>Closed Net</th><th>Open MTM</th><th>Total Net</th><th>Avg % Margin</th><th>Median % Margin</th></tr></thead><tbody>${rows}</tbody>`;
+    }
+    function renderStaleSuppressed(){
+      const rows = snapshot.stale_suppressed_open_positions || [];
+      if(!rows.length){
+        document.getElementById('staleTable').innerHTML = '<tbody><tr><td class="empty">No suppressed stale entries</td></tr></tbody>';
+        return;
+      }
+      const body = rows.map(r => `<tr>
+        <td><strong>${r.symbol}</strong></td>
+        <td>${String(r.side || '').toUpperCase()}</td>
+        <td>${Array.isArray(r.tranches) ? r.tranches.map(x => `<span class="tag">${x}</span>`).join(' ') : '--'}</td>
+        <td class="mono">${t(r.entry_time)}</td>
+        <td>${price(r.entry_fill_price || r.entry_price)}</td>
+        <td>${r.entry_staleness_seconds == null ? '--' : pctFmt.format(Number(r.entry_staleness_seconds)) + 's'}</td>
+        <td>${r.entry_stale_reason || '--'}</td>
+        <td class="mono">${r.position_id || '--'}</td>
+      </tr>`).join('');
+      document.getElementById('staleTable').innerHTML =
+        `<thead><tr><th>Symbol</th><th>Side</th><th>Suppressed Legs</th><th>Entry Time</th><th>Entry Fill</th><th>Stale By</th><th>Reason</th><th>Position Id</th></tr></thead><tbody>${body}</tbody>`;
     }
     function populateSymbols(){
       const select=document.getElementById('symbol');
@@ -784,7 +898,7 @@ def dashboard_html() -> str:
       snapshot = await res.json();
       document.getElementById('health').textContent = 'Dashboard Live';
       document.getElementById('stamp').textContent = new Date(snapshot.created_at_utc).toLocaleString('en-IN', {hour12:false});
-      renderCards(); populateSymbols(); renderRows(); renderTranches();
+      renderCards(); populateSymbols(); renderRows(); renderTranches(); renderStaleSuppressed();
     }
     document.querySelectorAll('button[data-filter]').forEach(btn => btn.addEventListener('click', () => {
       filter = btn.dataset.filter;

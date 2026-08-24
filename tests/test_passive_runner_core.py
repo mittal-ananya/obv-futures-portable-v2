@@ -7,6 +7,7 @@ from dataclasses import replace
 from datetime import date, datetime
 from pathlib import Path
 
+import obvfut_portable_v2.passive_runner as passive_runner_module
 from obvfut_portable_v2.passive_runner import (
     IST,
     OnlineObvState,
@@ -26,6 +27,7 @@ from obvfut_portable_v2.passive_runner import (
 
 
 def _runner(tmp_path: Path) -> PassiveV2Runner:
+    passive_runner_module.now_ist = lambda: datetime(2026, 8, 17, 9, 0, tzinfo=IST)
     config = json.loads((Path(__file__).resolve().parents[1] / "config" / "runtime.json").read_text())
     config["state_dir"] = str(tmp_path)
     config["state_dir_local"] = str(tmp_path)
@@ -728,11 +730,12 @@ def test_dynamic_retention_protects_open_and_transition_symbols(tmp_path: Path) 
 
     report = runner.refresh_dynamic_retention()
 
-    assert report["unlimited_targets"] >= 2
+    assert report["changed"] >= 2
+    assert report["unlimited_targets"] == 0
     expected_retention = runner.active_second_row_retention_seconds
     assert runner.states[bank.execution_key].second_row_retention_seconds == expected_retention
     assert runner.states[bank.signal_key].second_row_retention_seconds == expected_retention
-    assert runner.states[reliance.signal_key].second_row_retention_seconds is None
+    assert runner.states[reliance.signal_key].second_row_retention_seconds == runner.transition_second_row_retention_seconds
 
 
 def test_v1_contract_state_exposes_v53_diagnostic_edges(tmp_path: Path) -> None:

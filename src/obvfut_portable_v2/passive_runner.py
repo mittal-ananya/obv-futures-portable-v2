@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import base64
 import bisect
+import csv
 import gzip
 import hashlib
 import importlib
@@ -167,11 +168,105 @@ def read_json(path: Path, default: Any) -> Any:
         return default
 
 
+def truthy(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def load_holiday_dates(path: Path) -> set[date]:
+    if not path.exists():
+        return set()
+    holidays: set[date] = set()
+    try:
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                values: list[str] = []
+                for key in ("date", "holiday_date", "trading_holiday", "day"):
+                    if row.get(key):
+                        values.append(str(row[key]))
+                values.extend(str(value) for value in row.values() if value)
+                for value in values:
+                    try:
+                        holidays.add(date.fromisoformat(value.strip()[:10]))
+                        break
+                    except Exception:
+                        continue
+    except Exception:
+        return set()
+    return holidays
+
+
 def synthesized_september_future_key(fut_key: str) -> str | None:
     key = str(fut_key or "")
     if not key.endswith("26AUGFUT"):
         return None
     return f"{key[:-len('26AUGFUT')]}26SEPFUT"
+
+
+def load_contract_chain_manifest(config: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    path = resolve_config_path(config, "contract_chain_manifest_path", "contract_chain_manifest_path_local")
+    payload = read_json(path, {})
+    raw_symbols = payload.get("symbols") if isinstance(payload, dict) else {}
+    if not isinstance(raw_symbols, dict):
+        return {}
+    out: dict[str, list[dict[str, Any]]] = {}
+    for symbol, item in raw_symbols.items():
+        raw_contracts = item.get("contracts") if isinstance(item, dict) else item
+        if not isinstance(raw_contracts, list):
+            continue
+        contracts: list[dict[str, Any]] = []
+        for contract in raw_contracts:
+            if not isinstance(contract, dict):
+                continue
+            key = str(contract.get("instrument_key") or "")
+            expiry = str(contract.get("expiry_date") or contract.get("expiry") or "")
+            if not key or not expiry:
+                continue
+            payload_contract = dict(contract)
+            payload_contract["instrument_key"] = key
+            payload_contract["expiry_date"] = expiry
+            payload_contract["label"] = str(payload_contract.get("label") or contract_label_from_expiry(expiry))
+            contracts.append(payload_contract)
+        if contracts:
+            out[str(symbol)] = sorted(contracts, key=lambda row: str(row.get("expiry_date") or ""))
+    return out
+
+
+def contract_label_from_expiry(expiry: str) -> str:
+    try:
+        month = date.fromisoformat(str(expiry)).strftime("%B").lower()
+    except Exception:
+        month = "future"
+    return f"{month}_shadow"
+
+
+def merge_contract_chain_with_manifest(
+    chain: list[dict[str, Any]],
+    manifest_chain: list[dict[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    if not manifest_chain:
+        return [dict(contract) for contract in chain if isinstance(contract, dict)]
+    by_key: dict[str, dict[str, Any]] = {}
+    for contract in chain:
+        if not isinstance(contract, dict):
+            continue
+        key = str(contract.get("instrument_key") or "")
+        if key:
+            by_key[key] = dict(contract)
+    for contract in manifest_chain:
+        key = str(contract.get("instrument_key") or "")
+        if not key:
+            continue
+        existing = by_key.get(key, {})
+        merged = dict(contract)
+        merged.update(existing)
+        merged["instrument_key"] = key
+        merged["expiry_date"] = str(merged.get("expiry_date") or contract.get("expiry_date") or "")
+        merged["label"] = str(merged.get("label") or contract_label_from_expiry(str(merged.get("expiry_date") or "")))
+        by_key[key] = merged
+    return sorted(by_key.values(), key=lambda row: str(row.get("expiry_date") or ""))
 
 
 def load_key_manifest(config: dict[str, Any], primary_key: str, local_key: str | None = None) -> set[str]:
@@ -1422,43 +1517,64 @@ def is_model_clock_epoch(epoch: int, clock_epochs: set[int]) -> bool:
     return int(epoch) in clock_epochs
 
 
-def previous_weekday(day: date) -> date:
+def previous_trading_day(day: date, holidays: set[date] | None = None) -> date:
+    holiday_dates = holidays or set()
     current = day - timedelta(days=1)
-    while current.weekday() >= 5:
+    while current.weekday() >= 5 or current in holiday_dates:
         current -= timedelta(days=1)
     return current
 
 
-def contract_lifecycle_start(chain: list[dict[str, Any]], index: int) -> str | None:
+def contract_lifecycle_start(
+    chain: list[dict[str, Any]],
+    index: int,
+    holidays: set[date] | None = None,
+) -> str | None:
     item = chain[index]
     if item.get("baseline_start_date"):
         return str(item["baseline_start_date"])
+    if item.get("lifecycle_start_date"):
+        return str(item["lifecycle_start_date"])
     if index <= 0:
         return None
     expiry = chain[index - 1].get("expiry_date")
-    return previous_weekday(date.fromisoformat(str(expiry))).isoformat() if expiry else None
+    return previous_trading_day(date.fromisoformat(str(expiry)), holidays).isoformat() if expiry else None
 
 
-def contract_roll_datetime(chain: list[dict[str, Any]], index: int, roll_time_ist: str | None) -> datetime:
+def contract_roll_datetime(
+    chain: list[dict[str, Any]],
+    index: int,
+    roll_time_ist: str | None,
+    holidays: set[date] | None = None,
+) -> datetime:
     item = chain[index]
     roll_date = item.get("roll_date")
     if not roll_date:
-        roll_date = previous_weekday(date.fromisoformat(str(item["expiry_date"]))).isoformat()
+        roll_date = previous_trading_day(date.fromisoformat(str(item["expiry_date"])), holidays).isoformat()
     hh, mm = parse_hhmm(str(roll_time_ist or "15:25"))
     return datetime(date.fromisoformat(str(roll_date)).year, date.fromisoformat(str(roll_date)).month, date.fromisoformat(str(roll_date)).day, hh, mm, tzinfo=IST)
 
 
-def current_contract_index(chain: list[dict[str, Any]], when: datetime, roll_time_ist: str | None) -> int:
+def current_contract_index(
+    chain: list[dict[str, Any]],
+    when: datetime,
+    roll_time_ist: str | None,
+    holidays: set[date] | None = None,
+) -> int:
     if not chain:
         return 0
     current = 0
     for index in range(len(chain) - 1):
-        if when >= contract_roll_datetime(chain, index, roll_time_ist):
+        if when >= contract_roll_datetime(chain, index, roll_time_ist, holidays):
             current = index + 1
     return current
 
 
-def lifecycle_status_from_meta(meta: "InstrumentMeta", when: datetime | None = None) -> dict[str, Any]:
+def lifecycle_status_from_meta(
+    meta: "InstrumentMeta",
+    when: datetime | None = None,
+    holidays: set[date] | None = None,
+) -> dict[str, Any]:
     when = when or now_ist()
     chain = list(meta.contract_chain or [])
     if not chain:
@@ -1467,7 +1583,7 @@ def lifecycle_status_from_meta(meta: "InstrumentMeta", when: datetime | None = N
     rollovers: list[dict[str, Any]] = []
     active_rollover: dict[str, Any] | None = None
     for index in range(len(chain) - 1):
-        roll_dt = contract_roll_datetime(chain, index, meta.roll_execution_time_ist)
+        roll_dt = contract_roll_datetime(chain, index, meta.roll_execution_time_ist, holidays)
         roll = {
             "rollover_id": f"{chain[index]['instrument_key']}->{chain[index + 1]['instrument_key']}@{roll_dt.isoformat()}",
             "from_index": index,
@@ -1481,7 +1597,7 @@ def lifecycle_status_from_meta(meta: "InstrumentMeta", when: datetime | None = N
             "roll_datetime_ist": roll_dt.isoformat(),
             "roll_date": roll_dt.date().isoformat(),
             "roll_time_ist": roll_dt.strftime("%H:%M"),
-            "next_lifecycle_start_date": contract_lifecycle_start(chain, index + 1),
+            "next_lifecycle_start_date": contract_lifecycle_start(chain, index + 1, holidays),
             "status": "due" if when >= roll_dt else "pending",
         }
         rollovers.append(roll)
@@ -1491,13 +1607,13 @@ def lifecycle_status_from_meta(meta: "InstrumentMeta", when: datetime | None = N
     shadow_index = current_index + 1 if current_index + 1 < len(chain) else None
     return {
         "enabled": True,
-        "policy": "next_contract_baseline_start = one trading day before current_contract_expiry",
+        "policy": "next_contract_baseline_start = previous NSE trading day before current_contract_expiry",
         "current_index": current_index,
         "shadow_index": shadow_index,
         "current_contract": chain[current_index]["instrument_key"],
         "shadow_contract": chain[shadow_index]["instrument_key"] if shadow_index is not None else None,
-        "current_lifecycle_start_date": contract_lifecycle_start(chain, current_index),
-        "shadow_lifecycle_start_date": contract_lifecycle_start(chain, shadow_index)
+        "current_lifecycle_start_date": contract_lifecycle_start(chain, current_index, holidays),
+        "shadow_lifecycle_start_date": contract_lifecycle_start(chain, shadow_index, holidays)
         if shadow_index is not None
         else None,
         "active_rollover": active_rollover,
@@ -2240,8 +2356,20 @@ class PassiveV2Runner:
         self.active_second_row_retention_seconds = retention_seconds_from_config(
             self.config.get("active_second_row_retention_seconds")
         )
+        self.shadow_lifecycle_second_row_retention_seconds = retention_seconds_from_config(
+            self.config.get("shadow_lifecycle_second_row_retention_seconds")
+            if self.config.get("shadow_lifecycle_second_row_retention_seconds") is not None
+            else 27000
+        )
+        self.lifecycle_reset_second_row_retention_seconds = retention_seconds_from_config(
+            self.config.get("lifecycle_reset_second_row_retention_seconds")
+            if self.config.get("lifecycle_reset_second_row_retention_seconds") is not None
+            else self.active_second_row_retention_seconds
+        )
         self.transition_second_row_retention_seconds = retention_seconds_from_config(
             self.config.get("transition_second_row_retention_seconds")
+            if self.config.get("transition_second_row_retention_seconds") is not None
+            else self.active_second_row_retention_seconds
         )
         self.compute_non_clock_percentiles = bool(self.config.get("compute_non_clock_percentiles", True))
         self.clock_start = str(self.config.get("clock_start_ist") or "09:20")
@@ -2250,6 +2378,9 @@ class PassiveV2Runner:
         self.market_start = parse_hhmmss(str(self.config.get("market_start_ist") or "09:15:00"))
         self.market_end = parse_hhmmss(str(self.config.get("market_end_ist") or "15:30:00"))
         self.today = now_ist().date()
+        self.holiday_dates = load_holiday_dates(
+            resolve_config_path(self.config, "holiday_calendar_path", "holiday_calendar_path_local")
+        )
         self.clock_epochs = set(
             clock_epochs_for_day(
                 self.today,
@@ -2324,6 +2455,7 @@ class PassiveV2Runner:
             "synthesized_shadow_keys_path",
             "synthesized_shadow_keys_path_local",
         )
+        contract_chain_manifest = load_contract_chain_manifest(self.config)
         require_shadow_manifest = bool(self.config.get("require_synthesized_shadow_key_in_manifest", False))
         adaptive_overrides = self.load_adaptive_calibrations()
         out: dict[str, InstrumentMeta] = {}
@@ -2333,9 +2465,12 @@ class PassiveV2Runner:
             if symbol in v1_by_symbol:
                 item = dict(v1_by_symbol[symbol])
                 contracts = ((item.get("contract_lifecycle") or {}).get("contracts") or [])
-                chain = [dict(contract) for contract in contracts if isinstance(contract, dict)]
+                chain = merge_contract_chain_with_manifest(
+                    [dict(contract) for contract in contracts if isinstance(contract, dict)],
+                    contract_chain_manifest.get(symbol),
+                )
                 roll_time = str((item.get("contract_lifecycle") or {}).get("roll_execution_time_ist") or "15:25")
-                current_index = current_contract_index(chain, now_ist(), roll_time) if chain else 0
+                current_index = current_contract_index(chain, now_ist(), roll_time, self.holiday_dates) if chain else 0
                 current_contract = dict(chain[current_index]) if chain else {}
                 shadow_index = current_index + 1 if chain and current_index + 1 < len(chain) else None
                 shadow_contract = dict(chain[shadow_index]) if shadow_index is not None else {}
@@ -2380,7 +2515,7 @@ class PassiveV2Runner:
                     execution_point_config=execution_point_config,
                     signal_contract_label=f"{current_label}_cash_signal" if signal_source == "cash" else current_label,
                     execution_contract_label=current_label,
-                    lifecycle_start_date=contract_lifecycle_start(chain, current_index) if chain else current_contract.get("baseline_start_date") or self.config.get("new_symbol_baseline_start_date"),
+                    lifecycle_start_date=contract_lifecycle_start(chain, current_index, self.holiday_dates) if chain else current_contract.get("baseline_start_date") or self.config.get("new_symbol_baseline_start_date"),
                     expiry_date=current_contract.get("expiry_date") or entry.get("expiry"),
                     round_trip_cost_points=as_float(item.get("round_trip_cost_points")) or as_float(self.config.get("fallback_round_trip_cost_points")) or 1.0,
                     contract_chain=chain,
@@ -2412,7 +2547,7 @@ class PassiveV2Runner:
                 signal_key = fut_key
                 signal_contract_label = "august_main"
                 shadow_signal_key = sep_fut_key
-            contract_chain = [
+            base_contract_chain = [
                 {
                     "label": "august_main",
                     "instrument_key": fut_key,
@@ -2421,13 +2556,28 @@ class PassiveV2Runner:
                 }
             ]
             if sep_fut_key:
-                contract_chain.append(
+                base_contract_chain.append(
                     {
                         "label": "september_shadow",
                         "instrument_key": sep_fut_key,
                         "expiry_date": str(self.config.get("synthesized_september_expiry_date") or "2026-09-29"),
                     }
                 )
+            contract_chain = merge_contract_chain_with_manifest(base_contract_chain, contract_chain_manifest.get(symbol))
+            current_index = current_contract_index(contract_chain, now_ist(), "15:25", self.holiday_dates) if contract_chain else 0
+            current_contract = dict(contract_chain[current_index]) if contract_chain else {}
+            shadow_index = current_index + 1 if contract_chain and current_index + 1 < len(contract_chain) else None
+            shadow_contract = dict(contract_chain[shadow_index]) if shadow_index is not None else {}
+            current_key = str(current_contract.get("instrument_key") or fut_key)
+            current_label = str(current_contract.get("label") or "current")
+            shadow_execution_key = str(shadow_contract.get("instrument_key") or "") or None
+            shadow_signal_key = str(cash_key) if signal_source == "cash" and shadow_execution_key else shadow_execution_key
+            if signal_source == "futures":
+                signal_key = current_key
+                signal_contract_label = current_label
+            else:
+                signal_key = str(cash_key)
+                signal_contract_label = f"{current_label}_cash_signal"
             signal_point_config, execution_point_config, adaptive_meta = self.apply_adaptive_calibration(
                 symbol,
                 signal_point_config,
@@ -2439,7 +2589,7 @@ class PassiveV2Runner:
                 display_name=symbol,
                 signal_source=signal_source,
                 signal_key=signal_key,
-                execution_key=fut_key,
+                execution_key=current_key,
                 cash_key=str(cash_key) if cash_key else None,
                 lot_size=int(entry.get("lot_size") or 1),
                 margin_long=as_float(entry.get("margin_long")),
@@ -2448,16 +2598,25 @@ class PassiveV2Runner:
                 signal_point_config=signal_point_config,
                 execution_point_config=execution_point_config,
                 signal_contract_label=signal_contract_label,
-                execution_contract_label="august_main",
-                lifecycle_start_date=str(self.config.get("new_symbol_baseline_start_date") or "2026-08-10"),
-                expiry_date=str(entry.get("expiry") or "2026-08-25"),
+                execution_contract_label=current_label,
+                lifecycle_start_date=contract_lifecycle_start(contract_chain, current_index, self.holiday_dates) if contract_chain else str(self.config.get("new_symbol_baseline_start_date") or "2026-08-10"),
+                expiry_date=str(current_contract.get("expiry_date") or entry.get("expiry") or "2026-08-25"),
                 round_trip_cost_points=as_float(entry.get("round_trip_cost_points")) or as_float(self.config.get("fallback_round_trip_cost_points")) or 1.0,
                 contract_chain=contract_chain,
-                current_contract_index=0,
-                shadow_execution_key=sep_fut_key,
+                current_contract_index=current_index,
+                shadow_execution_key=shadow_execution_key,
                 shadow_signal_key=shadow_signal_key,
                 roll_execution_time_ist="15:25",
-                target_keys=[str(key) for key in {signal_key, fut_key, sep_fut_key, cash_key} if key],
+                target_keys=[
+                    str(key)
+                    for key in {
+                        signal_key,
+                        current_key,
+                        cash_key,
+                        *[contract.get("instrument_key") for contract in contract_chain],
+                    }
+                    if key
+                ],
                 source="hurst_manifest_synthesized",
                 synthesized=True,
                 adaptive_calibration=adaptive_meta,
@@ -2631,7 +2790,7 @@ class PassiveV2Runner:
             execution_key=execution_key,
             signal_contract_label=signal_label,
             execution_contract_label=label,
-            lifecycle_start_date=contract_lifecycle_start(chain, index),
+            lifecycle_start_date=contract_lifecycle_start(chain, index, self.holiday_dates),
             expiry_date=str(contract.get("expiry_date")) if contract.get("expiry_date") else None,
             current_contract_index=index,
             shadow_execution_key=shadow_execution_key,
@@ -2700,6 +2859,24 @@ class PassiveV2Runner:
             return None
         return max(int(current), int(candidate))
 
+    def position_is_stale_rejected(self, position: dict[str, Any]) -> bool:
+        if not isinstance(position, dict):
+            return False
+        if truthy(position.get("entry_stale")):
+            return True
+        reason = str(position.get("entry_stale_reason") or position.get("stale_entry_reason") or "")
+        return reason in {"retained_window_late_fill", "stale_entry_rejected", "stale_live_entry"} or reason.startswith("stale_")
+
+    def position_counts_as_active(self, position: dict[str, Any]) -> bool:
+        if not isinstance(position, dict):
+            return False
+        if (
+            bool(self.config.get("ignore_stale_open_positions_for_live_retention", True))
+            and self.position_is_stale_rejected(position)
+        ):
+            return False
+        return True
+
     def desired_retention_by_key(self) -> dict[str, int | None]:
         retention = {key: self.flat_second_row_retention_seconds for key in self.targets}
         for symbol, meta in self.instruments.items():
@@ -2716,7 +2893,7 @@ class PassiveV2Runner:
                 and last_closed.get("exit_reason") == "post_signal_hard_exhaustion"
             )
 
-            if isinstance(position, dict):
+            if isinstance(position, dict) and self.position_counts_as_active(position):
                 for key in {
                     str(position.get("instrument_key") or meta.execution_key),
                     str(position.get("signal_instrument_key") or meta.signal_key),
@@ -2739,11 +2916,14 @@ class PassiveV2Runner:
             chain = list(meta.contract_chain or [])
             shadow_index = meta.current_contract_index + 1 if meta.current_contract_index + 1 < len(chain) else None
             if shadow_index is not None:
-                shadow_start = contract_lifecycle_start(chain, shadow_index)
+                shadow_start = contract_lifecycle_start(chain, shadow_index, self.holiday_dates)
                 if shadow_start and now_ist().date().isoformat() >= shadow_start:
                     for key in {meta.shadow_execution_key, meta.shadow_signal_key}:
                         if key and key in retention:
-                            retention[key] = None
+                            retention[key] = self._wider_retention(
+                                retention[key],
+                                self.shadow_lifecycle_second_row_retention_seconds,
+                            )
         return retention
 
     def refresh_dynamic_retention(self) -> dict[str, Any]:
@@ -2765,6 +2945,7 @@ class PassiveV2Runner:
             "flat_retention_seconds": self.flat_second_row_retention_seconds,
             "pending_retention_seconds": self.pending_second_row_retention_seconds,
             "active_retention_seconds": self.active_second_row_retention_seconds,
+            "shadow_lifecycle_retention_seconds": self.shadow_lifecycle_second_row_retention_seconds,
             "transition_retention_seconds": self.transition_second_row_retention_seconds,
         }
 
@@ -2802,7 +2983,7 @@ class PassiveV2Runner:
                             keys.add(key)
             chain = list(meta.contract_chain or [])
             shadow_index = meta.current_contract_index + 1 if meta.current_contract_index + 1 < len(chain) else None
-            shadow_start = contract_lifecycle_start(chain, shadow_index) if shadow_index is not None else None
+            shadow_start = contract_lifecycle_start(chain, shadow_index, self.holiday_dates) if shadow_index is not None else None
             should_load_shadow = load_shadow or (
                 load_shadow_on_lifecycle and shadow_start is not None and today_text >= str(shadow_start)
             )
@@ -2945,6 +3126,14 @@ class PassiveV2Runner:
 
     def is_market_hours_now(self) -> bool:
         current = now_ist().time()
+        start = current.replace(hour=self.market_start[0], minute=self.market_start[1], second=self.market_start[2], microsecond=0)
+        end = current.replace(hour=self.market_end[0], minute=self.market_end[1], second=self.market_end[2], microsecond=0)
+        return start <= current <= end
+
+    def is_market_hours_epoch(self, epoch: int | float | None) -> bool:
+        if epoch is None:
+            return self.is_market_hours_now()
+        current = datetime.fromtimestamp(float(epoch), tz=IST).time()
         start = current.replace(hour=self.market_start[0], minute=self.market_start[1], second=self.market_start[2], microsecond=0)
         end = current.replace(hour=self.market_end[0], minute=self.market_end[1], second=self.market_end[2], microsecond=0)
         return start <= current <= end
@@ -3093,7 +3282,7 @@ class PassiveV2Runner:
         entry_delay_seconds: int,
     ) -> tuple[dict[str, Any], int]:
         max_lag = self.live_entry_fill_acceptance_seconds()
-        if max_lag is None or not self.is_market_hours_now():
+        if max_lag is None or not self.is_market_hours_epoch(evaluation_epoch):
             return signal_contract_state, 0
         edges = signal_contract_state.get("entry_edges_today")
         if not isinstance(edges, list) or not edges:
@@ -3127,7 +3316,7 @@ class PassiveV2Runner:
         entry_delay_seconds: int,
     ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
         max_lag = self.live_entry_fill_acceptance_seconds()
-        if max_lag is None or not self.is_market_hours_now():
+        if max_lag is None or not self.is_market_hours_epoch(evaluation_epoch):
             return model_state, events
         for event in events:
             if not isinstance(event, dict) or event.get("event") != "paper_entry":
@@ -3135,10 +3324,27 @@ class PassiveV2Runner:
             position = event.get("position") if isinstance(event.get("position"), dict) else {}
             due_epoch = self._entry_due_epoch(position, entry_delay_seconds)
             entry_epoch = as_float(position.get("entry_epoch"))
+            position_marked_stale = self.position_is_stale_rejected(position) or truthy(event.get("entry_stale"))
             if due_epoch is None or entry_epoch is None:
-                continue
-            fill_delay_seconds = int(entry_epoch) - int(due_epoch)
-            if fill_delay_seconds <= int(max_lag):
+                if not position_marked_stale:
+                    continue
+                fill_delay_seconds = int(
+                    as_float(position.get("entry_staleness_seconds"))
+                    or as_float(event.get("entry_staleness_seconds"))
+                    or 0
+                )
+            else:
+                fill_delay_seconds = int(entry_epoch) - int(due_epoch)
+                if position_marked_stale:
+                    fill_delay_seconds = max(
+                        fill_delay_seconds,
+                        int(
+                            as_float(position.get("entry_staleness_seconds"))
+                            or as_float(event.get("entry_staleness_seconds"))
+                            or 0
+                        ),
+                    )
+            if not position_marked_stale and fill_delay_seconds <= int(max_lag):
                 continue
             signal_epoch = int(as_float(position.get("signal_epoch")) or 0)
             repaired_state = dict(previous_state or {})
@@ -3157,12 +3363,23 @@ class PassiveV2Runner:
                 ]
             rejected_event = {
                 "event": "stale_entry_rejected",
-                "reason": "retained_window_late_fill",
+                "reason": str(position.get("entry_stale_reason") or event.get("entry_stale_reason") or "retained_window_late_fill"),
+                "entry_stale": True,
+                "entry_stale_reason": str(
+                    position.get("entry_stale_reason") or event.get("entry_stale_reason") or "retained_window_late_fill"
+                ),
+                "entry_staleness_seconds": fill_delay_seconds,
                 "symbol": meta.symbol,
                 "signal_id": signal_id,
                 "position_id": position.get("position_id") or event.get("position_id"),
                 "side": position.get("side"),
                 "source": position.get("source"),
+                "signal_source": meta.signal_source,
+                "signal_instrument_key": meta.signal_key,
+                "execution_instrument_key": meta.execution_key,
+                "signal_contract_label": meta.signal_contract_label,
+                "execution_contract_label": meta.execution_contract_label,
+                "lifecycle_start_date": meta.lifecycle_start_date,
                 "signal_epoch": signal_epoch,
                 "signal_time": position.get("signal_time"),
                 "entry_due_epoch": due_epoch,
@@ -3173,6 +3390,7 @@ class PassiveV2Runner:
                 "max_live_entry_fill_lag_seconds": int(max_lag),
                 "evaluation_epoch": int(evaluation_epoch),
                 "evaluation_time": epoch_ist_iso(int(evaluation_epoch)),
+                "debug_policy": "rejected_for_live_positioning_preserved_for_eod_forensics",
                 "created_at_ist": now_ist().isoformat(),
             }
             return repaired_state, [rejected_event]
@@ -3763,7 +3981,10 @@ class PassiveV2Runner:
     ) -> list[dict[str, Any]]:
         entry_epoch = int(position.get("entry_epoch") or 0)
         latest_epoch = int(position.get("latest_epoch") or 0)
-        lower_bound = latest_epoch if latest_epoch > 0 else max(0, entry_epoch - 1)
+        carry_mark_epoch = 0
+        if str(position.get("status") or "").lower() == "open" and str(position.get("exit_reason") or "") == "open_mark_if_closed":
+            carry_mark_epoch = int(position.get("exit_epoch") or 0)
+        lower_bound = max(latest_epoch, carry_mark_epoch) if max(latest_epoch, carry_mark_epoch) > 0 else max(0, entry_epoch - 1)
         if entry_epoch > 0:
             lower_bound = max(lower_bound, entry_epoch - 1)
         return self._rows_between_epochs(second_rows, lower_bound, int(cutoff_epoch))
@@ -3833,6 +4054,10 @@ class PassiveV2Runner:
                 exit_mfe = max_favorable
                 exit_mae = max_adverse
                 break
+
+        if exit_row is not None and int(exit_row.get("epoch_second") or exit_row.get("epoch") or 0) <= entry_epoch:
+            exit_row = None
+            exit_reason = None
 
         latest = exit_row or deduped[-1]
         latest_price = as_float(latest.get("price"))
@@ -4729,7 +4954,7 @@ class PassiveV2Runner:
                     event_samples.extend(enriched[: max(0, 10 - len(event_samples))])
                 updated += 1
                 continue
-            if reason == "model_clock" and isinstance(position, dict):
+            if reason in {"model_clock", "model_clock_active_symbols"} and isinstance(position, dict):
                 try:
                     model_state, events = self._compact_model_clock_position_update(
                         model_state=current_model_state,
@@ -5305,7 +5530,7 @@ class PassiveV2Runner:
                 self.reset_online_state_to_lifecycle(
                     key,
                     meta.lifecycle_start_date,
-                    retention_seconds=None,
+                    retention_seconds=self.lifecycle_reset_second_row_retention_seconds,
                 )
             )
         return reports
@@ -5326,7 +5551,7 @@ class PassiveV2Runner:
         statuses: list[dict[str, Any]] = []
         event_samples: list[dict[str, Any]] = []
         for symbol, meta in list(self.instruments.items()):
-            context = lifecycle_status_from_meta(meta, when)
+            context = lifecycle_status_from_meta(meta, when, self.holiday_dates)
             active = context.get("active_rollover") if isinstance(context, dict) else None
             if not isinstance(active, dict):
                 continue
@@ -5772,7 +5997,7 @@ class PassiveV2Runner:
                 "roll_ltp_spread_points": (roll_entry_ltp_price - roll_exit_ltp_price)
                 if roll_entry_ltp_price is not None and roll_exit_ltp_price is not None
                 else None,
-                "rule": "one trading day before current contract expiry after 15:25 checkpoint",
+                "rule": "previous NSE trading day before current contract expiry after 15:25 checkpoint",
                 "created_at_ist": now_ist().isoformat(),
             }
             state["position"] = new_position
@@ -5826,7 +6051,11 @@ class PassiveV2Runner:
         for symbol, state in self.model_states.items():
             if not isinstance(state, dict):
                 continue
-            if state.get("position") or state.get("pending_entry") or state.get("pending_entry_signals"):
+            position = state.get("position")
+            if isinstance(position, dict) and self.position_counts_as_active(position):
+                out.append(symbol)
+                continue
+            if state.get("pending_entry") or state.get("pending_entry_signals"):
                 out.append(symbol)
                 continue
             if not include_transition_watch:
@@ -5973,6 +6202,19 @@ class PassiveV2Runner:
         finalized_counts = [state.finalized_seconds for state in self.states.values()]
         retained_second_rows = [len(state.second_rows) for state in self.states.values()]
         target_ready = sum(1 for state in self.states.values() if state.last_finalized_second is not None)
+        open_positions = 0
+        stale_open_positions = 0
+        active_counted_positions = 0
+        for state_payload in self.model_states.values():
+            if not isinstance(state_payload, dict):
+                continue
+            position = state_payload.get("position")
+            if isinstance(position, dict):
+                open_positions += 1
+                if self.position_is_stale_rejected(position):
+                    stale_open_positions += 1
+                if self.position_counts_as_active(position):
+                    active_counted_positions += 1
         symbol_ready = 0
         for meta in self.instruments.values():
             signal_state = self.states.get(meta.signal_key)
@@ -5997,6 +6239,9 @@ class PassiveV2Runner:
             "symbols_ready": symbol_ready,
             "target_keys": len(self.targets),
             "target_keys_ready": target_ready,
+            "open_positions": open_positions,
+            "stale_open_positions": stale_open_positions,
+            "active_counted_positions": active_counted_positions,
             "bootstrap": self.bootstrap_report,
             "rows_seen": self.rows_seen,
             "quotes_seen": self.quotes_seen,
@@ -6106,6 +6351,17 @@ class PassiveV2Runner:
                                     symbols=entry_symbols,
                                     reason="model_clock_entry_symbols",
                                 )
+                                pending_due_symbols = self.pending_entry_due_symbols(
+                                    lookahead_seconds=float(
+                                        self.config.get("pending_entry_fill_priority_lookahead_seconds") or 2.0
+                                    )
+                                )
+                                if pending_due_symbols:
+                                    self.evaluate_frozen_trade_state(
+                                        trade_date,
+                                        symbols=pending_due_symbols,
+                                        reason="entry_fill_priority",
+                                    )
                             remaining_symbols = sorted(set(scoped_symbols) - set(entry_symbols))
                             if remaining_symbols:
                                 self.evaluate_frozen_trade_state(
@@ -6216,6 +6472,7 @@ class ObvTargetStreamExtractor:
             "synthesized_shadow_keys_path",
             "synthesized_shadow_keys_path_local",
         )
+        contract_chain_manifest = load_contract_chain_manifest(self.config)
         require_shadow_manifest = bool(self.config.get("require_synthesized_shadow_key_in_manifest", False))
         for entry in manifest.get("entries") or []:
             symbol = str(entry.get("symbol") or "")
@@ -6224,7 +6481,11 @@ class ObvTargetStreamExtractor:
                 cash_key = item.get("cash_instrument_key") or entry.get("cash_key")
                 if cash_key:
                     out.add(str(cash_key))
-                for contract in (item.get("contract_lifecycle") or {}).get("contracts", []) or []:
+                chain = merge_contract_chain_with_manifest(
+                    [dict(contract) for contract in ((item.get("contract_lifecycle") or {}).get("contracts", []) or []) if isinstance(contract, dict)],
+                    contract_chain_manifest.get(symbol),
+                )
+                for contract in chain:
                     key = contract.get("instrument_key")
                     if key:
                         out.add(str(key))
@@ -6237,6 +6498,10 @@ class ObvTargetStreamExtractor:
                 sep_fut_key = None
             if sep_fut_key:
                 out.add(sep_fut_key)
+            for contract in contract_chain_manifest.get(symbol, []):
+                key = contract.get("instrument_key")
+                if key:
+                    out.add(str(key))
         return out
 
     def load_target_symbol_count(self) -> int:

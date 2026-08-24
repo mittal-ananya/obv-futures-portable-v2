@@ -1,0 +1,12 @@
+[Unit]
+Description=Refresh OBVFUTPORT-v2 futures contract chain and target-stream shadow keys
+After=network-online.target cloud-market-data-collector-start.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/cloud-deploy-candidates/obv-futures-portable-v2
+ExecStart=/usr/bin/python3 /opt/cloud-deploy-candidates/obv-futures-portable-v2/scripts/refresh_future_chain_manifest.py
+ExecStartPost=/bin/systemctl try-restart cloud-obvfutport-v2-target-stream.service
+Nice=10
+NoNewPrivileges=true

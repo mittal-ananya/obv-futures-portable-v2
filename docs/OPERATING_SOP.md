@@ -21,6 +21,10 @@ Before market open:
 
 Daily EOD is incremental by default:
 
+- Use `scripts/run_symbol_incremental_eod_append.py` for the daily append path.
+  The broad multi-symbol replay path is not the default because it was proven
+  memory-heavy on Aug 24; per-symbol append keeps cloud memory bounded and gives
+  symbol-level retry/reporting.
 - Append only the new trade date's quote-valid compact stream/archive-canonical input.
 - Update v2 ledgers, decision events, open T1/T2/T3 positions, tranche state,
   margins, summaries, dashboard state, and Matrix state.
@@ -28,6 +32,12 @@ Daily EOD is incremental by default:
   missing/extra exits, stale tags, signal-vs-entry timing, fill/price differences,
   open-position differences, T2/T3 state differences, PnL/margin differences,
   Matrix mismatches, and dashboard summary gaps.
+- Treat stale live entries as an execution defect. Corrected replay must remove
+  stale `paper_entry` rows from installed state and preserve rejected entries as
+  explicit `stale_entry_rejected` diagnostics with symbol and reason.
+- Rebuild Matrix from the corrected selected-leg ledger using the bridge's
+  historical `--once` mode after reset; the service tail mode intentionally skips
+  historical rows and is not sufficient for EOD rebuilds.
 - Generate a state manifest after every install/update.
 - Do not run a full Aug10 onward replay unless the user explicitly approves after
   a detailed explanation.

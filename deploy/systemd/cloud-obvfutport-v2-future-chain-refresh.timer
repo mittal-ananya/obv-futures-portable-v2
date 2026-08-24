@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily OBVFUTPORT-v2 futures contract-chain refresh before target stream starts
+
+[Timer]
+OnCalendar=Mon..Fri *-*-* 03:22:00 UTC
+Persistent=false
+Unit=cloud-obvfutport-v2-future-chain-refresh.service
+
+[Install]
+WantedBy=timers.target

@@ -23,7 +23,9 @@ STREAM_STATUS_PATH = STATE_DIR / "target_stream_extractor" / "target_stream_stat
 PASSIVE_SERVICE = "cloud-obvfutport-v2-passive.service"
 STREAM_SERVICE = "cloud-obvfutport-v2-target-stream.service"
 DASHBOARD_SERVICE = "cloud-obvfutport-v2-dashboard.service"
-WATCHED_SERVICES = [PASSIVE_SERVICE, STREAM_SERVICE, DASHBOARD_SERVICE]
+MATRIX_SERVICE = "cloud-matrix-v1.service"
+MATRIX_BRIDGE_SERVICE = "cloud-matrix-v1-bridge.service"
+WATCHED_SERVICES = [PASSIVE_SERVICE, STREAM_SERVICE, DASHBOARD_SERVICE, MATRIX_SERVICE, MATRIX_BRIDGE_SERVICE]
 
 INTERVAL_SECONDS = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_INTERVAL_SECONDS", "30"))
 QUOTE_AGE_WARN_SECONDS = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_QUOTE_AGE_WARN_SECONDS", "5"))
@@ -32,7 +34,8 @@ FEED_AGE_WARN_SECONDS = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_FEED_AGE_WA
 FEED_AGE_CRIT_SECONDS = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_FEED_AGE_CRIT_SECONDS", "30"))
 LOAD1_WARN = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_LOAD1_WARN", "5"))
 LOAD1_CRIT = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_LOAD1_CRIT", "7.5"))
-STREAM_MEMORY_WARN_FRACTION = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_STREAM_MEMORY_WARN_FRACTION", "0.95"))
+SERVICE_MEMORY_WARN_FRACTION = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_SERVICE_MEMORY_WARN_FRACTION", "0.85"))
+SERVICE_MEMORY_CRIT_FRACTION = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_SERVICE_MEMORY_CRIT_FRACTION", "0.95"))
 CLOCK_EVAL_GRACE_SECONDS = int(os.environ.get("OBVFUTPORT_V2_WATCHDOG_CLOCK_GRACE_SECONDS", "90"))
 ALERT_REPEAT_SECONDS = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_ALERT_REPEAT_SECONDS", "300"))
 OOM_CHECK_SECONDS = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_OOM_CHECK_SECONDS", "180"))
@@ -166,6 +169,10 @@ def latest_expected_clock(current: datetime) -> datetime | None:
     return expected
 
 
+def market_data_expected(current: datetime) -> bool:
+    return dtime(9, 15) <= current.time() <= dtime(15, 35)
+
+
 def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
     current = now_ist()
     v2 = load_json(V2_STATUS_PATH)
@@ -199,29 +206,40 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
         add("critical", "partial_live_start", "v2 partial_live_start is true")
     if v2.get("decisions_suppressed") is True:
         add("critical", "decisions_suppressed", "v2 decisions are suppressed")
-    if int(v2.get("target_keys") or 0) != 631:
-        add("critical", "v2_target_key_count", "v2 target key count is not 631", target_keys=v2.get("target_keys"))
+    v2_target_keys = int(v2.get("target_keys") or 0)
+    stream_target_keys = int(stream.get("target_keys") or 0)
+    if v2_target_keys <= 0:
+        add("critical", "v2_target_key_count", "v2 target key count is missing", target_keys=v2.get("target_keys"))
 
     if stream.get("ok") is not True:
         add("critical", "stream_not_ok", "v2 owned stream status is not ok", status=stream.get("status"))
-    if int(stream.get("target_keys") or 0) != 631:
-        add("critical", "stream_target_key_count", "v2 owned stream key count is not 631", target_keys=stream.get("target_keys"))
+    if stream_target_keys <= 0:
+        add("critical", "stream_target_key_count", "v2 owned stream key count is missing", target_keys=stream.get("target_keys"))
+    elif v2_target_keys > 0 and stream_target_keys != v2_target_keys:
+        add(
+            "critical",
+            "stream_target_key_count_mismatch",
+            "v2 owned stream key count does not match v2 runner target count",
+            stream_target_keys=stream_target_keys,
+            v2_target_keys=v2_target_keys,
+        )
 
     quote_age = as_float(stream.get("latest_quote_age_seconds"))
-    if quote_age is None:
-        add("warning", "quote_age_missing", "v2 owned stream quote age is missing")
-    elif quote_age > QUOTE_AGE_CRIT_SECONDS:
-        add("critical", "quote_age_critical", "v2 owned stream quote age is too high", quote_age_seconds=quote_age)
-    elif quote_age > QUOTE_AGE_WARN_SECONDS:
-        add("warning", "quote_age_warning", "v2 owned stream quote age is elevated", quote_age_seconds=quote_age)
-
     feed_age = as_float(v2.get("feed_latest_age_seconds"))
-    if feed_age is None:
-        add("warning", "feed_age_missing", "v2 feed age is missing")
-    elif feed_age > FEED_AGE_CRIT_SECONDS:
-        add("critical", "feed_age_critical", "v2 feed age is too high", feed_age_seconds=feed_age)
-    elif feed_age > FEED_AGE_WARN_SECONDS:
-        add("warning", "feed_age_warning", "v2 feed age is elevated", feed_age_seconds=feed_age)
+    if market_data_expected(current):
+        if quote_age is None:
+            add("warning", "quote_age_missing", "v2 owned stream quote age is missing")
+        elif quote_age > QUOTE_AGE_CRIT_SECONDS:
+            add("critical", "quote_age_critical", "v2 owned stream quote age is too high", quote_age_seconds=quote_age)
+        elif quote_age > QUOTE_AGE_WARN_SECONDS:
+            add("warning", "quote_age_warning", "v2 owned stream quote age is elevated", quote_age_seconds=quote_age)
+
+        if feed_age is None:
+            add("warning", "feed_age_missing", "v2 feed age is missing")
+        elif feed_age > FEED_AGE_CRIT_SECONDS:
+            add("critical", "feed_age_critical", "v2 feed age is too high", feed_age_seconds=feed_age)
+        elif feed_age > FEED_AGE_WARN_SECONDS:
+            add("warning", "feed_age_warning", "v2 feed age is elevated", feed_age_seconds=feed_age)
 
     if load1 is not None:
         if load1 > LOAD1_CRIT:
@@ -229,15 +247,31 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
         elif load1 > LOAD1_WARN:
             add("warning", "load1_warning", "host load1 is elevated", load1=load1)
 
-    stream_service = services.get(STREAM_SERVICE, {})
-    mem_current = stream_service.get("MemoryCurrent")
-    mem_max = stream_service.get("MemoryMax")
-    if isinstance(mem_current, int) and isinstance(mem_max, int) and mem_max > 0:
-        fraction = mem_current / mem_max
-        if fraction >= 0.99:
-            add("critical", "stream_memory_at_cap", "v2 owned stream memory is at/above 99% of cap", memory_current=mem_current, memory_max=mem_max, fraction=fraction)
-        elif fraction >= STREAM_MEMORY_WARN_FRACTION:
-            add("warning", "stream_memory_near_cap", "v2 owned stream memory is near cap", memory_current=mem_current, memory_max=mem_max, fraction=fraction)
+    for service, info in services.items():
+        mem_current = info.get("MemoryCurrent")
+        mem_max = info.get("MemoryMax")
+        if isinstance(mem_current, int) and isinstance(mem_max, int) and mem_max > 0:
+            fraction = mem_current / mem_max
+            if fraction >= SERVICE_MEMORY_CRIT_FRACTION:
+                add(
+                    "critical",
+                    "service_memory_near_cap",
+                    f"{service} memory is near cap",
+                    service=service,
+                    memory_current=mem_current,
+                    memory_max=mem_max,
+                    fraction=fraction,
+                )
+            elif fraction >= SERVICE_MEMORY_WARN_FRACTION:
+                add(
+                    "warning",
+                    "service_memory_elevated",
+                    f"{service} memory is elevated",
+                    service=service,
+                    memory_current=mem_current,
+                    memory_max=mem_max,
+                    fraction=fraction,
+                )
 
     expected = latest_expected_clock(current)
     last_clock = parse_dt(v2.get("last_evaluated_clock") or v2.get("clock_watermark"))
