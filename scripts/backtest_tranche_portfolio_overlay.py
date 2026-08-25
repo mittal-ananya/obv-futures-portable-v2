@@ -384,12 +384,17 @@ def sample_std(values: list[float]) -> float:
     return statistics.pstdev(values)
 
 
-def risk_adjusted_momentum(index: QuoteIndex, leg: TrancheLeg, clock_epoch: int, lookback_minutes: int, *, risk_floor: float) -> float | None:
+def directional_return(index: QuoteIndex, leg: TrancheLeg, clock_epoch: int, lookback_minutes: int) -> float | None:
     ref_epoch = clock_epoch - 60
     end = index.quote_by_trading_offset(leg.signal_key, ref_epoch, 0)
     start = index.quote_by_trading_offset(leg.signal_key, ref_epoch, lookback_minutes)
     if end is None or start is None or start.price <= 0:
         return None
+    return signed_direction(leg.side) * ((end.price / start.price) - 1.0)
+
+
+def risk_adjusted_momentum(index: QuoteIndex, leg: TrancheLeg, clock_epoch: int, lookback_minutes: int, *, risk_floor: float) -> float | None:
+    ref_epoch = clock_epoch - 60
     window = index.price_window(leg.signal_key, ref_epoch, lookback_minutes)
     if len(window) < lookback_minutes:
         return None
@@ -399,9 +404,11 @@ def risk_adjusted_momentum(index: QuoteIndex, leg: TrancheLeg, clock_epoch: int,
             returns.append((cur / prev) - 1.0)
     if len(returns) < max(2, lookback_minutes // 2):
         return None
-    directional_return = signed_direction(leg.side) * ((end.price / start.price) - 1.0)
+    dir_ret = directional_return(index, leg, clock_epoch, lookback_minutes)
+    if dir_ret is None:
+        return None
     realized_risk = sample_std(returns) * math.sqrt(max(1, len(returns)))
-    return directional_return / max(risk_floor, realized_risk)
+    return dir_ret / max(risk_floor, realized_risk)
 
 
 def percentile_ranks(items: list[tuple[str, float | None]]) -> dict[str, float | None]:
@@ -424,7 +431,9 @@ def score_eligible(index: QuoteIndex, legs: list[TrancheLeg], clock_epoch: int, 
     for leg in legs:
         ram10 = risk_adjusted_momentum(index, leg, clock_epoch, 10, risk_floor=risk_floor)
         ram60 = risk_adjusted_momentum(index, leg, clock_epoch, 60, risk_floor=risk_floor)
-        raw[leg.row_id] = {"ram_10": ram10, "ram_60": ram60}
+        ret10 = directional_return(index, leg, clock_epoch, 10)
+        ret60 = directional_return(index, leg, clock_epoch, 60)
+        raw[leg.row_id] = {"ram_10": ram10, "ram_60": ram60, "ret_10": ret10, "ret_60": ret60}
     rank10 = percentile_ranks([(leg.row_id, raw[leg.row_id]["ram_10"]) for leg in legs])
     rank60 = percentile_ranks([(leg.row_id, raw[leg.row_id]["ram_60"]) for leg in legs])
     out: dict[str, dict[str, Any]] = {}
@@ -440,6 +449,8 @@ def score_eligible(index: QuoteIndex, legs: list[TrancheLeg], clock_epoch: int, 
             "score": score,
             "ram_10": raw[leg.row_id]["ram_10"],
             "ram_60": raw[leg.row_id]["ram_60"],
+            "ret_10": raw[leg.row_id]["ret_10"],
+            "ret_60": raw[leg.row_id]["ret_60"],
             "rank_10": r10,
             "rank_60": r60,
         }
@@ -471,6 +482,45 @@ def accounting(v1_portfolio: Any, leg: TrancheLeg, entry_fill: float, exit_fill:
         lots=int(lots or 1),
         point_config=None,
     )
+
+
+def estimated_cost_adjusted_edge(
+    index: QuoteIndex,
+    v1_portfolio: Any,
+    leg: TrancheLeg,
+    clock_epoch: int,
+    score: dict[str, Any],
+    *,
+    weight_10: float,
+) -> dict[str, Any]:
+    ret10 = as_float(score.get("ret_10"))
+    ret60 = as_float(score.get("ret_60"))
+    if ret10 is None or ret60 is None:
+        return {"ok": False, "reason": "missing_directional_return"}
+    edge_return = max(0.0, weight_10 * ret10 + (1.0 - weight_10) * ret60)
+    if edge_return <= 0:
+        return {"ok": False, "reason": "non_positive_edge_return", "edge_return": edge_return}
+    fill = execution_fill(index, v1_portfolio, leg, clock_epoch, phase="entry")
+    if fill is None:
+        return {"ok": False, "reason": "missing_entry_fill_for_edge"}
+    entry_fill = float(fill["fill_price"])
+    if leg.side == "long":
+        projected_exit = entry_fill * (1.0 + edge_return)
+    else:
+        projected_exit = entry_fill * (1.0 - edge_return)
+    acct = accounting(v1_portfolio, leg, entry_fill, projected_exit, 1)
+    gross = abs(float(acct.get("gross_rupees") or 0.0))
+    charges = float(acct.get("charges_rupees") or 0.0)
+    net = float(acct.get("net_rupees") or 0.0)
+    return {
+        "ok": net > 0 and gross > 0,
+        "reason": "ok" if net > 0 and gross > 0 else "non_positive_projected_net",
+        "edge_return": edge_return,
+        "gross_edge_rupees_per_lot": gross,
+        "estimated_charges_rupees_per_lot": charges,
+        "estimated_net_edge_rupees_per_lot": net,
+        "edge_to_cost_multiple": (gross / charges) if charges > 0 else None,
+    }
 
 
 def holding_mtm(index: QuoteIndex, v1_portfolio: Any, holding: Holding, epoch: int) -> float:
@@ -581,6 +631,32 @@ def choose_lots(cash: float, equity: float, margin_per_lot: float) -> int:
     return max(0, int(math.floor(budget / margin_per_lot)))
 
 
+def positive_ram_count(score: dict[str, Any]) -> int:
+    return sum(
+        1
+        for key in ("ram_10", "ram_60")
+        if as_float(score.get(key)) is not None and float(score[key]) > 0
+    )
+
+
+def parse_tranche_float_map(text: str, *, default: float | None = None) -> dict[str, float | None]:
+    out = {"T2": default, "T3": default}
+    raw = (text or "").strip()
+    if not raw:
+        return out
+    if ":" not in raw:
+        value = None if raw.lower() in {"none", "null", "na"} else float(raw)
+        return {"T2": value, "T3": value}
+    for item in raw.split(","):
+        item = item.strip()
+        if not item:
+            continue
+        tranche, value_text = item.split(":", 1)
+        value = None if value_text.strip().lower() in {"none", "null", "na"} else float(value_text)
+        out[tranche.strip().upper()] = value
+    return out
+
+
 def summarize_transactions(transactions: list[dict[str, Any]], open_holdings: dict[str, Holding], cash: float, equity: float, peak_margin: float, peak_equity: float) -> dict[str, Any]:
     exits = [row for row in transactions if row.get("event") == "portfolio_exit"]
     net = [float(row.get("net_rupees") or 0.0) for row in exits]
@@ -621,6 +697,11 @@ def run_portfolio(
     min_hold_minutes: int,
     replacement_persist_clocks: int,
     weakest_score_ceiling: float | None,
+    max_leg_age_minutes: float | None,
+    min_positive_ram_count: int,
+    min_edge_cost_multiple: float | None,
+    age_score_penalty: float | None,
+    min_minutes_to_session_end: float | None,
     min_score: float,
     weight_10: float,
     risk_floor: float,
@@ -638,6 +719,10 @@ def run_portfolio(
         "replacement_blocked_min_hold": 0,
         "replacement_blocked_persistence": 0,
         "replacement_blocked_weakest_score_ceiling": 0,
+        "entry_blocked_max_age": 0,
+        "entry_blocked_positive_ram": 0,
+        "entry_blocked_cost_edge": 0,
+        "entry_blocked_session_runway": 0,
         "entries": 0,
         "evaluated_clocks": 0,
     }
@@ -646,7 +731,9 @@ def run_portfolio(
     legs_by_id = {leg.row_id: leg for leg in legs}
     replacement_streak: dict[tuple[str, str], int] = {}
     for day in dates:
-        for clock_epoch in session_clock_epochs(day):
+        day_clocks = session_clock_epochs(day)
+        session_end_epoch = day_clocks[-1] if day_clocks else None
+        for clock_epoch in day_clocks:
             diagnostics["evaluated_clocks"] += 1
             # Underlying T2/T3 exits are immediate; process them at the next portfolio clock.
             for holding_key, holding in list(holdings.items()):
@@ -677,13 +764,45 @@ def run_portfolio(
             if not active:
                 continue
             scores = score_eligible(index, active, clock_epoch, weight_10=weight_10, risk_floor=risk_floor)
-            eligible = [
-                leg
-                for leg in active
-                if leg.row_id not in holdings
-                and scores.get(leg.row_id, {}).get("score") is not None
-                and float(scores[leg.row_id]["score"]) >= min_score
-            ]
+            eligible: list[TrancheLeg] = []
+            for leg in active:
+                if leg.row_id in holdings:
+                    continue
+                score = scores.get(leg.row_id, {})
+                raw_score = as_float(score.get("score"))
+                if raw_score is None:
+                    continue
+                leg_age_minutes = max(0.0, (clock_epoch - leg.entry_epoch) / 60.0)
+                minutes_to_session_end = ((session_end_epoch - clock_epoch) / 60.0) if session_end_epoch else None
+                if (
+                    min_minutes_to_session_end is not None
+                    and minutes_to_session_end is not None
+                    and minutes_to_session_end < min_minutes_to_session_end
+                ):
+                    diagnostics["entry_blocked_session_runway"] += 1
+                    continue
+                if max_leg_age_minutes is not None and leg_age_minutes > max_leg_age_minutes:
+                    diagnostics["entry_blocked_max_age"] += 1
+                    continue
+                if min_positive_ram_count > 0 and positive_ram_count(score) < min_positive_ram_count:
+                    diagnostics["entry_blocked_positive_ram"] += 1
+                    continue
+                if age_score_penalty is not None and max_leg_age_minutes and max_leg_age_minutes > 0:
+                    adjusted_score = max(0.0, raw_score - float(age_score_penalty) * min(1.0, leg_age_minutes / max_leg_age_minutes))
+                    score["raw_score"] = raw_score
+                    score["age_adjusted_score"] = adjusted_score
+                    score["score"] = adjusted_score
+                    raw_score = adjusted_score
+                if raw_score < min_score:
+                    continue
+                edge = estimated_cost_adjusted_edge(index, v1_portfolio, leg, clock_epoch, score, weight_10=weight_10)
+                score["edge_diagnostics"] = edge
+                if min_edge_cost_multiple is not None:
+                    multiple = as_float(edge.get("edge_to_cost_multiple"))
+                    if not edge.get("ok") or multiple is None or multiple < min_edge_cost_multiple:
+                        diagnostics["entry_blocked_cost_edge"] += 1
+                        continue
+                eligible.append(leg)
             diagnostics["score_missing_candidates"] += sum(
                 1 for leg in active if scores.get(leg.row_id, {}).get("score") is None
             )
@@ -733,6 +852,11 @@ def run_portfolio(
                         "entry_score": holding.entry_score,
                         "entry_ram_10": holding.entry_ram_10,
                         "entry_ram_60": holding.entry_ram_60,
+                        "entry_raw_score": scores[leg.row_id].get("raw_score"),
+                        "entry_age_adjusted_score": scores[leg.row_id].get("age_adjusted_score"),
+                        "entry_edge_diagnostics": scores[leg.row_id].get("edge_diagnostics"),
+                        "leg_age_minutes": max(0.0, (clock_epoch - leg.entry_epoch) / 60.0),
+                        "minutes_to_session_end": ((session_end_epoch - clock_epoch) / 60.0) if session_end_epoch else None,
                         "signal_key": leg.signal_key,
                         "execution_key": leg.execution_key,
                         "underlying_tranche_entry_epoch": leg.entry_epoch,
@@ -831,6 +955,11 @@ def run_portfolio(
                         "entry_score": new_holding.entry_score,
                         "entry_ram_10": new_holding.entry_ram_10,
                         "entry_ram_60": new_holding.entry_ram_60,
+                        "entry_raw_score": scores[leg.row_id].get("raw_score"),
+                        "entry_age_adjusted_score": scores[leg.row_id].get("age_adjusted_score"),
+                        "entry_edge_diagnostics": scores[leg.row_id].get("edge_diagnostics"),
+                        "leg_age_minutes": max(0.0, (clock_epoch - leg.entry_epoch) / 60.0),
+                        "minutes_to_session_end": ((session_end_epoch - clock_epoch) / 60.0) if session_end_epoch else None,
                         "signal_key": leg.signal_key,
                         "execution_key": leg.execution_key,
                         "underlying_tranche_entry_epoch": leg.entry_epoch,
@@ -876,6 +1005,11 @@ def run_portfolio(
             "min_hold_minutes": min_hold_minutes,
             "replacement_persist_clocks": replacement_persist_clocks,
             "weakest_score_ceiling": weakest_score_ceiling,
+            "max_leg_age_minutes": max_leg_age_minutes,
+            "min_positive_ram_count": min_positive_ram_count,
+            "min_edge_cost_multiple": min_edge_cost_multiple,
+            "age_score_penalty": age_score_penalty,
+            "min_minutes_to_session_end": min_minutes_to_session_end,
             "min_score": min_score,
             "weight_10": weight_10,
             "weight_60": 1.0 - weight_10,
@@ -895,6 +1029,11 @@ def write_summary_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "min_hold_minutes",
         "replacement_persist_clocks",
         "weakest_score_ceiling",
+        "max_leg_age_minutes",
+        "min_positive_ram_count",
+        "min_edge_cost_multiple",
+        "age_score_penalty",
+        "min_minutes_to_session_end",
         "min_score",
         "weight_10",
         "closed_trades",
@@ -928,6 +1067,11 @@ def main() -> int:
     parser.add_argument("--min-hold-minutes", default="0")
     parser.add_argument("--replacement-persist-clocks", default="1")
     parser.add_argument("--weakest-score-ceilings", default="none")
+    parser.add_argument("--max-leg-age-minutes", default="none")
+    parser.add_argument("--min-positive-ram-count", type=int, default=0)
+    parser.add_argument("--min-edge-cost-multiple", default="none")
+    parser.add_argument("--age-score-penalty", default="none")
+    parser.add_argument("--min-minutes-to-session-end", default="none")
     parser.add_argument("--min-scores", default="0,0.50,0.60,0.70")
     parser.add_argument("--weight-10", type=float, default=0.5)
     parser.add_argument("--risk-floor", type=float, default=0.001)
@@ -963,6 +1107,10 @@ def main() -> int:
         if not text:
             continue
         weakest_score_ceilings.append(None if text in {"none", "null", "na"} else float(text))
+    max_age_by_tranche = parse_tranche_float_map(args.max_leg_age_minutes, default=None)
+    min_edge_cost_by_tranche = parse_tranche_float_map(args.min_edge_cost_multiple, default=None)
+    age_penalty_by_tranche = parse_tranche_float_map(args.age_score_penalty, default=None)
+    min_session_runway_by_tranche = parse_tranche_float_map(args.min_minutes_to_session_end, default=None)
     all_summaries: list[dict[str, Any]] = []
     best_by_portfolio: dict[str, dict[str, Any]] = {}
     manifest_report = {
@@ -981,6 +1129,13 @@ def main() -> int:
                 "min_hold_minutes": "holding must age at least this many minutes before replacement; underlying tranche exits still happen",
                 "replacement_persist_clocks": "same candidate must beat the same weakest holding for this many consecutive clocks",
                 "weakest_score_ceiling": "replacement allowed only if weakest held score is <= this ceiling; none disables this gate",
+            },
+            "forward_edge_controls": {
+                "max_leg_age_minutes": max_age_by_tranche,
+                "min_positive_ram_count": args.min_positive_ram_count,
+                "min_edge_cost_multiple": min_edge_cost_by_tranche,
+                "age_score_penalty": age_penalty_by_tranche,
+                "min_minutes_to_session_end": min_session_runway_by_tranche,
             },
             "lookback_basis": "last N available trading-minute target-stream observations",
             "execution": "futures execution key; v1 bid/ask proxy slippage and futures accounting",
@@ -1012,6 +1167,11 @@ def main() -> int:
                                 min_hold_minutes=int(min_hold),
                                 replacement_persist_clocks=int(persist),
                                 weakest_score_ceiling=weakest_ceiling,
+                                max_leg_age_minutes=max_age_by_tranche.get(tranche),
+                                min_positive_ram_count=int(args.min_positive_ram_count),
+                                min_edge_cost_multiple=min_edge_cost_by_tranche.get(tranche),
+                                age_score_penalty=age_penalty_by_tranche.get(tranche),
+                                min_minutes_to_session_end=min_session_runway_by_tranche.get(tranche),
                                 min_score=float(min_score),
                                 weight_10=float(args.weight_10),
                                 risk_floor=float(args.risk_floor),
