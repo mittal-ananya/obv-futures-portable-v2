@@ -1,7 +1,8 @@
 [Unit]
 Description=OBVFUTPORT V2 passive compact incremental shadow runner
-After=network-online.target
-Wants=network-online.target
+After=network-online.target cloud-obvfutport-v2-target-stream.service
+Wants=network-online.target cloud-obvfutport-v2-live-watchdog.service
+Requires=cloud-obvfutport-v2-target-stream.service
 
 [Service]
 Type=simple
@@ -18,4 +19,3 @@ NoNewPrivileges=true
 
 [Install]
 WantedBy=multi-user.target
-
