@@ -4,6 +4,10 @@ tmp/
 logs/
 reports/
 backups/
+*.bak
+*.bak_*
+*.audit_*
+*.pre_*
 
 # Heavy market/replay data
 *.jsonl
@@ -26,4 +30,3 @@ venv/
 # Local editor/system files
 .DS_Store
 *.swp
-

@@ -1,14 +1,15 @@
 [Unit]
-Description=OBVFUTPORT V2 OBV-safe compact target stream extractor
-After=network-online.target
+Description=OBVFUTPORT v2 owned quote-valid target stream extractor
+After=network-online.target cloud-market-data-collector.service
 Wants=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/cloud-deploy-candidates/obv-futures-portable-v2
+WorkingDirectory=/opt/cloud-deploy-candidates/stock-ws-pullback-reclaim-v0-1
 Environment=PYTHONUNBUFFERED=1
-Environment=OBVFUTPORT_V2_ROOT=/opt/cloud-deploy-candidates/obv-futures-portable-v2
-ExecStart=/opt/cloud-deploy-candidates/obv-futures-portable-v2/scripts/run_target_stream.sh
+Environment=STOCK_WS_PULLBACK_ROOT=/opt/cloud-deploy-candidates/stock-ws-pullback-reclaim-v0-1
+Environment=PYTHONPATH=/opt/cloud-deploy-candidates/stock-ws-pullback-reclaim-v0-1/src
+ExecStart=/usr/bin/python3 -m stock_ws_pullback_reclaim_v0_1.live_shadow target-stream --config /opt/cloud-deploy-candidates/obv-futures-portable-v2/config/target_stream_runtime.json
 Restart=always
 RestartSec=10
 Nice=10

@@ -1,0 +1,94 @@
+{
+  "after_fix": {
+    "dash_minus_matrix": [],
+    "dash_minus_matrix_count": 0,
+    "dashboard_open_t2_count": 134,
+    "matrix_event_count": 2109,
+    "matrix_last_event_at_ist": "2026-08-25T21:33:18.026235+05:30",
+    "matrix_minus_dash": [],
+    "matrix_minus_dash_count": 0,
+    "matrix_notifications_today_count": 0,
+    "matrix_open_count": 134,
+    "services_is_active": [
+      "active",
+      "active",
+      "active"
+    ]
+  },
+  "before_fix_observed": {
+    "dash_minus_matrix": [
+      "ADANIENT",
+      "ADANIPOWER",
+      "ANGELONE",
+      "BAJAJ-AUTO",
+      "COCHINSHIP",
+      "CUMMINSIND",
+      "DLF",
+      "HINDALCO",
+      "HINDPETRO",
+      "INDIANB",
+      "IREDA",
+      "IRFC",
+      "JSWSTEEL",
+      "JUBLFOOD",
+      "LODHA",
+      "LTF",
+      "MANAPPURAM",
+      "MAXHEALTH",
+      "MCX",
+      "NMDC",
+      "SHRIRAMFIN",
+      "SIEMENS",
+      "TITAN",
+      "TRENT",
+      "VMM"
+    ],
+    "dash_minus_matrix_count": 25,
+    "dashboard_open_t2_count": 134,
+    "matrix_minus_dash": [
+      "BHARATFORG",
+      "GAIL",
+      "POLICYBZR",
+      "RECLTD"
+    ],
+    "matrix_minus_dash_count": 4,
+    "matrix_open_count": 113
+  },
+  "dashboard_stale_diagnostics": {
+    "MOTHERSON_treatment": "MOTHERSON was not a stale accepted entry; live entry was timely. The observed issue was Matrix notification/display delay, fixed by non-notifying rebuilds and position-aware reducer.",
+    "count": 73,
+    "has_KALYANKJIL": true,
+    "has_MOTHERSON": false,
+    "has_NTPC": true,
+    "known_1530_rows_present": {
+      "MFSL": true,
+      "NAUKRI": true,
+      "NIFTY": true,
+      "PAGEIND": true,
+      "SHRIRAMFIN": true,
+      "SIEMENS": true,
+      "TITAN": true,
+      "UNOMINDA": true
+    }
+  },
+  "fix_applied": [
+    "Patched matrix-v1/scripts/sync_from_v2.py to maintain active_position_by_symbol and skip unmatched old-position exits for Matrix state transitions.",
+    "Patched matrix-v1/src/matrix_v1/app.py to ignore unmatched exit events defensively if position_id does not match active_position_id.",
+    "Tagged full Matrix rebuild payloads with matrix_rebuild_event=true and suppress_notification=true.",
+    "Reset and rebuilt Matrix from current production v2 ledgers, then restarted Matrix bridge."
+  ],
+  "generated_at_utc": "2026-08-25T16:05:52+00:00",
+  "ok": true,
+  "prevention_for_tomorrow": [
+    "Matrix bridge tails with active_position_by_symbol and will not let old-position exits override current selected-leg state.",
+    "Historical rebuild/reseed events are suppressed from Matrix notifications.",
+    "Dashboard stale diagnostics are loaded from archived RCA reports as display-only evidence, so replay correction does not erase diagnostics."
+  ],
+  "root_cause": [
+    "Matrix reduced events by symbol while v2 lifecycle events are position-keyed.",
+    "A later exit belonging to an older/opposite position could neutralize a newer active selected T2 position for the same symbol.",
+    "Historical full-rebuild payloads were not explicitly marked non-notifying, so old replay events could appear as delayed Matrix notifications."
+  ],
+  "schema": "obvfutport_v2.matrix_dashboard_sync_audit.v1",
+  "trade_date": "2026-08-25"
+}

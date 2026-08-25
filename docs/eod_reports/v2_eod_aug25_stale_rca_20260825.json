@@ -1,0 +1,4344 @@
+{
+  "entry_comparison": {
+    "added_by_replay_count": 311,
+    "added_by_replay_sample": [
+      "OBVFUTPORT_V2_PASSIVE:360ONE:long:1787544300:41190ef4e340621c",
+      "OBVFUTPORT_V2_PASSIVE:360ONE:long:1787565300:roll:8337a70e978b9d09",
+      "OBVFUTPORT_V2_PASSIVE:ABB:short:1787630700:880114a50b6b28e6",
+      "OBVFUTPORT_V2_PASSIVE:ABCAPITAL:long:1787565300:roll:d8defbcb51f136dc",
+      "OBVFUTPORT_V2_PASSIVE:ADANIENSOL:short:1787565300:roll:600574e460c1d931",
+      "OBVFUTPORT_V2_PASSIVE:ADANIENT:long:1787544300:d277fffe2bc4b56d",
+      "OBVFUTPORT_V2_PASSIVE:ADANIENT:long:1787565300:roll:9f6c5fa4f8db0125",
+      "OBVFUTPORT_V2_PASSIVE:ADANIENT:long:1787636100:51850f9530e7592e",
+      "OBVFUTPORT_V2_PASSIVE:ADANIGREEN:long:1787631600:79bfb925b1d9febf",
+      "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:short:1787551500:93645732dd0d376b",
+      "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:short:1787565300:roll:79048544425166a4",
+      "OBVFUTPORT_V2_PASSIVE:ALKEM:short:1787550600:7c24a407ce97781d",
+      "OBVFUTPORT_V2_PASSIVE:ALKEM:short:1787565300:roll:8438104692aec508",
+      "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787543400:35ba0b56a8d48e12",
+      "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787546100:3764ccda12fd79bf",
+      "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787650500:992b4508707796ba",
+      "OBVFUTPORT_V2_PASSIVE:AMBUJACEM:short:1787550600:0d9f539455180d83",
+      "OBVFUTPORT_V2_PASSIVE:AMBUJACEM:short:1787565300:roll:82f987309494c173",
+      "OBVFUTPORT_V2_PASSIVE:ANGELONE:short:1787559600:1ab280fddca170aa",
+      "OBVFUTPORT_V2_PASSIVE:ANGELONE:short:1787565300:roll:78761919df03b235",
+      "OBVFUTPORT_V2_PASSIVE:APLAPOLLO:long:1787543400:034f964c3180da52",
+      "OBVFUTPORT_V2_PASSIVE:APLAPOLLO:long:1787565300:roll:17a7fc580bf8ddb2",
+      "OBVFUTPORT_V2_PASSIVE:APLAPOLLO:short:1787630700:6583fe8a53dcb133",
+      "OBVFUTPORT_V2_PASSIVE:APOLLOHOSP:long:1787637900:f67c7ce9edbbd451",
+      "OBVFUTPORT_V2_PASSIVE:APOLLOHOSP:short:1787543400:632c14c19b1e45f5",
+      "OBVFUTPORT_V2_PASSIVE:APOLLOHOSP:short:1787565300:roll:ae278821f2f41bf1",
+      "OBVFUTPORT_V2_PASSIVE:ASHOKLEY:long:1787649600:37004bf29d4fa677",
+      "OBVFUTPORT_V2_PASSIVE:ASHOKLEY:short:1787543400:8144d01670cef0d2",
+      "OBVFUTPORT_V2_PASSIVE:ASHOKLEY:short:1787565300:roll:e32a752cb0703411",
+      "OBVFUTPORT_V2_PASSIVE:ASIANPAINT:short:1787631600:b2156a46d75fad21"
+    ],
+    "changed_entry_time_count": 8,
+    "changed_entry_time_sample": [
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 907.0,
+          "entry_time": "2026-08-25T15:14:58+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:06.132526+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "ADANIPOWER"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T14:36:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:05:22.833663+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "ADANIPOWER"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 906.0,
+          "entry_time": "2026-08-25T15:14:59+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:06.220703+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:BAJAJ-AUTO:long:1787649600:38fb47d52a4c7a6a",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "BAJAJ-AUTO"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T14:51:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:08:34.150888+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:BAJAJ-AUTO:long:1787649600:38fb47d52a4c7a6a",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "BAJAJ-AUTO"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:BAJAJ-AUTO:long:1787649600:38fb47d52a4c7a6a"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 913.0,
+          "entry_time": "2026-08-25T15:14:52+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:06.453347+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:COCHINSHIP:long:1787649600:73adfff463765a4c",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "COCHINSHIP"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T14:51:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:13:51.026676+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:COCHINSHIP:long:1787649600:73adfff463765a4c",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "COCHINSHIP"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:COCHINSHIP:long:1787649600:73adfff463765a4c"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 911.0,
+          "entry_time": "2026-08-25T15:14:54+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:06.681093+05:30",
+          "side": "short",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:COLPAL:short:1787645100:6988479fd9152e54",
+          "signal_time": null,
+          "source": "fresh_trend_short",
+          "symbol": "COLPAL"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T13:36:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:14:11.635996+05:30",
+          "side": "short",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:COLPAL:short:1787645100:6988479fd9152e54",
+          "signal_time": null,
+          "source": "fresh_trend_short",
+          "symbol": "COLPAL"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:COLPAL:short:1787645100:6988479fd9152e54"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 905.0,
+          "entry_time": "2026-08-25T15:14:59+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:07.520857+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:IREDA:long:1787649600:6b5874b4eb05ddd2",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "IREDA"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T14:51:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:25:37.560143+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:IREDA:long:1787649600:6b5874b4eb05ddd2",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "IREDA"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:IREDA:long:1787649600:6b5874b4eb05ddd2"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 906.0,
+          "entry_time": "2026-08-25T15:14:59+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:08.633742+05:30",
+          "side": "short",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70",
+          "signal_time": null,
+          "source": "fresh_trend_short",
+          "symbol": "PAGEIND"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T13:06:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:38:07.061900+05:30",
+          "side": "short",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70",
+          "signal_time": null,
+          "source": "fresh_trend_short",
+          "symbol": "PAGEIND"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 906.0,
+          "entry_time": "2026-08-25T15:14:59+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:08.728378+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "SHRIRAMFIN"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T15:06:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:45:06.198186+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "SHRIRAMFIN"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 905.0,
+          "entry_time": "2026-08-25T15:14:59+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:08.946876+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "TITAN"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T14:36:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:48:47.156725+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "TITAN"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff"
+      }
+    ],
+    "live_entry_count": 128,
+    "missing_live_entries_in_replay_count": 105,
+    "missing_live_entries_in_replay_sample": [
+      "OBVFUTPORT_V2_PASSIVE:ABB:short:1787561400:2c74ac885919dcfc",
+      "OBVFUTPORT_V2_PASSIVE:ADANIENT:long:1787646900:14dab6d3ad9657a7",
+      "OBVFUTPORT_V2_PASSIVE:ADANIENT:short:1787632500:bb101cedce016306",
+      "OBVFUTPORT_V2_PASSIVE:ALKEM:short:1787633400:af7d94616e3578da",
+      "OBVFUTPORT_V2_PASSIVE:AMBUJACEM:short:1787638800:7cae96c9468a57b1",
+      "OBVFUTPORT_V2_PASSIVE:BAJAJFINSV:short:1787634300:cc4473e5a9747e0d",
+      "OBVFUTPORT_V2_PASSIVE:BAJAJHLDNG:short:1787564100:f8f14349a3b7c14c",
+      "OBVFUTPORT_V2_PASSIVE:BAJAJHLDNG:short:1787647800:2510235bc4ce51c5",
+      "OBVFUTPORT_V2_PASSIVE:BAJFINANCE:short:1787561400:3e4af564aedeb82a",
+      "OBVFUTPORT_V2_PASSIVE:BANDHANBNK:short:1787562300:cc451f68f356ac08",
+      "OBVFUTPORT_V2_PASSIVE:BANKINDIA:long:1787630700:3b6472c9bf4b0a03",
+      "OBVFUTPORT_V2_PASSIVE:BDL:long:1787639700:447345df722731ec",
+      "OBVFUTPORT_V2_PASSIVE:BIOCON:long:1787639700:dce3b205fde12a73",
+      "OBVFUTPORT_V2_PASSIVE:BIOCON:short:1787564100:e19dc9636df4c7fc",
+      "OBVFUTPORT_V2_PASSIVE:BLUESTARCO:short:1787564100:fe840569697c90c1",
+      "OBVFUTPORT_V2_PASSIVE:BPCL:long:1787648700:20888451b465c3f9",
+      "OBVFUTPORT_V2_PASSIVE:CDSL:short:1787564100:7131be812da65e1b",
+      "OBVFUTPORT_V2_PASSIVE:COFORGE:long:1787646900:a5fd6e39c45f7df1",
+      "OBVFUTPORT_V2_PASSIVE:CONCOR:short:1787564100:fec32680031996de",
+      "OBVFUTPORT_V2_PASSIVE:CROMPTON:short:1787639700:7ee466f4a885ef98",
+      "OBVFUTPORT_V2_PASSIVE:CUMMINSIND:short:1787644200:7b95cef4eb9fc745",
+      "OBVFUTPORT_V2_PASSIVE:DELHIVERY:short:1787629800:e173c5245bfc4b48",
+      "OBVFUTPORT_V2_PASSIVE:DIVISLAB:long:1787638800:09dbe22b39c090bf",
+      "OBVFUTPORT_V2_PASSIVE:DIXON:long:1787651400:4494d13fd00a053f",
+      "OBVFUTPORT_V2_PASSIVE:DLF:long:1787651400:67cb27b3b77c0859",
+      "OBVFUTPORT_V2_PASSIVE:EICHERMOT:long:1787641288:544bc1db5cbb78df",
+      "OBVFUTPORT_V2_PASSIVE:FEDERALBNK:short:1787638800:6ee4d0995a059a10",
+      "OBVFUTPORT_V2_PASSIVE:FEDERALBNK:short:1787642400:0c2dc64e6cc0cfbe",
+      "OBVFUTPORT_V2_PASSIVE:FORCEMOT:short:1787565000:b9409861a31486e3",
+      "OBVFUTPORT_V2_PASSIVE:FORTIS:long:1787648700:718afe409bc26c11"
+    ],
+    "replay_entry_count": 334
+  },
+  "event_counts": {
+    "live_backup": {
+      "entry_signal": 441,
+      "entry_signal_skipped": 32,
+      "paper_entry": 94,
+      "paper_exit": 50,
+      "stale_entry_rejected": 8,
+      "tranche3_entry": 29,
+      "tranche3_exit": 16
+    },
+    "prod_installed": {
+      "paper_entry": 126,
+      "paper_exit": 88,
+      "stale_entry_rejected": 1,
+      "tranche2_exit": 16,
+      "tranche3_entry": 31,
+      "tranche3_exit": 11
+    },
+    "replay": {
+      "paper_entry": 126,
+      "paper_exit": 88,
+      "stale_entry_rejected": 1,
+      "tranche2_exit": 16,
+      "tranche3_entry": 31,
+      "tranche3_exit": 11
+    }
+  },
+  "generated_at_utc": "2026-08-25T15:52:54Z",
+  "ledger_day_rows": {
+    "live_backup": 245,
+    "replay": 866
+  },
+  "notes": [
+    "Aug24 carry had to be rebuilt from the selected-candidate baseline because the prior Aug24 merged temp source had been deleted.",
+    "The first EOD attempt was stopped because it duplicated stream materialization and filled root disk; disk-safe direct curated stream mode completed replay.",
+    "Install initially failed on root-owned state files; ownership was repaired under v2 state only and install/audit/manifest succeeded.",
+    "This report compares live pre-install backup to corrected replay/production state."
+  ],
+  "ok": true,
+  "post_install_state": {
+    "matrix": {
+      "event_count": 2035,
+      "instrument_count": 212,
+      "open_count_by_state": 0,
+      "open_symbols_sample": [],
+      "stale_symbols_sample": []
+    },
+    "open_counts_from_prod_ledgers": {
+      "T1": 82,
+      "T2": 82,
+      "T3": 102,
+      "open_by_symbol_sample": {
+        "ADANIENT": {
+          "T1": 0,
+          "T2": 0,
+          "T3": 1
+        },
+        "ADANIGREEN": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ADANIPOWER": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "AMBER": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ANGELONE": {
+          "T1": 0,
+          "T2": 0,
+          "T3": 1
+        },
+        "APLAPOLLO": {
+          "T1": 0,
+          "T2": 0,
+          "T3": 1
+        },
+        "APOLLOHOSP": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ASHOKLEY": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ASIANPAINT": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ASTRAL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "AXISBANK": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BAJAJ-AUTO": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BAJFINANCE": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BANKINDIA": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BANKNIFTY": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BDL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BEL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BHARTIARTL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BHEL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BIOCON": {
+          "T1": 0,
+          "T2": 0,
+          "T3": 1
+        }
+      },
+      "symbols": 212
+    },
+    "open_counts_from_replay_ledgers": {
+      "T1": 82,
+      "T2": 82,
+      "T3": 102,
+      "open_by_symbol_sample": {
+        "ADANIENT": {
+          "T1": 0,
+          "T2": 0,
+          "T3": 1
+        },
+        "ADANIGREEN": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ADANIPOWER": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "AMBER": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ANGELONE": {
+          "T1": 0,
+          "T2": 0,
+          "T3": 1
+        },
+        "APLAPOLLO": {
+          "T1": 0,
+          "T2": 0,
+          "T3": 1
+        },
+        "APOLLOHOSP": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ASHOKLEY": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ASIANPAINT": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "ASTRAL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "AXISBANK": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BAJAJ-AUTO": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BAJFINANCE": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BANKINDIA": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BANKNIFTY": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BDL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BEL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BHARTIARTL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BHEL": {
+          "T1": 1,
+          "T2": 1,
+          "T3": 1
+        },
+        "BIOCON": {
+          "T1": 0,
+          "T2": 0,
+          "T3": 1
+        }
+      },
+      "symbols": 212
+    },
+    "services": {
+      "cloud-matrix-v1-bridge.service": {
+        "active": "active",
+        "enabled": "enabled"
+      },
+      "cloud-matrix-v1.service": {
+        "active": "active",
+        "enabled": "enabled"
+      },
+      "cloud-obvfutport-v2-dashboard.service": {
+        "active": "active",
+        "enabled": "enabled"
+      },
+      "cloud-obvfutport-v2-future-chain-refresh.timer": {
+        "active": "active",
+        "enabled": "enabled"
+      },
+      "cloud-obvfutport-v2-live-watchdog.service": {
+        "active": "inactive",
+        "enabled": "enabled"
+      },
+      "cloud-obvfutport-v2-passive.service": {
+        "active": "inactive",
+        "enabled": "enabled"
+      },
+      "cloud-obvfutport-v2-passive.timer": {
+        "active": "active",
+        "enabled": "enabled"
+      },
+      "cloud-obvfutport-v2-target-stream.service": {
+        "active": "inactive",
+        "enabled": "enabled"
+      }
+    }
+  },
+  "source_reports": {
+    "aug25_replay": {
+      "date_reports": [
+        {
+          "duration_seconds": 5137.5619,
+          "quotes_used": 8846624,
+          "rows_seen": 1875484288,
+          "trade_date": "2026-08-25",
+          "trade_state_events": 273
+        }
+      ],
+      "end_date": "2026-08-25",
+      "filtered_root": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered",
+      "ok": true,
+      "partial": false,
+      "schema": "obvfutport_v2.symbol_checkpoint_merged_archive_replay.v1",
+      "source": "merged_symbol_checkpoint_replay",
+      "start_date": "2026-08-25",
+      "strategy_id": "OBVFUTPORT_V2_PASSIVE",
+      "symbol_reports": [
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_360ONE",
+          "symbol": "360ONE"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ABB",
+          "symbol": "ABB"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ABCAPITAL",
+          "symbol": "ABCAPITAL"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ADANIENSOL",
+          "symbol": "ADANIENSOL"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ADANIENT",
+          "symbol": "ADANIENT"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ADANIGREEN",
+          "symbol": "ADANIGREEN"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ADANIPORTS",
+          "symbol": "ADANIPORTS"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ADANIPOWER",
+          "symbol": "ADANIPOWER"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ALKEM",
+          "symbol": "ALKEM"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_AMBER",
+          "symbol": "AMBER"
+        },
+        {
+          "dates": null,
+          "events": 4,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_AMBUJACEM",
+          "symbol": "AMBUJACEM"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ANGELONE",
+          "symbol": "ANGELONE"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_APLAPOLLO",
+          "symbol": "APLAPOLLO"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_APOLLOHOSP",
+          "symbol": "APOLLOHOSP"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ASHOKLEY",
+          "symbol": "ASHOKLEY"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ASIANPAINT",
+          "symbol": "ASIANPAINT"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ASTRAL",
+          "symbol": "ASTRAL"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_AUBANK",
+          "symbol": "AUBANK"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_AUROPHARMA",
+          "symbol": "AUROPHARMA"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_AXISBANK",
+          "symbol": "AXISBANK"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BAJAJ-AUTO",
+          "symbol": "BAJAJ-AUTO"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BAJAJFINSV",
+          "symbol": "BAJAJFINSV"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BAJAJHLDNG",
+          "symbol": "BAJAJHLDNG"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BAJFINANCE",
+          "symbol": "BAJFINANCE"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BANDHANBNK",
+          "symbol": "BANDHANBNK"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BANKBARODA",
+          "symbol": "BANKBARODA"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BANKINDIA",
+          "symbol": "BANKINDIA"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BANKNIFTY",
+          "symbol": "BANKNIFTY"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BDL",
+          "symbol": "BDL"
+        },
+        {
+          "dates": null,
+          "events": 4,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BEL",
+          "symbol": "BEL"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BHARATFORG",
+          "symbol": "BHARATFORG"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BHARTIARTL",
+          "symbol": "BHARTIARTL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BHEL",
+          "symbol": "BHEL"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BIOCON",
+          "symbol": "BIOCON"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BLUESTARCO",
+          "symbol": "BLUESTARCO"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BOSCHLTD",
+          "symbol": "BOSCHLTD"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BPCL",
+          "symbol": "BPCL"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BRITANNIA",
+          "symbol": "BRITANNIA"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_BSE",
+          "symbol": "BSE"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_CAMS",
+          "symbol": "CAMS"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_CANBK",
+          "symbol": "CANBK"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_CDSL",
+          "symbol": "CDSL"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_CGPOWER",
+          "symbol": "CGPOWER"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_CHOLAFIN",
+          "symbol": "CHOLAFIN"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_CIPLA",
+          "symbol": "CIPLA"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_COALINDIA",
+          "symbol": "COALINDIA"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_COCHINSHIP",
+          "symbol": "COCHINSHIP"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_COFORGE",
+          "symbol": "COFORGE"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_COLPAL",
+          "symbol": "COLPAL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_CONCOR",
+          "symbol": "CONCOR"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_CROMPTON",
+          "symbol": "CROMPTON"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_CUMMINSIND",
+          "symbol": "CUMMINSIND"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_DABUR",
+          "symbol": "DABUR"
+        },
+        {
+          "dates": null,
+          "events": 6,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_DALBHARAT",
+          "symbol": "DALBHARAT"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_DELHIVERY",
+          "symbol": "DELHIVERY"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_DIVISLAB",
+          "symbol": "DIVISLAB"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_DIXON",
+          "symbol": "DIXON"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_DLF",
+          "symbol": "DLF"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_DMART",
+          "symbol": "DMART"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_DRREDDY",
+          "symbol": "DRREDDY"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_EICHERMOT",
+          "symbol": "EICHERMOT"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ETERNAL",
+          "symbol": "ETERNAL"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_FEDERALBNK",
+          "symbol": "FEDERALBNK"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_FINNIFTY",
+          "symbol": "FINNIFTY"
+        },
+        {
+          "dates": null,
+          "events": 5,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_FORCEMOT",
+          "symbol": "FORCEMOT"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_FORTIS",
+          "symbol": "FORTIS"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_GAIL",
+          "symbol": "GAIL"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_GLENMARK",
+          "symbol": "GLENMARK"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_GMRAIRPORT",
+          "symbol": "GMRAIRPORT"
+        },
+        {
+          "dates": null,
+          "events": 6,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_GODFRYPHLP",
+          "symbol": "GODFRYPHLP"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_GODREJCP",
+          "symbol": "GODREJCP"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_GODREJPROP",
+          "symbol": "GODREJPROP"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_GRASIM",
+          "symbol": "GRASIM"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_GVT_D",
+          "symbol": "GVT&D"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HAL",
+          "symbol": "HAL"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HAVELLS",
+          "symbol": "HAVELLS"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HCLTECH",
+          "symbol": "HCLTECH"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HDFCAMC",
+          "symbol": "HDFCAMC"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HDFCBANK",
+          "symbol": "HDFCBANK"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HDFCLIFE",
+          "symbol": "HDFCLIFE"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HEROMOTOCO",
+          "symbol": "HEROMOTOCO"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HINDALCO",
+          "symbol": "HINDALCO"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HINDPETRO",
+          "symbol": "HINDPETRO"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HINDUNILVR",
+          "symbol": "HINDUNILVR"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HINDZINC",
+          "symbol": "HINDZINC"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_HYUNDAI",
+          "symbol": "HYUNDAI"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ICICIBANK",
+          "symbol": "ICICIBANK"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ICICIGI",
+          "symbol": "ICICIGI"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ICICIPRULI",
+          "symbol": "ICICIPRULI"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_IDEA",
+          "symbol": "IDEA"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_IDFCFIRSTB",
+          "symbol": "IDFCFIRSTB"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_IEX",
+          "symbol": "IEX"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_INDHOTEL",
+          "symbol": "INDHOTEL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_INDIANB",
+          "symbol": "INDIANB"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_INDIGO",
+          "symbol": "INDIGO"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_INDUSINDBK",
+          "symbol": "INDUSINDBK"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_INDUSTOWER",
+          "symbol": "INDUSTOWER"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_INFY",
+          "symbol": "INFY"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_INOXWIND",
+          "symbol": "INOXWIND"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_IOC",
+          "symbol": "IOC"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_IREDA",
+          "symbol": "IREDA"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_IRFC",
+          "symbol": "IRFC"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ITC",
+          "symbol": "ITC"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_JINDALSTEL",
+          "symbol": "JINDALSTEL"
+        },
+        {
+          "dates": null,
+          "events": 4,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_JIOFIN",
+          "symbol": "JIOFIN"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_JSWENERGY",
+          "symbol": "JSWENERGY"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_JSWSTEEL",
+          "symbol": "JSWSTEEL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_JUBLFOOD",
+          "symbol": "JUBLFOOD"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_KALYANKJIL",
+          "symbol": "KALYANKJIL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_KAYNES",
+          "symbol": "KAYNES"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_KEI",
+          "symbol": "KEI"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_KFINTECH",
+          "symbol": "KFINTECH"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_KOTAKBANK",
+          "symbol": "KOTAKBANK"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_KPITTECH",
+          "symbol": "KPITTECH"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_LAURUSLABS",
+          "symbol": "LAURUSLABS"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_LICHSGFIN",
+          "symbol": "LICHSGFIN"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_LICI",
+          "symbol": "LICI"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_LODHA",
+          "symbol": "LODHA"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_LT",
+          "symbol": "LT"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_LTF",
+          "symbol": "LTF"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_LTM",
+          "symbol": "LTM"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_LUPIN",
+          "symbol": "LUPIN"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_M_M",
+          "symbol": "M&M"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MANAPPURAM",
+          "symbol": "MANAPPURAM"
+        },
+        {
+          "dates": null,
+          "events": 5,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MANKIND",
+          "symbol": "MANKIND"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MARICO",
+          "symbol": "MARICO"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MARUTI",
+          "symbol": "MARUTI"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MAXHEALTH",
+          "symbol": "MAXHEALTH"
+        },
+        {
+          "dates": null,
+          "events": 4,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MAZDOCK",
+          "symbol": "MAZDOCK"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MCX",
+          "symbol": "MCX"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MFSL",
+          "symbol": "MFSL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MIDCPNIFTY",
+          "symbol": "MIDCPNIFTY"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MOTHERSON",
+          "symbol": "MOTHERSON"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MOTILALOFS",
+          "symbol": "MOTILALOFS"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MPHASIS",
+          "symbol": "MPHASIS"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_MUTHOOTFIN",
+          "symbol": "MUTHOOTFIN"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NAM-INDIA",
+          "symbol": "NAM-INDIA"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NATIONALUM",
+          "symbol": "NATIONALUM"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NAUKRI",
+          "symbol": "NAUKRI"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NBCC",
+          "symbol": "NBCC"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NESTLEIND",
+          "symbol": "NESTLEIND"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NHPC",
+          "symbol": "NHPC"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NIFTY",
+          "symbol": "NIFTY"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NMDC",
+          "symbol": "NMDC"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NTPC",
+          "symbol": "NTPC"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_NYKAA",
+          "symbol": "NYKAA"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_OBEROIRLTY",
+          "symbol": "OBEROIRLTY"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_OFSS",
+          "symbol": "OFSS"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_OIL",
+          "symbol": "OIL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ONGC",
+          "symbol": "ONGC"
+        },
+        {
+          "dates": null,
+          "events": 6,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PAGEIND",
+          "symbol": "PAGEIND"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PATANJALI",
+          "symbol": "PATANJALI"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PAYTM",
+          "symbol": "PAYTM"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PERSISTENT",
+          "symbol": "PERSISTENT"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PETRONET",
+          "symbol": "PETRONET"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PFC",
+          "symbol": "PFC"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PGEL",
+          "symbol": "PGEL"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PHOENIXLTD",
+          "symbol": "PHOENIXLTD"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PIDILITIND",
+          "symbol": "PIDILITIND"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PIIND",
+          "symbol": "PIIND"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PNB",
+          "symbol": "PNB"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PNBHOUSING",
+          "symbol": "PNBHOUSING"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_POLICYBZR",
+          "symbol": "POLICYBZR"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_POLYCAB",
+          "symbol": "POLYCAB"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_POWERGRID",
+          "symbol": "POWERGRID"
+        },
+        {
+          "dates": null,
+          "events": 4,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_POWERINDIA",
+          "symbol": "POWERINDIA"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PREMIERENE",
+          "symbol": "PREMIERENE"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_PRESTIGE",
+          "symbol": "PRESTIGE"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_RADICO",
+          "symbol": "RADICO"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_RBLBANK",
+          "symbol": "RBLBANK"
+        },
+        {
+          "dates": null,
+          "events": 4,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_RECLTD",
+          "symbol": "RECLTD"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_RELIANCE",
+          "symbol": "RELIANCE"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_RVNL",
+          "symbol": "RVNL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SAIL",
+          "symbol": "SAIL"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SBICARD",
+          "symbol": "SBICARD"
+        },
+        {
+          "dates": null,
+          "events": 5,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SBILIFE",
+          "symbol": "SBILIFE"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SBIN",
+          "symbol": "SBIN"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SHREECEM",
+          "symbol": "SHREECEM"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SHRIRAMFIN",
+          "symbol": "SHRIRAMFIN"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SIEMENS",
+          "symbol": "SIEMENS"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SOLARINDS",
+          "symbol": "SOLARINDS"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SONACOMS",
+          "symbol": "SONACOMS"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SRF",
+          "symbol": "SRF"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SUNPHARMA",
+          "symbol": "SUNPHARMA"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SUPREMEIND",
+          "symbol": "SUPREMEIND"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SUZLON",
+          "symbol": "SUZLON"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_SWIGGY",
+          "symbol": "SWIGGY"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TATACONSUM",
+          "symbol": "TATACONSUM"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TATAELXSI",
+          "symbol": "TATAELXSI"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TATAPOWER",
+          "symbol": "TATAPOWER"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TATASTEEL",
+          "symbol": "TATASTEEL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TCS",
+          "symbol": "TCS"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TECHM",
+          "symbol": "TECHM"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TIINDIA",
+          "symbol": "TIINDIA"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TITAN",
+          "symbol": "TITAN"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TMPV",
+          "symbol": "TMPV"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TORNTPHARM",
+          "symbol": "TORNTPHARM"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TRENT",
+          "symbol": "TRENT"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_TVSMOTOR",
+          "symbol": "TVSMOTOR"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ULTRACEMCO",
+          "symbol": "ULTRACEMCO"
+        },
+        {
+          "dates": null,
+          "events": 4,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_UNIONBANK",
+          "symbol": "UNIONBANK"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_UNITDSPR",
+          "symbol": "UNITDSPR"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_UNOMINDA",
+          "symbol": "UNOMINDA"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_UPL",
+          "symbol": "UPL"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_VBL",
+          "symbol": "VBL"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_VEDL",
+          "symbol": "VEDL"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_VMM",
+          "symbol": "VMM"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_VOLTAS",
+          "symbol": "VOLTAS"
+        },
+        {
+          "dates": null,
+          "events": 2,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_WAAREEENER",
+          "symbol": "WAAREEENER"
+        },
+        {
+          "dates": null,
+          "events": 3,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_WIPRO",
+          "symbol": "WIPRO"
+        },
+        {
+          "dates": null,
+          "events": 0,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_YESBANK",
+          "symbol": "YESBANK"
+        },
+        {
+          "dates": null,
+          "events": 1,
+          "run_dir": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_filtered/symbol_runs/shard_00_ZYDUSLIFE",
+          "symbol": "ZYDUSLIFE"
+        }
+      ],
+      "symbols": 212,
+      "target_keys": 632,
+      "targets_missing": 0,
+      "updated_at_ist": "2026-08-25T15:23:09.714961+00:00"
+    },
+    "install_retry": {
+      "backup": {
+        "bootstrap_state": 1,
+        "bootstrap_status.json": 1,
+        "date_count": 2,
+        "decision_events": 1,
+        "instruments": 1,
+        "reports/v2_tranche_performance_20260810_20260821.json": 1,
+        "status.json": 1,
+        "target_stream_consumer_pointer.json": 1
+      },
+      "backup_dir": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/backups/pre_v2_reseed_install_20260825_153525",
+      "dry_run": false,
+      "end_date": "2026-08-25",
+      "install": {
+        "counts": {
+          "bootstrap_state_tree": 1,
+          "bootstrap_status": 1,
+          "decision_event_files": 1,
+          "decision_events_total": 273,
+          "instruments_tree": 1,
+          "status": 1,
+          "symbols": 212
+        },
+        "decision_event_counts": {
+          "2026-08-24": 0,
+          "2026-08-25": 273
+        },
+        "symbols": [
+          "360ONE",
+          "ABB",
+          "ABCAPITAL",
+          "ADANIENSOL",
+          "ADANIENT",
+          "ADANIGREEN",
+          "ADANIPORTS",
+          "ADANIPOWER",
+          "ALKEM",
+          "AMBER",
+          "AMBUJACEM",
+          "ANGELONE",
+          "APLAPOLLO",
+          "APOLLOHOSP",
+          "ASHOKLEY",
+          "ASIANPAINT",
+          "ASTRAL",
+          "AUBANK",
+          "AUROPHARMA",
+          "AXISBANK",
+          "BAJAJ-AUTO",
+          "BAJAJFINSV",
+          "BAJAJHLDNG",
+          "BAJFINANCE",
+          "BANDHANBNK",
+          "BANKBARODA",
+          "BANKINDIA",
+          "BANKNIFTY",
+          "BDL",
+          "BEL",
+          "BHARATFORG",
+          "BHARTIARTL",
+          "BHEL",
+          "BIOCON",
+          "BLUESTARCO",
+          "BOSCHLTD",
+          "BPCL",
+          "BRITANNIA",
+          "BSE",
+          "CAMS",
+          "CANBK",
+          "CDSL",
+          "CGPOWER",
+          "CHOLAFIN",
+          "CIPLA",
+          "COALINDIA",
+          "COCHINSHIP",
+          "COFORGE",
+          "COLPAL",
+          "CONCOR",
+          "CROMPTON",
+          "CUMMINSIND",
+          "DABUR",
+          "DALBHARAT",
+          "DELHIVERY",
+          "DIVISLAB",
+          "DIXON",
+          "DLF",
+          "DMART",
+          "DRREDDY",
+          "EICHERMOT",
+          "ETERNAL",
+          "FEDERALBNK",
+          "FINNIFTY",
+          "FORCEMOT",
+          "FORTIS",
+          "GAIL",
+          "GLENMARK",
+          "GMRAIRPORT",
+          "GODFRYPHLP",
+          "GODREJCP",
+          "GODREJPROP",
+          "GRASIM",
+          "GVT&D",
+          "HAL",
+          "HAVELLS",
+          "HCLTECH",
+          "HDFCAMC",
+          "HDFCBANK",
+          "HDFCLIFE",
+          "HEROMOTOCO",
+          "HINDALCO",
+          "HINDPETRO",
+          "HINDUNILVR",
+          "HINDZINC",
+          "HYUNDAI",
+          "ICICIBANK",
+          "ICICIGI",
+          "ICICIPRULI",
+          "IDEA",
+          "IDFCFIRSTB",
+          "IEX",
+          "INDHOTEL",
+          "INDIANB",
+          "INDIGO",
+          "INDUSINDBK",
+          "INDUSTOWER",
+          "INFY",
+          "INOXWIND",
+          "IOC",
+          "IREDA",
+          "IRFC",
+          "ITC",
+          "JINDALSTEL",
+          "JIOFIN",
+          "JSWENERGY",
+          "JSWSTEEL",
+          "JUBLFOOD",
+          "KALYANKJIL",
+          "KAYNES",
+          "KEI",
+          "KFINTECH",
+          "KOTAKBANK",
+          "KPITTECH",
+          "LAURUSLABS",
+          "LICHSGFIN",
+          "LICI",
+          "LODHA",
+          "LT",
+          "LTF",
+          "LTM",
+          "LUPIN",
+          "M&M",
+          "MANAPPURAM",
+          "MANKIND",
+          "MARICO",
+          "MARUTI",
+          "MAXHEALTH",
+          "MAZDOCK",
+          "MCX",
+          "MFSL",
+          "MIDCPNIFTY",
+          "MOTHERSON",
+          "MOTILALOFS",
+          "MPHASIS",
+          "MUTHOOTFIN",
+          "NAM-INDIA",
+          "NATIONALUM",
+          "NAUKRI",
+          "NBCC",
+          "NESTLEIND",
+          "NHPC",
+          "NIFTY",
+          "NMDC",
+          "NTPC",
+          "NYKAA",
+          "OBEROIRLTY",
+          "OFSS",
+          "OIL",
+          "ONGC",
+          "PAGEIND",
+          "PATANJALI",
+          "PAYTM",
+          "PERSISTENT",
+          "PETRONET",
+          "PFC",
+          "PGEL",
+          "PHOENIXLTD",
+          "PIDILITIND",
+          "PIIND",
+          "PNB",
+          "PNBHOUSING",
+          "POLICYBZR",
+          "POLYCAB",
+          "POWERGRID",
+          "POWERINDIA",
+          "PREMIERENE",
+          "PRESTIGE",
+          "RADICO",
+          "RBLBANK",
+          "RECLTD",
+          "RELIANCE",
+          "RVNL",
+          "SAIL",
+          "SBICARD",
+          "SBILIFE",
+          "SBIN",
+          "SHREECEM",
+          "SHRIRAMFIN",
+          "SIEMENS",
+          "SOLARINDS",
+          "SONACOMS",
+          "SRF",
+          "SUNPHARMA",
+          "SUPREMEIND",
+          "SUZLON",
+          "SWIGGY",
+          "TATACONSUM",
+          "TATAELXSI",
+          "TATAPOWER",
+          "TATASTEEL",
+          "TCS",
+          "TECHM",
+          "TIINDIA",
+          "TITAN",
+          "TMPV",
+          "TORNTPHARM",
+          "TRENT",
+          "TVSMOTOR",
+          "ULTRACEMCO",
+          "UNIONBANK",
+          "UNITDSPR",
+          "UNOMINDA",
+          "UPL",
+          "VBL",
+          "VEDL",
+          "VMM",
+          "VOLTAS",
+          "WAAREEENER",
+          "WIPRO",
+          "YESBANK",
+          "ZYDUSLIFE"
+        ]
+      },
+      "ok": true,
+      "prod_state": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state",
+      "required_symbol_count": 212,
+      "schema": "obvfutport_v2.reseed_install.v1",
+      "selected_candidate_gate": {},
+      "selected_candidate_gate_ok": true,
+      "selected_candidate_gate_required": false,
+      "source_replay_ok": true,
+      "source_replay_partial": false,
+      "source_state": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_merged",
+      "source_symbol_count": 212,
+      "start_date": "2026-08-24",
+      "updated_epoch": 1787672130.0138025
+    },
+    "post_install_audit": {
+      "failures": [],
+      "matrix": {
+        "bridge_last_result": {
+          "accepted": 0,
+          "failed": 0,
+          "skipped": 1,
+          "skipped_historical": 0,
+          "skipped_stale_entries": 32,
+          "tailed_files": 214
+        },
+        "bridge_state_exists": true,
+        "matrix_events_exists": true,
+        "matrix_events_line_count": 1862,
+        "matrix_events_sha256": "be0e631bcb434a11a8c499345927a8a4722734330cf8516f56153ba4342f910d",
+        "matrix_instrument_count": 212,
+        "matrix_state_event_count": 1862,
+        "matrix_state_exists": true,
+        "matrix_state_sha256": "0995edfa0889d6eec6acedbec8035c43bd2abed1cb2e1a3e0e64c29ab2faf927"
+      },
+      "matrix_state_dir": "/opt/cloud-deploy-candidates/matrix-v1/state",
+      "ok": true,
+      "override": {
+        "adaptive_count": 209,
+        "expected_quarantined_symbols": [
+          "IOC",
+          "MAXHEALTH",
+          "WAAREEENER"
+        ],
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/adaptive_calibration/v2_symbol_overrides_latest.json",
+        "quarantined_count": 3,
+        "quarantined_symbols": [
+          "IOC",
+          "MAXHEALTH",
+          "WAAREEENER"
+        ],
+        "sha256": "07c54f85d72b87ce042b3e74d9c167ddc88ec6b03eb215ae576e3cd264480c5e",
+        "symbol_count": 212
+      },
+      "schema": "obvfutport_v2.post_install_audit.v1",
+      "state_dir": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state",
+      "updated_epoch": 1787672131.292326,
+      "v2_state": {
+        "event_type_counts": {
+          "paper_entry": 1116,
+          "paper_exit": 974,
+          "paper_rollover": 106,
+          "stale_entry_rejected": 19,
+          "tranche2_exit": 227,
+          "tranche3_entry": 246,
+          "tranche3_exit": 212
+        },
+        "instrument_count": 212,
+        "ledger_rows": 2900,
+        "missing_ledger_symbols": [],
+        "open_position_rows_unverified": 1116,
+        "symbols_with_ledger": 212,
+        "t3_issue_count": 0,
+        "t3_issues_sample": []
+      }
+    }
+  },
+  "sources": {
+    "live_backup": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/backups/pre_v2_reseed_install_20260825_153525",
+    "production_state": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state",
+    "replay_state": "/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340/aug25_merged"
+  },
+  "stale_diagnostics": {
+    "accepted_stale_paper_entry_count": 53,
+    "accepted_stale_sample": [
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.050217+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIENT:long:1787646900:14dab6d3ad9657a7",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "ADANIENT"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 907.0,
+        "entry_time": "2026-08-25T15:14:58+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.132526+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "ADANIPOWER"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.220703+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:BAJAJ-AUTO:long:1787649600:38fb47d52a4c7a6a",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "BAJAJ-AUTO"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:58+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.312009+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:BAJAJHLDNG:short:1787647800:2510235bc4ce51c5",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "BAJAJHLDNG"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:58+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.396688+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:BPCL:long:1787648700:20888451b465c3f9",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "BPCL"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 913.0,
+        "entry_time": "2026-08-25T15:14:52+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.453347+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:COCHINSHIP:long:1787649600:73adfff463765a4c",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "COCHINSHIP"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 905.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.548118+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:COFORGE:long:1787646900:a5fd6e39c45f7df1",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "COFORGE"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 911.0,
+        "entry_time": "2026-08-25T15:14:54+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.681093+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:COLPAL:short:1787645100:6988479fd9152e54",
+        "signal_time": null,
+        "source": "fresh_trend_short",
+        "symbol": "COLPAL"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 905.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.785513+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:CUMMINSIND:short:1787644200:7b95cef4eb9fc745",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "CUMMINSIND"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 545.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.832993+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:DIXON:long:1787651400:4494d13fd00a053f",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "DIXON"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 545.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.916540+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:DLF:long:1787651400:67cb27b3b77c0859",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "DLF"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.015807+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:FORTIS:long:1787648700:718afe409bc26c11",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "FORTIS"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.097974+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:GODREJCP:short:1787644200:162a6194bd2f52df",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "GODREJCP"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.182846+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:GRASIM:short:1787641500:fde9dc2f654993ef",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "GRASIM"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 907.0,
+        "entry_time": "2026-08-25T15:14:58+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.237040+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:HINDPETRO:long:1787650500:02e78bd23e514dfc",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "HINDPETRO"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 544.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.349349+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:INDIGO:long:1787651400:27531e5218ac1923",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "INDIGO"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 925.0,
+        "entry_time": "2026-08-25T15:14:40+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.436924+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:IOC:long:1787650500:4ea7a0a7829fae5c",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "IOC"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 905.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.520857+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:IREDA:long:1787649600:6b5874b4eb05ddd2",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "IREDA"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.609989+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:IRFC:short:1787644200:75ceda5e93776784",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "IRFC"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 545.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.653175+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:JUBLFOOD:long:1787651400:de684370c588def6",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "JUBLFOOD"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 544.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.725358+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:M&M:long:1787651400:d27f9b907718ce9a",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "M&M"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.849184+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:MARICO:short:1787641500:cffa9e611bf8402a",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "MARICO"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 545.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.919147+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:MAXHEALTH:long:1787651400:de3a838676b81448",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "MAXHEALTH"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.019310+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:MAZDOCK:long:1787648700:c3028509e5be18c7",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "MAZDOCK"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.108758+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:MFSL:long:1787641500:806117cd37322688",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "MFSL"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.420174+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NAUKRI:short:1787641500:d02ee66bf062e437",
+        "signal_time": null,
+        "source": "fresh_trend_short",
+        "symbol": "NAUKRI"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.532904+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NIFTY:long:1787649600:f81cd1288bcfb1ed",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "NIFTY"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.633742+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70",
+        "signal_time": null,
+        "source": "fresh_trend_short",
+        "symbol": "PAGEIND"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.728378+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "SHRIRAMFIN"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.813793+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SIEMENS:long:1787646000:677993a65ba8478b",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "SIEMENS"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 905.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.946876+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "TITAN"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:09.054326+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:UNOMINDA:short:1787642400:cc72c4e5ce59f2ec",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "UNOMINDA"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.050217+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIENT:long:1787646900:14dab6d3ad9657a7",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "ADANIENT"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 907.0,
+        "entry_time": "2026-08-25T15:14:58+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.132526+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "ADANIPOWER"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.220703+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:BAJAJ-AUTO:long:1787649600:38fb47d52a4c7a6a",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "BAJAJ-AUTO"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:58+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.312009+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:BAJAJHLDNG:short:1787647800:2510235bc4ce51c5",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "BAJAJHLDNG"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:58+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.396688+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:BPCL:long:1787648700:20888451b465c3f9",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "BPCL"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 905.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.785513+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:CUMMINSIND:short:1787644200:7b95cef4eb9fc745",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "CUMMINSIND"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 545.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.832993+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:DIXON:long:1787651400:4494d13fd00a053f",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "DIXON"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.097974+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:GODREJCP:short:1787644200:162a6194bd2f52df",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "GODREJCP"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.182846+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:GRASIM:short:1787641500:fde9dc2f654993ef",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "GRASIM"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 544.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.349349+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:INDIGO:long:1787651400:27531e5218ac1923",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "INDIGO"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 925.0,
+        "entry_time": "2026-08-25T15:14:40+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.436924+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:IOC:long:1787650500:4ea7a0a7829fae5c",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "IOC"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.609989+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:IRFC:short:1787644200:75ceda5e93776784",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "IRFC"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 545.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.653175+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:JUBLFOOD:long:1787651400:de684370c588def6",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "JUBLFOOD"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 545.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.919147+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:MAXHEALTH:long:1787651400:de3a838676b81448",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "MAXHEALTH"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.108758+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:MFSL:long:1787641500:806117cd37322688",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "MFSL"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 544.0,
+        "entry_time": "2026-08-25T15:21:00+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:07.725358+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:M&M:long:1787651400:d27f9b907718ce9a",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "M&M"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.532904+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NIFTY:long:1787649600:f81cd1288bcfb1ed",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "NIFTY"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.633742+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70",
+        "signal_time": null,
+        "source": "fresh_trend_short",
+        "symbol": "PAGEIND"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.728378+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "SHRIRAMFIN"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.813793+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SIEMENS:long:1787646000:677993a65ba8478b",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "SIEMENS"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 905.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.946876+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "TITAN"
+      }
+    ],
+    "known_symbol_rows": [
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:58+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.312009+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:BAJAJHLDNG:short:1787647800:2510235bc4ce51c5",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "BAJAJHLDNG"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.108758+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:MFSL:long:1787641500:806117cd37322688",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "MFSL"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.420174+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NAUKRI:short:1787641500:d02ee66bf062e437",
+        "signal_time": null,
+        "source": "fresh_trend_short",
+        "symbol": "NAUKRI"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.532904+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NIFTY:long:1787649600:f81cd1288bcfb1ed",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "NIFTY"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.633742+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70",
+        "signal_time": null,
+        "source": "fresh_trend_short",
+        "symbol": "PAGEIND"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.728378+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "SHRIRAMFIN"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.813793+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SIEMENS:long:1787646000:677993a65ba8478b",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "SIEMENS"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 905.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.946876+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "TITAN"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:09.054326+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:UNOMINDA:short:1787642400:cc72c4e5ce59f2ec",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "UNOMINDA"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:58+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:06.312009+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:BAJAJHLDNG:short:1787647800:2510235bc4ce51c5",
+        "signal_time": null,
+        "source": "primary_obv_short_abs1.5",
+        "symbol": "BAJAJHLDNG"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.108758+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:MFSL:long:1787641500:806117cd37322688",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "MFSL"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.532904+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NIFTY:long:1787649600:f81cd1288bcfb1ed",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "NIFTY"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.633742+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70",
+        "signal_time": null,
+        "source": "fresh_trend_short",
+        "symbol": "PAGEIND"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.728378+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "SHRIRAMFIN"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 906.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.813793+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SIEMENS:long:1787646000:677993a65ba8478b",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "SIEMENS"
+      },
+      {
+        "entry_due_time": null,
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": 905.0,
+        "entry_time": "2026-08-25T15:14:59+05:30",
+        "event": "paper_entry",
+        "exit_time": null,
+        "has_t1": true,
+        "has_t2": true,
+        "has_t3": true,
+        "recorded_at_ist": "2026-08-25T15:30:08.946876+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff",
+        "signal_time": null,
+        "source": "fresh_trend_long",
+        "symbol": "TITAN"
+      },
+      {
+        "entry_due_time": "2026-08-25T09:17:00+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 212.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T09:20:33.084083+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:KALYANKJIL:long:1787629560:426af70a3e6c8caa",
+        "signal_time": "2026-08-25T09:16:00+05:30",
+        "source": "long_after_short_obv_exhaustion",
+        "symbol": "KALYANKJIL"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:20+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T10:19:33.074109+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NTPC:long:1787633300:0da1c050cfb5cab4",
+        "signal_time": "2026-08-25T10:18:20+05:30",
+        "source": null,
+        "symbol": "NTPC"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:09:39+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 627.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:20:08.200769+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NTPC:long:1787639919:a3eecaccf29302ff",
+        "signal_time": "2026-08-25T12:08:39+05:30",
+        "source": "long_after_short_obv_exhaustion",
+        "symbol": "NTPC"
+      },
+      {
+        "entry_due_time": "2026-08-25T13:54:57+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 9.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T13:55:07.549891+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NTPC:long:1787646237:b63853ed6105df1d",
+        "signal_time": "2026-08-25T13:53:57+05:30",
+        "source": "long_after_short_obv_exhaustion",
+        "symbol": "NTPC"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 906.0,
+          "entry_time": "2026-08-25T15:14:59+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:08.633742+05:30",
+          "side": "short",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70",
+          "signal_time": null,
+          "source": "fresh_trend_short",
+          "symbol": "PAGEIND"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T13:06:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:38:07.061900+05:30",
+          "side": "short",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70",
+          "signal_time": null,
+          "source": "fresh_trend_short",
+          "symbol": "PAGEIND"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PAGEIND:short:1787643300:fd8b1cef10efcf70"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 906.0,
+          "entry_time": "2026-08-25T15:14:59+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:08.728378+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "SHRIRAMFIN"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T15:06:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:45:06.198186+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "SHRIRAMFIN"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SHRIRAMFIN:long:1787650500:a6b65b208d90e013"
+      },
+      {
+        "live": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 905.0,
+          "entry_time": "2026-08-25T15:14:59+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T15:30:08.946876+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "TITAN"
+        },
+        "replay": {
+          "entry_due_time": null,
+          "entry_stale_reason": null,
+          "entry_staleness_seconds": 0.0,
+          "entry_time": "2026-08-25T14:36:00+05:30",
+          "event": "paper_entry",
+          "exit_time": null,
+          "has_t1": true,
+          "has_t2": true,
+          "has_t3": true,
+          "recorded_at_ist": "2026-08-25T20:48:47.156725+05:30",
+          "side": "long",
+          "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff",
+          "signal_time": null,
+          "source": "fresh_trend_long",
+          "symbol": "TITAN"
+        },
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:TITAN:long:1787648700:1362dc795ffd56ff"
+      }
+    ],
+    "live_stale_count": 67,
+    "prevention_action": "EOD workflow now requires RCA -> replay correction -> next-day prevention. Live path still needs zero-staleness follow-up if stale suppression repeats on the next session.",
+    "replay_stale_count": 20,
+    "suppressed_or_skipped_stale_count": 40,
+    "suppressed_sample": [
+      {
+        "entry_due_time": "2026-08-25T09:17:00+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 212.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T09:20:33.084083+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:KALYANKJIL:long:1787629560:426af70a3e6c8caa",
+        "signal_time": "2026-08-25T09:16:00+05:30",
+        "source": "long_after_short_obv_exhaustion",
+        "symbol": "KALYANKJIL"
+      },
+      {
+        "entry_due_time": "2026-08-25T09:17:00+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 1703.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T09:50:34.159946+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:DIVISLAB:short:1787629560:ffc19747d34de6cc",
+        "signal_time": "2026-08-25T09:16:00+05:30",
+        "source": "short_after_long_obv_exhaustion",
+        "symbol": "DIVISLAB"
+      },
+      {
+        "entry_due_time": "2026-08-25T09:17:00+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 1704.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T09:50:34.317963+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:HCLTECH:long:1787629560:1d90cba4af24a169",
+        "signal_time": "2026-08-25T09:16:00+05:30",
+        "source": "long_after_short_obv_exhaustion",
+        "symbol": "HCLTECH"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:22+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T10:19:32.789046+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787633302:28547c7fb6e5ba6a",
+        "signal_time": "2026-08-25T10:18:22+05:30",
+        "source": null,
+        "symbol": "AMBER"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:19+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T10:19:32.825044+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:DIVISLAB:short:1787633299:7d5101e74a3c0d7c",
+        "signal_time": "2026-08-25T10:18:19+05:30",
+        "source": null,
+        "symbol": "DIVISLAB"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:21+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T10:19:32.878233+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:FINNIFTY:long:1787633301:8814dbe35030eaa5",
+        "signal_time": "2026-08-25T10:18:21+05:30",
+        "source": null,
+        "symbol": "FINNIFTY"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:20+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T10:19:33.074109+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NTPC:long:1787633300:0da1c050cfb5cab4",
+        "signal_time": "2026-08-25T10:18:20+05:30",
+        "source": null,
+        "symbol": "NTPC"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:20+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T10:19:33.091233+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PRESTIGE:long:1787633300:08a5a5e8e7499664",
+        "signal_time": "2026-08-25T10:18:20+05:30",
+        "source": null,
+        "symbol": "PRESTIGE"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:19+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T10:19:33.108176+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SUNPHARMA:long:1787633299:f0dbe2b05b048b81",
+        "signal_time": "2026-08-25T10:18:19+05:30",
+        "source": null,
+        "symbol": "SUNPHARMA"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:20+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T10:19:33.190663+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:VMM:long:1787633300:1e5133d01e67c565",
+        "signal_time": "2026-08-25T10:18:20+05:30",
+        "source": null,
+        "symbol": "VMM"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:20+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T10:19:33.225276+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:YESBANK:long:1787633300:e8e7372b43dd9ad0",
+        "signal_time": "2026-08-25T10:18:20+05:30",
+        "source": null,
+        "symbol": "YESBANK"
+      },
+      {
+        "entry_due_time": "2026-08-25T10:19:19+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 3366.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T11:20:38.968870+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:DIVISLAB:short:1787633299:7d5101e74a3c0d7c",
+        "signal_time": "2026-08-25T10:18:19+05:30",
+        "source": "short_after_long_obv_exhaustion",
+        "symbol": "DIVISLAB"
+      },
+      {
+        "entry_due_time": "2026-08-25T11:38:20+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T11:38:38.356761+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIGREEN:long:1787638040:0882fb935c473ff7",
+        "signal_time": "2026-08-25T11:37:20+05:30",
+        "source": null,
+        "symbol": "ADANIGREEN"
+      },
+      {
+        "entry_due_time": "2026-08-25T11:38:18+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T11:38:38.401467+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787638038:d491486a2b717710",
+        "signal_time": "2026-08-25T11:37:18+05:30",
+        "source": null,
+        "symbol": "AMBER"
+      },
+      {
+        "entry_due_time": "2026-08-25T11:38:19+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T11:38:38.421772+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:DIVISLAB:short:1787638039:04c70da3581ab633",
+        "signal_time": "2026-08-25T11:37:19+05:30",
+        "source": null,
+        "symbol": "DIVISLAB"
+      },
+      {
+        "entry_due_time": "2026-08-25T11:38:21+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T11:38:38.705897+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PRESTIGE:long:1787638041:c0e8f5a743a97484",
+        "signal_time": "2026-08-25T11:37:21+05:30",
+        "source": null,
+        "symbol": "PRESTIGE"
+      },
+      {
+        "entry_due_time": "2026-08-25T11:38:17+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T11:38:38.732702+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SUNPHARMA:long:1787638037:9dff877279bc6a1f",
+        "signal_time": "2026-08-25T11:37:17+05:30",
+        "source": null,
+        "symbol": "SUNPHARMA"
+      },
+      {
+        "entry_due_time": "2026-08-25T11:38:17+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T11:38:38.754300+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:VMM:long:1787638037:c6d7bc08e740f5d9",
+        "signal_time": "2026-08-25T11:37:17+05:30",
+        "source": null,
+        "symbol": "VMM"
+      },
+      {
+        "entry_due_time": "2026-08-25T11:38:17+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T11:38:38.822934+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:YESBANK:long:1787638037:a4c06e07ca898a87",
+        "signal_time": "2026-08-25T11:37:17+05:30",
+        "source": null,
+        "symbol": "YESBANK"
+      },
+      {
+        "entry_due_time": "2026-08-25T11:45:29+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 303.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T11:50:32.420054+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:FINNIFTY:long:1787638469:112604dcd13abe7d",
+        "signal_time": "2026-08-25T11:44:29+05:30",
+        "source": "long_after_short_obv_exhaustion",
+        "symbol": "FINNIFTY"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:08:29+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:08:47.252299+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:360ONE:short:1787639849:eb1a2a077bd5f96b",
+        "signal_time": "2026-08-25T12:07:29+05:30",
+        "source": null,
+        "symbol": "360ONE"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:08:27+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:08:47.292973+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIGREEN:long:1787639847:92d74d3bae733d32",
+        "signal_time": "2026-08-25T12:07:27+05:30",
+        "source": null,
+        "symbol": "ADANIGREEN"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:08:28+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:08:47.323750+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787639848:bca6f675469a6ac7",
+        "signal_time": "2026-08-25T12:07:28+05:30",
+        "source": null,
+        "symbol": "AMBER"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:08:28+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:08:47.391380+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:FINNIFTY:long:1787639848:04d889255b2145f1",
+        "signal_time": "2026-08-25T12:07:28+05:30",
+        "source": null,
+        "symbol": "FINNIFTY"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:08:27+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:08:47.597225+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PRESTIGE:long:1787639847:1edc5f8d66103bf1",
+        "signal_time": "2026-08-25T12:07:27+05:30",
+        "source": null,
+        "symbol": "PRESTIGE"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:08:31+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:08:47.617806+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SUNPHARMA:long:1787639851:6ded3d0aa4bdf4a4",
+        "signal_time": "2026-08-25T12:07:31+05:30",
+        "source": null,
+        "symbol": "SUNPHARMA"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:08:29+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:08:47.670215+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:VMM:long:1787639849:5920da7a1b1b9258",
+        "signal_time": "2026-08-25T12:07:29+05:30",
+        "source": null,
+        "symbol": "VMM"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:08:27+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:08:47.707773+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:YESBANK:long:1787639847:ec3f895e756c7bb0",
+        "signal_time": "2026-08-25T12:07:27+05:30",
+        "source": null,
+        "symbol": "YESBANK"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:09:39+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 627.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:20:08.200769+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NTPC:long:1787639919:a3eecaccf29302ff",
+        "signal_time": "2026-08-25T12:08:39+05:30",
+        "source": "long_after_short_obv_exhaustion",
+        "symbol": "NTPC"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:10:04+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 619.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:20:24.123861+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:JSWSTEEL:long:1787639944:a87a5f6e331e0bcc",
+        "signal_time": "2026-08-25T12:09:04+05:30",
+        "source": "long_after_short_obv_exhaustion",
+        "symbol": "JSWSTEEL"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:27:49+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:28:11.432840+05:30",
+        "side": "short",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:360ONE:short:1787641009:39f081e4a5163b6c",
+        "signal_time": "2026-08-25T12:26:49+05:30",
+        "source": null,
+        "symbol": "360ONE"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:27:48+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:28:11.485549+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:ADANIGREEN:long:1787641008:492e5631cbf391b4",
+        "signal_time": "2026-08-25T12:26:48+05:30",
+        "source": null,
+        "symbol": "ADANIGREEN"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:27:48+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:28:11.506588+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787641008:16ce33ce4f35286e",
+        "signal_time": "2026-08-25T12:26:48+05:30",
+        "source": null,
+        "symbol": "AMBER"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:27:48+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:28:11.539067+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:FINNIFTY:long:1787641008:6f8f28ea6e0743c9",
+        "signal_time": "2026-08-25T12:26:48+05:30",
+        "source": null,
+        "symbol": "FINNIFTY"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:27:54+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:28:11.626440+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:JSWSTEEL:long:1787641014:78eeb8bb16dd95d5",
+        "signal_time": "2026-08-25T12:26:54+05:30",
+        "source": null,
+        "symbol": "JSWSTEEL"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:27:51+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:28:11.731524+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:PRESTIGE:long:1787641011:7b1f954e227e557a",
+        "signal_time": "2026-08-25T12:26:51+05:30",
+        "source": null,
+        "symbol": "PRESTIGE"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:27:50+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:28:11.791623+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:SUNPHARMA:long:1787641010:999c4d92ad6862d4",
+        "signal_time": "2026-08-25T12:26:50+05:30",
+        "source": null,
+        "symbol": "SUNPHARMA"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:27:50+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:28:11.825585+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:VMM:long:1787641010:f0c3e0296ee047ea",
+        "signal_time": "2026-08-25T12:26:50+05:30",
+        "source": null,
+        "symbol": "VMM"
+      },
+      {
+        "entry_due_time": "2026-08-25T12:27:48+05:30",
+        "entry_stale_reason": null,
+        "entry_staleness_seconds": null,
+        "entry_time": null,
+        "event": "entry_signal_skipped",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T12:28:11.924875+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:YESBANK:long:1787641008:9eb733c0282ff471",
+        "signal_time": "2026-08-25T12:26:48+05:30",
+        "source": null,
+        "symbol": "YESBANK"
+      },
+      {
+        "entry_due_time": "2026-08-25T13:54:57+05:30",
+        "entry_stale_reason": "stale_live_entry",
+        "entry_staleness_seconds": 9.0,
+        "entry_time": null,
+        "event": "stale_entry_rejected",
+        "exit_time": null,
+        "has_t1": null,
+        "has_t2": false,
+        "has_t3": false,
+        "recorded_at_ist": "2026-08-25T13:55:07.549891+05:30",
+        "side": "long",
+        "signal_id": "OBVFUTPORT_V2_PASSIVE:NTPC:long:1787646237:b63853ed6105df1d",
+        "signal_time": "2026-08-25T13:53:57+05:30",
+        "source": "long_after_short_obv_exhaustion",
+        "symbol": "NTPC"
+      }
+    ],
+    "treatment": "Installed production state was replaced from the corrected replay. Live stale rows remain diagnostic in the pre-install backup and should not drive dashboard or Matrix transactions."
+  },
+  "system_health": {
+    "df": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/root       310G  256G   55G  83% /",
+    "free": "total        used        free      shared  buff/cache   available\nMem:           15788        1619         171         133       13996       13682\nSwap:           2047         313        1734",
+    "run_folder_du": "5.2G\t/tmp/obvfutport_v2_aug25_eod_chain_disk_safe_20260825_1340",
+    "uptime": "15:52:56 up 13 days, 11:30,  0 users,  load average: 0.52, 0.36, 0.60"
+  },
+  "trade_date": "2026-08-25"
+}

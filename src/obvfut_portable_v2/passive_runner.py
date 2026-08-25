@@ -32,6 +32,31 @@ MIN_CLOCK_HISTORY = 20
 _V1_PORTFOLIO_MODULE: Any | None = None
 _V1_OBV_MODEL_MODULE: Any | None = None
 
+SECOND_STATE_COLUMNS = [
+    "trade_date",
+    "epoch_second",
+    "actual_time",
+    "received_at_ist",
+    "exchange_timestamp",
+    "price",
+    "bid_price",
+    "ask_price",
+    "volume_traded",
+]
+
+CLOCK_STATE_COLUMNS = [
+    "trade_date",
+    "clock_label",
+    "clock_time",
+    "has_clock_row",
+    "actual_time",
+    "received_at_ist",
+    "exchange_timestamp",
+    "epoch_second",
+    "price",
+    "prior_clock_vol_points",
+]
+
 
 def now_ist() -> datetime:
     return datetime.now(tz=IST)
@@ -3909,6 +3934,8 @@ class PassiveV2Runner:
                     hi = mid
             second_rows_source = second_rows_source[:lo]
         seconds = pd.DataFrame(second_rows_source)
+        if seconds.empty:
+            seconds = pd.DataFrame(columns=SECOND_STATE_COLUMNS)
         if not seconds.empty:
             seconds = seconds.sort_values("epoch_second", kind="mergesort").reset_index(drop=True)
             if through_epoch is not None and "epoch_second" in seconds.columns:
@@ -3930,6 +3957,8 @@ class PassiveV2Runner:
                     hi = mid
             clock_rows_source = clock_rows_source[:lo]
         clock_state = pd.DataFrame(clock_rows_source)
+        if clock_state.empty:
+            clock_state = pd.DataFrame(columns=CLOCK_STATE_COLUMNS)
         if not clock_state.empty:
             clock_state = clock_state.sort_values("epoch_second", kind="mergesort").reset_index(drop=True)
             if through_epoch is not None and "epoch_second" in clock_state.columns:
@@ -5519,6 +5548,8 @@ class PassiveV2Runner:
         self._last_transition_signal_eval_monotonic = time.perf_counter()
         started = time.perf_counter()
         now_epoch = int(time.time())
+        entry_delay_seconds = int(self.config.get("entry_delay_seconds") or 60)
+        max_live_entry_lag_seconds = self.live_entry_fill_acceptance_seconds()
         v1_obv_model = load_v1_obv_model_module(self.config)
         watched = 0
         events: list[dict[str, Any]] = []
@@ -5563,11 +5594,52 @@ class PassiveV2Runner:
                     continue
                 if signal_epoch <= last_signal_epoch or signal_epoch <= last_exit_epoch:
                     continue
+                due_epoch = self._entry_due_epoch(edge, entry_delay_seconds)
                 event = self.entry_event_from_edge(
                     meta,
                     {**edge, "signal_loop_match": "post_exhaustion_transition_edge"},
                 )
                 if event["signal_id"] in self.events_seen:
+                    continue
+                if (
+                    max_live_entry_lag_seconds is not None
+                    and due_epoch is not None
+                    and self.is_market_hours_epoch(now_epoch)
+                    and now_epoch - int(due_epoch) > int(max_live_entry_lag_seconds)
+                ):
+                    skip_event = self.entry_signal_skip_event_from_edge(
+                        meta,
+                        {**edge, "signal_loop_match": "post_exhaustion_transition_edge"},
+                        reason="stale_transition_signal_at_detection",
+                        details={
+                            "signal_epoch": signal_epoch,
+                            "signal_time": epoch_ist_iso(signal_epoch),
+                            "entry_due_epoch": int(due_epoch),
+                            "entry_due_time": epoch_ist_iso(int(due_epoch)),
+                            "detected_epoch": now_epoch,
+                            "detected_time": epoch_ist_iso(now_epoch),
+                            "entry_staleness_seconds": now_epoch - int(due_epoch),
+                            "max_live_entry_fill_lag_seconds": int(max_live_entry_lag_seconds),
+                        },
+                    )
+                    self.events_seen.add(str(skip_event["signal_id"]))
+                    append_jsonl(self.decision_events_path(trade_date), skip_event)
+                    model_state["last_signal_epoch"] = max(
+                        int(model_state.get("last_signal_epoch") or 0),
+                        signal_epoch,
+                    )
+                    model_state["updated_at_ist"] = now_ist().isoformat()
+                    self.model_states[meta.symbol] = dict(model_state)
+                    self.save_model_state(meta.symbol, self.model_states[meta.symbol])
+                    skipped.append(
+                        {
+                            "symbol": meta.symbol,
+                            "reason": "stale_transition_signal_at_detection",
+                            "signal_epoch": signal_epoch,
+                            "entry_due_epoch": int(due_epoch),
+                            "entry_staleness_seconds": now_epoch - int(due_epoch),
+                        }
+                    )
                     continue
                 self.events_seen.add(str(event["signal_id"]))
                 append_jsonl(self.decision_events_path(trade_date), event)
@@ -6460,10 +6532,17 @@ class PassiveV2Runner:
                 else:
                     self.evaluate_rollovers(trade_date)
                     evaluated_clocks = self.evaluate_due_clocks(trade_date)
-                    self.evaluate_transition_signals(trade_date)
+                    transition_report = self.evaluate_transition_signals(trade_date)
+                    transition_entry_symbols = sorted(
+                        {
+                            str(symbol)
+                            for symbol in transition_report.get("event_symbols") or []
+                            if symbol
+                        }
+                    )
                     if evaluated_clocks:
                         all_symbols = bool(self.config.get("trade_state_all_symbols_on_clock", False))
-                        entry_symbols = sorted(set(self.latest_due_clock_event_symbols))
+                        entry_symbols = sorted(set(self.latest_due_clock_event_symbols) | set(transition_entry_symbols))
                         active_symbols = self.active_trade_state_symbols(include_transition_watch=False)
                         scoped_symbols = sorted(set(active_symbols) | set(entry_symbols))
                         if all_symbols:
@@ -6513,6 +6592,12 @@ class PassiveV2Runner:
                             append_jsonl(self.telemetry_path, report)
                             self.latest_trade_state_report = report
                     else:
+                        if transition_entry_symbols:
+                            self.evaluate_frozen_trade_state(
+                                trade_date,
+                                symbols=transition_entry_symbols,
+                                reason="transition_entry_symbols",
+                            )
                         pending_due_symbols = self.pending_entry_due_symbols(
                             lookahead_seconds=float(self.config.get("pending_entry_fill_priority_lookahead_seconds") or 2.0)
                         )
@@ -6522,19 +6607,19 @@ class PassiveV2Runner:
                                 symbols=pending_due_symbols,
                                 reason="entry_fill_priority",
                             )
+                        priority_block = self.active_sweep_clock_priority_block()
+                        if priority_block is not None:
+                            append_jsonl(self.telemetry_path, priority_block)
+                            self.latest_trade_state_report = priority_block
                         else:
-                            priority_block = self.active_sweep_clock_priority_block()
-                            if priority_block is not None:
-                                append_jsonl(self.telemetry_path, priority_block)
-                                self.latest_trade_state_report = priority_block
-                            else:
-                                active_symbols = self.active_trade_state_symbols(include_transition_watch=False)
-                                if active_symbols and self.should_evaluate_active_trade_state():
-                                    self.evaluate_frozen_trade_state(
-                                        trade_date,
-                                        symbols=active_symbols,
-                                        reason="active_position_loop",
-                                    )
+                            active_symbols = self.active_trade_state_symbols(include_transition_watch=False)
+                            active_symbols = sorted(set(active_symbols) - set(pending_due_symbols))
+                            if active_symbols and self.should_evaluate_active_trade_state():
+                                self.evaluate_frozen_trade_state(
+                                    trade_date,
+                                    symbols=active_symbols,
+                                    reason="active_position_loop",
+                                )
             retention_report = self.refresh_dynamic_retention()
             self.latest_retention_report = retention_report
             if time.time() - last_status >= self.status_write_seconds:

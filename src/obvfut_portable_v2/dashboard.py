@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import json
 import os
+import re
 import statistics
 import time
 from datetime import datetime, timedelta, timezone
@@ -18,10 +19,15 @@ STATE_DIR = Path(os.environ.get("OBVFUTPORT_V2_STATE_DIR", "/opt/cloud-deploy-ca
 ROOT_DIR = Path(os.environ.get("OBVFUTPORT_V2_ROOT", "/opt/cloud-deploy-candidates/obv-futures-portable-v2"))
 START_DATE = os.environ.get("OBVFUTPORT_V2_DASHBOARD_START_DATE", "2026-08-10")
 CACHE_TTL_SECONDS = float(os.environ.get("OBVFUTPORT_V2_DASHBOARD_CACHE_TTL_SECONDS", "5"))
+STALE_DIAGNOSTIC_DAYS = max(1, int(float(os.environ.get("OBVFUTPORT_V2_STALE_DIAGNOSTIC_DAYS", "1"))))
 
 app = FastAPI(title="OBVFUTPORT V2 Dashboard")
 
 _SNAPSHOT_CACHE: dict[str, Any] = {"built_at": 0.0, "data": None}
+
+
+def now_ist() -> datetime:
+    return datetime.now(timezone(timedelta(hours=5, minutes=30)))
 
 
 def read_json(path: Path, default: Any) -> Any:
@@ -67,10 +73,51 @@ def read_last_jsonl(path: Path) -> dict[str, Any]:
         return {}
 
 
+def safe_key(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", str(value))
+
+
 def load_adaptive_lookup() -> dict[str, Any]:
     payload = read_json(STATE_DIR / "adaptive_calibration" / "v2_symbol_overrides_latest.json", {})
     symbols = payload.get("symbols") if isinstance(payload, dict) else {}
     return symbols if isinstance(symbols, dict) else {}
+
+
+def load_universe_symbols() -> set[str]:
+    runtime = read_json(ROOT_DIR / "config" / "runtime.json", {})
+    paths: list[Path] = []
+    if isinstance(runtime, dict):
+        for key in ("contract_chain_manifest_path", "contract_chain_manifest_path_local"):
+            raw = runtime.get(key)
+            if raw:
+                paths.append(Path(str(raw)))
+    paths.append(ROOT_DIR / "config" / "obvfutport_v2_contract_chain_manifest.json")
+    for path in paths:
+        payload = read_json(path, {})
+        symbols = payload.get("symbols") if isinstance(payload, dict) else None
+        if isinstance(symbols, dict) and symbols:
+            return {str(symbol) for symbol in symbols}
+    return set()
+
+
+def load_instrument_sources(universe_symbols: set[str]) -> list[tuple[str, Path]]:
+    root = STATE_DIR / "instruments"
+    if not universe_symbols:
+        return [(path.name, path) for path in sorted(root.glob("*")) if path.is_dir()]
+
+    sources: list[tuple[str, Path]] = []
+    seen_paths: set[Path] = set()
+    for symbol in sorted(universe_symbols):
+        candidates = [root / symbol]
+        safe = root / safe_key(symbol)
+        if safe != candidates[0]:
+            candidates.append(safe)
+        for path in candidates:
+            if not path.is_dir() or path in seen_paths:
+                continue
+            seen_paths.add(path)
+            sources.append((symbol, path))
+    return sources
 
 
 def adaptive_fields(symbol: str, source: dict[str, Any], parent: dict[str, Any]) -> dict[str, Any]:
@@ -165,6 +212,35 @@ def fmt_epoch(epoch: int | None) -> str | None:
         return None
     ist = timezone(timedelta(hours=5, minutes=30))
     return datetime.fromtimestamp(epoch, tz=timezone.utc).astimezone(ist).isoformat()
+
+
+def parse_time_epoch(value: Any) -> int | None:
+    if not value:
+        return None
+    try:
+        text = str(value).replace("Z", "+00:00")
+        return int(datetime.fromisoformat(text).timestamp())
+    except (TypeError, ValueError):
+        return None
+
+
+def stale_event_reason(event: dict[str, Any]) -> str:
+    return str(
+        event.get("skip_reason")
+        or event.get("reason")
+        or event.get("entry_stale_reason")
+        or event.get("stale_reason")
+        or ""
+    )
+
+
+def event_stale_seconds(event: dict[str, Any]) -> float | None:
+    details = event.get("skip_details") if isinstance(event.get("skip_details"), dict) else {}
+    return safe_float(
+        event.get("entry_staleness_seconds")
+        or event.get("fill_delay_seconds")
+        or details.get("entry_staleness_seconds")
+    )
 
 
 def compact_decision_report(report: Any) -> dict[str, Any]:
@@ -363,10 +439,14 @@ def load_rows() -> dict[str, Any]:
     start_epoch = start_epoch_from_date(START_DATE)
     margins = load_margin_lookup()
     adaptive_lookup = load_adaptive_lookup()
+    universe_symbols = load_universe_symbols()
     rows_by_tranche: dict[str, list[dict[str, Any]]] = {"T1": [], "T2": [], "T3": []}
     stale_suppressed_open_positions: list[dict[str, Any]] = []
+    stale_suppressed_entry_diagnostics: list[dict[str, Any]] = []
     seen: set[tuple[Any, ...]] = set()
-    instrument_dirs = [p for p in sorted((STATE_DIR / "instruments").glob("*")) if p.is_dir()]
+    seen_stale: set[tuple[Any, ...]] = set()
+    instrument_sources = load_instrument_sources(universe_symbols)
+    instrument_symbols = sorted(universe_symbols) if universe_symbols else sorted({symbol for symbol, _ in instrument_sources})
 
     def add(row: dict[str, Any]) -> None:
         entry_epoch = parse_epoch(row.get("entry_epoch"))
@@ -426,8 +506,53 @@ def load_rows() -> dict[str, Any]:
             }
         )
 
-    for instrument_dir in instrument_dirs:
-        symbol = instrument_dir.name
+    def record_stale_entry_diagnostic(event: dict[str, Any]) -> None:
+        event_type = str(event.get("event") or "")
+        reason = stale_event_reason(event)
+        if event_type == "stale_entry_rejected":
+            pass
+        elif event_type == "entry_signal_skipped" and reason.startswith("stale_"):
+            pass
+        else:
+            return
+        details = event.get("skip_details") if isinstance(event.get("skip_details"), dict) else {}
+        signal_epoch = parse_epoch(event.get("signal_epoch") or details.get("signal_epoch"))
+        entry_due_epoch = parse_epoch(event.get("entry_due_epoch") or details.get("entry_due_epoch"))
+        recorded_epoch = parse_epoch(event.get("created_epoch") or event.get("recorded_epoch") or details.get("detected_epoch"))
+        reference_epoch = signal_epoch or entry_due_epoch or recorded_epoch
+        if reference_epoch is None or reference_epoch < start_epoch:
+            return
+        symbol = str(event.get("symbol") or "")
+        signal_id = str(event.get("signal_id") or "")
+        stale_key = (event_type, symbol, signal_id, signal_epoch, entry_due_epoch, reason)
+        if stale_key in seen_stale:
+            return
+        seen_stale.add(stale_key)
+        stale_suppressed_entry_diagnostics.append(
+            {
+                "symbol": symbol,
+                "position_id": event.get("position_id"),
+                "signal_id": signal_id,
+                "side": event.get("side"),
+                "entry_time": event.get("entry_due_time") or fmt_epoch(entry_due_epoch),
+                "signal_time": event.get("signal_time") or fmt_epoch(signal_epoch),
+                "recorded_at_ist": event.get("recorded_at_ist") or event.get("created_at_ist") or fmt_epoch(recorded_epoch),
+                "entry_epoch": entry_due_epoch,
+                "entry_price": safe_float(event.get("candidate_entry_price") or event.get("signal_price")),
+                "entry_fill_price": safe_float(event.get("candidate_entry_price")),
+                "entry_stale": True,
+                "entry_stale_reason": reason or "stale_entry_rejected",
+                "entry_staleness_seconds": event_stale_seconds(event),
+                "has_t1": False,
+                "has_t2": False,
+                "has_t3": False,
+                "tranches": ["Signal"],
+                "diagnostic_event": event_type,
+                "source": event.get("source") or event.get("module"),
+            }
+        )
+
+    for symbol, instrument_dir in instrument_sources:
         model = read_json(instrument_dir / "model_state.json", {})
         if isinstance(model, dict):
             position = model.get("position")
@@ -496,15 +621,98 @@ def load_rows() -> dict[str, Any]:
             elif event_type == "tranche3_exit":
                 add(normalize_row(symbol=symbol, tranche="T3", source=event, status="closed", margins=margins))
 
+    stale_cutoff_date = now_ist().date() - timedelta(days=STALE_DIAGNOSTIC_DAYS - 1)
+    for path in sorted((STATE_DIR / "decision_events").glob("decision_events_*.jsonl")):
+        date_text = path.stem.replace("decision_events_", "", 1)
+        try:
+            if datetime.fromisoformat(date_text).date() < stale_cutoff_date:
+                continue
+        except ValueError:
+            continue
+        for event in iter_jsonl(path):
+            record_stale_entry_diagnostic(event)
+
+    for path in sorted((STATE_DIR / "reports").glob("v2_eod_*_stale_rca_*.json")):
+        report = read_json(path, {})
+        trade_date = report.get("trade_date") if isinstance(report, dict) else None
+        try:
+            if not trade_date or datetime.fromisoformat(str(trade_date)).date() < stale_cutoff_date:
+                continue
+        except ValueError:
+            continue
+        diagnostics = report.get("stale_diagnostics") if isinstance(report.get("stale_diagnostics"), dict) else {}
+        archived_groups = [
+            ("live_accepted_stale_entry", diagnostics.get("accepted_stale_sample") or []),
+            ("live_suppressed_stale_entry", diagnostics.get("suppressed_sample") or []),
+        ]
+        for diagnostic_event, items in archived_groups:
+            if not isinstance(items, list):
+                continue
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                symbol = str(item.get("symbol") or "")
+                signal_id = str(item.get("signal_id") or "")
+                signal_epoch = parse_epoch(item.get("signal_epoch")) or parse_time_epoch(item.get("signal_time"))
+                entry_due_epoch = (
+                    parse_epoch(item.get("entry_due_epoch"))
+                    or parse_epoch(item.get("entry_epoch"))
+                    or parse_time_epoch(item.get("entry_due_time"))
+                    or parse_time_epoch(item.get("entry_time"))
+                )
+                recorded_epoch = parse_epoch(item.get("recorded_epoch")) or parse_time_epoch(item.get("recorded_at_ist"))
+                reason = str(item.get("entry_stale_reason") or "")
+                if diagnostic_event == "live_accepted_stale_entry" and not reason:
+                    reason = "live_accepted_stale_entry_replayed_timely"
+                stale_key = (diagnostic_event, symbol, signal_id, signal_epoch, entry_due_epoch, reason)
+                if stale_key in seen_stale:
+                    continue
+                seen_stale.add(stale_key)
+                stale_suppressed_entry_diagnostics.append(
+                    {
+                        "symbol": symbol,
+                        "position_id": item.get("position_id"),
+                        "signal_id": signal_id,
+                        "side": item.get("side"),
+                        "entry_time": item.get("entry_due_time") or item.get("entry_time") or fmt_epoch(entry_due_epoch),
+                        "signal_time": item.get("signal_time") or fmt_epoch(signal_epoch),
+                        "recorded_at_ist": item.get("recorded_at_ist") or fmt_epoch(recorded_epoch),
+                        "entry_epoch": entry_due_epoch,
+                        "entry_price": safe_float(item.get("entry_price")),
+                        "entry_fill_price": safe_float(item.get("entry_fill_price")),
+                        "entry_stale": True,
+                        "entry_stale_reason": reason or "stale_live_entry",
+                        "entry_staleness_seconds": safe_float(item.get("entry_staleness_seconds")),
+                        "has_t1": truthy(item.get("has_t1")),
+                        "has_t2": truthy(item.get("has_t2")),
+                        "has_t3": truthy(item.get("has_t3")),
+                        "tranches": item.get("tranches") if isinstance(item.get("tranches"), list) else ["Diagnostic"],
+                        "diagnostic_event": diagnostic_event,
+                        "source": item.get("source"),
+                        "replay_treatment": diagnostics.get("treatment"),
+                        "prevention_action": diagnostics.get("prevention_action"),
+                        "source_report": str(path),
+                    }
+                )
+
     all_rows = rows_by_tranche["T1"] + rows_by_tranche["T2"] + rows_by_tranche["T3"]
+    stale_suppressed_entries = sorted(
+        stale_suppressed_open_positions + stale_suppressed_entry_diagnostics,
+        key=lambda r: (parse_epoch(r.get("entry_epoch")) or 0, str(r.get("symbol"))),
+        reverse=True,
+    )
     return {
-        "instrument_dirs": len(instrument_dirs),
-        "instrument_symbols": [path.name for path in instrument_dirs],
+        "instrument_dirs": len(instrument_symbols),
+        "instrument_symbols": instrument_symbols,
+        "instrument_source_paths": [{"symbol": symbol, "path": str(path)} for symbol, path in instrument_sources],
+        "universe_symbols": sorted(universe_symbols),
         "adaptive_lookup": adaptive_lookup,
         "stale_suppressed_open_positions": sorted(
             stale_suppressed_open_positions,
             key=lambda r: (str(r.get("symbol")), parse_epoch(r.get("entry_epoch")) or 0),
         ),
+        "stale_suppressed_entry_diagnostics": stale_suppressed_entry_diagnostics,
+        "stale_suppressed_entries": stale_suppressed_entries,
         "rows_by_tranche": {k: sorted(v, key=lambda r: (r.get("entry_epoch") or 0, r.get("exit_epoch") or 0)) for k, v in rows_by_tranche.items()},
         "rows": sorted(all_rows, key=lambda r: (r.get("entry_epoch") or 0, r.get("tranche") or "", r.get("exit_epoch") or 0)),
     }
@@ -576,12 +784,15 @@ def build_snapshot() -> dict[str, Any]:
     summary = summarize(rows)
     tranche_summary = {tranche: summarize(items) for tranche, items in by_tranche.items()}
     stale_suppressed_open_positions = loaded.get("stale_suppressed_open_positions", [])
+    stale_suppressed_entry_diagnostics = loaded.get("stale_suppressed_entry_diagnostics", [])
+    stale_suppressed_entries = loaded.get("stale_suppressed_entries", stale_suppressed_open_positions)
     stale_suppressed_by_tranche = {
-        "T1": sum(1 for item in stale_suppressed_open_positions if item.get("has_t1")),
-        "T2": sum(1 for item in stale_suppressed_open_positions if item.get("has_t2")),
-        "T3": sum(1 for item in stale_suppressed_open_positions if item.get("has_t3")),
+        "T1": sum(1 for item in stale_suppressed_entries if item.get("has_t1")),
+        "T2": sum(1 for item in stale_suppressed_entries if item.get("has_t2")),
+        "T3": sum(1 for item in stale_suppressed_entries if item.get("has_t3")),
     }
     summary["stale_suppressed_open_count"] = len(stale_suppressed_open_positions)
+    summary["stale_suppressed_entry_count"] = len(stale_suppressed_entries)
     for tranche, count in stale_suppressed_by_tranche.items():
         tranche_summary.setdefault(tranche, {})["stale_suppressed_open_count"] = count
     margins = margin_timeline(rows)
@@ -625,8 +836,11 @@ def build_snapshot() -> dict[str, Any]:
         "rows": rows,
         "open_positions": sorted([r for r in rows if r.get("status") == "open"], key=lambda r: (str(r.get("symbol")), str(r.get("tranche")))),
         "stale_suppressed_open_positions": stale_suppressed_open_positions,
+        "stale_suppressed_entry_diagnostics": stale_suppressed_entry_diagnostics,
+        "stale_suppressed_entries": stale_suppressed_entries,
         "stale_suppressed_by_tranche": stale_suppressed_by_tranche,
         "stale_suppressed_open_count": len(stale_suppressed_open_positions),
+        "stale_suppressed_entry_count": len(stale_suppressed_entries),
         "transactions": sorted([r for r in rows if r.get("status") == "closed"], key=lambda r: (r.get("exit_epoch") or 0, r.get("entry_epoch") or 0), reverse=True),
         "symbols": sorted(by_symbol.values(), key=lambda item: item["symbol"]),
         "runner_status": status,
@@ -814,7 +1028,7 @@ def dashboard_html() -> str:
         card('Peak Margin', money(m.peak_margin_rupees)),
         card('Closed Success', pct(s.success_rate_pct)),
         card('Open Legs', String(s.open)),
-        card('Suppressed Stale Opens', String(snapshot.stale_suppressed_open_count || 0), 'small'),
+        card('Suppressed Stale Entries', String(snapshot.stale_suppressed_entry_count || 0), 'small'),
         card('Closed Legs', String(s.closed)),
         card('Symbols', String(snapshot.instrument_count)),
         card('Adaptive Symbols', String(adaptiveSymbols)),
@@ -833,7 +1047,7 @@ def dashboard_html() -> str:
         `<thead><tr><th>Tranche</th><th>Closed</th><th>Open</th><th>Success</th><th>Closed Net</th><th>Open MTM</th><th>Total Net</th><th>Avg % Margin</th><th>Median % Margin</th></tr></thead><tbody>${rows}</tbody>`;
     }
     function renderStaleSuppressed(){
-      const rows = snapshot.stale_suppressed_open_positions || [];
+      const rows = snapshot.stale_suppressed_entries || snapshot.stale_suppressed_open_positions || [];
       if(!rows.length){
         document.getElementById('staleTable').innerHTML = '<tbody><tr><td class="empty">No suppressed stale entries</td></tr></tbody>';
         return;
@@ -842,14 +1056,16 @@ def dashboard_html() -> str:
         <td><strong>${r.symbol}</strong></td>
         <td>${String(r.side || '').toUpperCase()}</td>
         <td>${Array.isArray(r.tranches) ? r.tranches.map(x => `<span class="tag">${x}</span>`).join(' ') : '--'}</td>
+        <td class="mono">${t(r.signal_time || r.entry_time)}</td>
         <td class="mono">${t(r.entry_time)}</td>
+        <td class="mono">${t(r.recorded_at_ist)}</td>
         <td>${price(r.entry_fill_price || r.entry_price)}</td>
         <td>${r.entry_staleness_seconds == null ? '--' : pctFmt.format(Number(r.entry_staleness_seconds)) + 's'}</td>
         <td>${r.entry_stale_reason || '--'}</td>
         <td class="mono">${r.position_id || '--'}</td>
       </tr>`).join('');
       document.getElementById('staleTable').innerHTML =
-        `<thead><tr><th>Symbol</th><th>Side</th><th>Suppressed Legs</th><th>Entry Time</th><th>Entry Fill</th><th>Stale By</th><th>Reason</th><th>Position Id</th></tr></thead><tbody>${body}</tbody>`;
+        `<thead><tr><th>Symbol</th><th>Side</th><th>Suppressed Legs</th><th>Signal Time</th><th>Due Time</th><th>Recorded</th><th>Entry Fill</th><th>Stale By</th><th>Reason</th><th>Position Id</th></tr></thead><tbody>${body}</tbody>`;
     }
     function populateSymbols(){
       const select=document.getElementById('symbol');

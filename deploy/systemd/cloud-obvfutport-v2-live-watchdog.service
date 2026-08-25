@@ -1,0 +1,19 @@
+[Unit]
+Description=OBVFUTPORT v2 live health watchdog
+After=network-online.target cloud-obvfutport-v2-passive.service cloud-obvfutport-v2-target-stream.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=PYTHONUNBUFFERED=1
+Environment=OBVFUTPORT_V2_WATCHDOG_INTERVAL_SECONDS=30
+ExecStart=/usr/bin/python3 /opt/cloud-deploy-candidates/obv-futures-portable-v2/scripts/live_watchdog.py
+Restart=always
+RestartSec=10
+Nice=15
+CPUQuota=5%
+MemoryMax=128M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

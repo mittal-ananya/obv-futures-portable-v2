@@ -1,0 +1,1587 @@
+{
+  "adaptive_override": {
+    "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/adaptive_calibration/v2_symbol_overrides_latest.json",
+    "quarantined_symbols": [
+      "IOC",
+      "MAXHEALTH"
+    ],
+    "sha256": "07c54f85d72b87ce042b3e74d9c167ddc88ec6b03eb215ae576e3cd264480c5e",
+    "symbol_count": 212,
+    "version": "joint_adaptive_v2_20260823_209_symbols"
+  },
+  "decision_events": {
+    "files": [
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-10.jsonl",
+        "rows": 3,
+        "sha256": "31921953e786b4af4339af4d48c9f0edf4aad946d2db43d414be66de1387757e"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-11.jsonl",
+        "rows": 476,
+        "sha256": "e5ed490d3fc5b53739a521810f5e35b91f6ed463ca78b0def131de0fcf81c343"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-12.jsonl",
+        "rows": 259,
+        "sha256": "b3877d1478663787874a928fce3533a07c5df54a8a8387c3a2fcf4acc38fdb9f"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-13.jsonl",
+        "rows": 186,
+        "sha256": "4d6d84b6a0340aaf62361207de6720a2664ed6f6d2db4c746ef574e8702119e4"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-14.jsonl",
+        "rows": 182,
+        "sha256": "0acfc7087369ca78e5ff4c2a13d43b7007dd5080d47a2975e2cf1c68ebb043bb"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-17.jsonl",
+        "rows": 183,
+        "sha256": "31327a6b1be71db2c77643d5feca6bcf0ed63f66a688eeef188e3ad7c4169b98"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-18.jsonl",
+        "rows": 148,
+        "sha256": "828922c1d9020f2d5d5e6ca42fc29c0f81182d1d8d1be8399802189cc10ef143"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-19.jsonl",
+        "rows": 287,
+        "sha256": "2f40cbe357f2251cfcb439063a4ea838b905f3cc4f2d35e495581e0cb6fe5ad1"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-20.jsonl",
+        "rows": 147,
+        "sha256": "fe9cdff64594206a44ca65b785489600aefaef66692374f4d35c6034962e8f37"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-21.jsonl",
+        "rows": 183,
+        "sha256": "a70c265ae038f7387a1367a1e2f29faf7717a005e82b07141876843e1f0f4052"
+      },
+      {
+        "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-25.jsonl",
+        "rows": 273,
+        "sha256": "d141582518e73c8898ce8c20c34e158747276065516825429ae2abdede90c235"
+      }
+    ]
+  },
+  "generated_at_ist": "2026-08-25T15:35:31+00:00",
+  "instruments": {
+    "count": 212,
+    "ledger_rows_total": 2900,
+    "open_rows_detected_total": 0,
+    "rows": [
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "17e2b72da375fc4ed9254eff7a172d9e3cb0bda37ff45753c6a0a6b8a381745f",
+        "model_state_sha256": "e576c685504cfdbc7c75372c7907c99f1407d191b10fbefa7a6f15a441539e84",
+        "open_rows_detected": 0,
+        "symbol": "360ONE"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "001341028062e70898d2c966eebc20330b5cc537ae4d75a00d0f8a0aff585dd7",
+        "model_state_sha256": "0419f140367d90cdfb05d175fbfc54da26e5e9015c44fc5cac753cc429296e36",
+        "open_rows_detected": 0,
+        "symbol": "ABB"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "7fd4c218878e02cb8ac0d4323f0fe3d19daa6515c841f6df1c6bc119db8ff8b9",
+        "model_state_sha256": "2b7c3b56e5d3ea87a0ae0d3cb2271aa127f7bb6e7d9b2fc671b6ce021e3a29d6",
+        "open_rows_detected": 0,
+        "symbol": "ABCAPITAL"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "2e40070d36ff70b40a7d703819b89235f90fdd661bd524e08de55474474c21e9",
+        "model_state_sha256": "4ac9478f0fb40e1ce79460d01b841e262c3ab57f3048df7d645921b8df7c0889",
+        "open_rows_detected": 0,
+        "symbol": "ADANIENSOL"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "84e643a90744b1e6f80fb46570fea8fa8a0fd1f6aa3164c9adbdc90212b15c49",
+        "model_state_sha256": "108c398cd6d1993ad5d5bb8e4fe715eb987719c39e04b3f8cecebaa3aa69c353",
+        "open_rows_detected": 0,
+        "symbol": "ADANIENT"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "90dbf291a0515b86bf9f505f05fc358c70f3ce7935157d48dcbe32ffb1f5d8cc",
+        "model_state_sha256": "45b4893e8517b03b6d2b978182099e76397c213209af3ca392c2182254d7d13d",
+        "open_rows_detected": 0,
+        "symbol": "ADANIGREEN"
+      },
+      {
+        "ledger_rows": 5,
+        "ledger_sha256": "45b58bd57620bdaeeac49b510d8444d018f3121fed9360c719c4fbf57a06ec8f",
+        "model_state_sha256": "edbe5de5cf12d54bff483c85acbaaf4abcf6fedcc268f57c9519dba2589065ff",
+        "open_rows_detected": 0,
+        "symbol": "ADANIPORTS"
+      },
+      {
+        "ledger_rows": 23,
+        "ledger_sha256": "9f38ace2a0211941fd6a55c17855858a0c74db711e216e306620ee094148095d",
+        "model_state_sha256": "de248d95b9c06b0d9ad153ca0e0da5667b26516a0233786b86d528af30db7dcc",
+        "open_rows_detected": 0,
+        "symbol": "ADANIPOWER"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "e2ebb5bdbaf89fee18379e9428718ba8e6defd49fb11f7064b8fb236ff20ecb4",
+        "model_state_sha256": "1b9d8ec7f7f9dbb9cf9a49e2b4da6b760a54fe790da529710c34852002cbec84",
+        "open_rows_detected": 0,
+        "symbol": "ALKEM"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "cf486cae91b71452b572a3051fc93434e2a95f1bade0c01bc27520a3b7c7a909",
+        "model_state_sha256": "7f780b98c854a7461ca139829438edaa86bdf433cee015635e7c058e46b4b5ea",
+        "open_rows_detected": 0,
+        "symbol": "AMBER"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "7ed17eb032d64af5431822ae4b84f5c2213c4bf71f0ed90e56bf397d928274cc",
+        "model_state_sha256": "ed71163d79f7fb2bc1321049c68e8deb496fbc693d82acc11790fdda23a50199",
+        "open_rows_detected": 0,
+        "symbol": "AMBUJACEM"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "b379113fb257dd79deebbbf019f74747ba373a2237a2ef45231c8cce9ab45407",
+        "model_state_sha256": "87400d02274ac1646f5242441fcff9499c80e3c348370c1b3cca152f3b1623bc",
+        "open_rows_detected": 0,
+        "symbol": "ANGELONE"
+      },
+      {
+        "ledger_rows": 30,
+        "ledger_sha256": "8529b6c875c4e435c6e6de0ed60fbd386fe392445f086e9b2bf7df6a8987f17f",
+        "model_state_sha256": "adbd158eb62c62d9a815d7c4bf207ad6a303ccf1de552ad7e15c0ac7291e6972",
+        "open_rows_detected": 0,
+        "symbol": "APLAPOLLO"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "77562b4ce41ba651dcb716d8bea079c4d9dcf7bc4fb2d3cac5f5be21186dc1fb",
+        "model_state_sha256": "cd4780f4f26e2cc1706f2d8eff2542f157944765d10a037bdaa5b81acab5c83f",
+        "open_rows_detected": 0,
+        "symbol": "APOLLOHOSP"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "5433e8f8a84ff3d5e4c9d2009c099c3ffc2493b650c73f76347c3cc10486064c",
+        "model_state_sha256": "f2de089830a8c76fa0da23a02a6f030d31266511932cb4c8d65b9e2766e91741",
+        "open_rows_detected": 0,
+        "symbol": "ASHOKLEY"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "0668203c0f63e60d775ee1e6f830a68d5adfb859dbcab598a7e6caf08dcb5467",
+        "model_state_sha256": "da5a9138893afeec0d6f655e0b7bf2abb1fe5598bb3870bc33143e1be33c66e5",
+        "open_rows_detected": 0,
+        "symbol": "ASIANPAINT"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "963ea864ef07cc95a6fcd14bea3dbef427f783ddded0fba62ece6b185232c1a2",
+        "model_state_sha256": "6356c2a796018d4ebcb19b95bb719b1ffb26df0b2cf70bd1a8787d613cc51dc4",
+        "open_rows_detected": 0,
+        "symbol": "ASTRAL"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "dc02e7bab45d6e99906cabb126502e3f82386c4120e7b9ee33a18b0e24c3c635",
+        "model_state_sha256": "c3092f6e67ac4459686470fc569c43bd3fe918bb4994a93a01e406cea7e6ea69",
+        "open_rows_detected": 0,
+        "symbol": "AUBANK"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "40688278049008cfa9a055ccd0e74708170682262e0595d74fdf7854f56a0c44",
+        "model_state_sha256": "c4089f3d12f7aa4e43648d8d553793622943d0d574ad7e3c55c7cda212a18361",
+        "open_rows_detected": 0,
+        "symbol": "AUROPHARMA"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "1fd2dc1b79318c97bf776ffb695e457be966022a2ac7466b0c752e5e496009c7",
+        "model_state_sha256": "a8c684bfbe1101669e8897bf6a84ec308367cbc69d1fdeb47901f24b5dbaa482",
+        "open_rows_detected": 0,
+        "symbol": "AXISBANK"
+      },
+      {
+        "ledger_rows": 26,
+        "ledger_sha256": "bee1e3c07cf9f9437769cb9015779db09cdc59f51f66a2f0ec681cbf18762fcc",
+        "model_state_sha256": "94e34449f4f23f90af8e624ed2d5c0a31ee43de003d12f0c9e7809f3f9eda33f",
+        "open_rows_detected": 0,
+        "symbol": "BAJAJ-AUTO"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "a6502e9b219d991c5529dae22aceac140b2698c2e48ad393b469a2c87acb5eb3",
+        "model_state_sha256": "40d6634b1a7c4a3e21879bd65c2c764d9cc92cf7d22935380da29232c013f0ab",
+        "open_rows_detected": 0,
+        "symbol": "BAJAJFINSV"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "62bb3952d65c3b5204f3fb1fa5cf0dc4d269abe7fd9e6cc10e794f24fa00221f",
+        "model_state_sha256": "f29ae8388cdcf2fb8f80d4bbb707dd6b102088f98ccd51f110f3d05d09dede36",
+        "open_rows_detected": 0,
+        "symbol": "BAJAJHLDNG"
+      },
+      {
+        "ledger_rows": 5,
+        "ledger_sha256": "894118edf99306e7acabdc2fbd895b0176b3af0449160472026963a802f7fdc1",
+        "model_state_sha256": "a37dd980a1aa95a7c294f0eca99c876df01bf7bb78aa6a1ec9657b1c0719b04b",
+        "open_rows_detected": 0,
+        "symbol": "BAJFINANCE"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "e6258f156abc7d9b87f8dfaff6440e66cf331cb7ec219d708086c375672cbb33",
+        "model_state_sha256": "eca22d6d067b4dd217a7d3435ab63133f77b95e8f2b6e0e5165b065ad3b79611",
+        "open_rows_detected": 0,
+        "symbol": "BANDHANBNK"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "95e5901a82e315565a9d28f1383fe76967f29717d6af13b6222e17a7ea867203",
+        "model_state_sha256": "722fd232ef7532e288d3ad218f9f54df141c0010ac9a2b2ce4e5d25e8169d141",
+        "open_rows_detected": 0,
+        "symbol": "BANKBARODA"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "4f2f6b8fedc477709c128872464a83304fe0fbcb60add47a6d1dad5df0e3d341",
+        "model_state_sha256": "10e5e45ed3e306401dface9aa1776086d70e53dd2eef48c3740c174b27a11a25",
+        "open_rows_detected": 0,
+        "symbol": "BANKINDIA"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "8738818158247b4e43515a278faa17a1881ae3c9f66d5442f8202ecea06b898f",
+        "model_state_sha256": "b434acc1f7fdf9342c7f9ac5a0481c168c1afaa663c90c99065a9cb515f3ef04",
+        "open_rows_detected": 0,
+        "symbol": "BANKNIFTY"
+      },
+      {
+        "ledger_rows": 7,
+        "ledger_sha256": "7181bc1924ebf470faa14507492791cc913c0992c6b4dd22467c331a5bddad48",
+        "model_state_sha256": "97985151747ba473eb5e5e6a8b1cf36101a3d012c9fe440aab7cfae44b2b53cd",
+        "open_rows_detected": 0,
+        "symbol": "BDL"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "30aacc7fe40491ebb3bf49ba1ff9eea82490bdd972dab4ee3de8d615384dd36f",
+        "model_state_sha256": "156af37d6f3cba68b0c118f2a5d45ec4c4d562c6ab05f99264658dc8cb3f0c11",
+        "open_rows_detected": 0,
+        "symbol": "BEL"
+      },
+      {
+        "ledger_rows": 6,
+        "ledger_sha256": "dfd1bcccb4474a4e4e073ee2186bf74e0622f22bae8a6711e14faa548d12700e",
+        "model_state_sha256": "600dfbea3d1affce08fdfdab6a5928a200b3565126c96cd8150fd07f1068eef6",
+        "open_rows_detected": 0,
+        "symbol": "BHARATFORG"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "97e6bbc2325c07332b1b8c3040fe3e97909741b0c3991b5b6abcce4e68c3c017",
+        "model_state_sha256": "50be2e1d178ae96653e5bf468e1cbf860d8d82ef6e9b071371da497771ea26f1",
+        "open_rows_detected": 0,
+        "symbol": "BHARTIARTL"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "e37e965cd2fd8177d648ddd2214728b5021f9b6a9e050fc38a78581bfeecf602",
+        "model_state_sha256": "3fd0cb0b728faf54891366ceac19ae98ee0d19f521030a6a5958916f23db197f",
+        "open_rows_detected": 0,
+        "symbol": "BHEL"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "87448cf1ef9ab53f3ea0ccb4bf247f1aaa4981e57b5724d099b1a7afa1fcac28",
+        "model_state_sha256": "e74d166222c682a732eccac107978f3c1bd982d27de45788d0ba283895dc0f8a",
+        "open_rows_detected": 0,
+        "symbol": "BIOCON"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "161f947c3c212b6329890c0ec319bf97f8e8eb6d7fdcae767c9168d9796863a8",
+        "model_state_sha256": "7e7f006b0aab41be18d3371c0c9e699cbe414d01c8556b1a1593e57e501ff298",
+        "open_rows_detected": 0,
+        "symbol": "BLUESTARCO"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "ba02293ea8a648c4ad33c1b22c2419bccf7757cfc1c46db328681c74229439ea",
+        "model_state_sha256": "e5c5a06725317d709eb4493ad1b514fe5f48ae7f49ef257122cc5eb5bdc88d25",
+        "open_rows_detected": 0,
+        "symbol": "BOSCHLTD"
+      },
+      {
+        "ledger_rows": 9,
+        "ledger_sha256": "e14cd7685480c220ec4df2c8e125f6a812a4b3fdbdec02f63dd5d1198534be37",
+        "model_state_sha256": "9fd214e8a8d8d6e81b1267fbfcd47355d9128d4368636cca031ac85c97bc3359",
+        "open_rows_detected": 0,
+        "symbol": "BPCL"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "00870994f4c4316cee21fb0a5bb22ceb43958b8832323e8fa6c66f3a74ed8841",
+        "model_state_sha256": "2de881fc01ea1ffcd739a03970b0880bed28f7353b2224bd8e2060a02483638e",
+        "open_rows_detected": 0,
+        "symbol": "BRITANNIA"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "a2cc328e13e6706f2c3431ed1dcae4a0c70ea7aa26ea83f38c1557119a4f3cef",
+        "model_state_sha256": "bac273d40777e3028adce8aec536d3854a80e54427dc98b535c94602ccc4f08d",
+        "open_rows_detected": 0,
+        "symbol": "BSE"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "dbef4b34f254b1d837e839d40e96fa82d12927868e54b99ce93f3f343bad459d",
+        "model_state_sha256": "67118aa759cd66c734d67c1e4fdda48b08060da14671757aea74b1ab541d5cf0",
+        "open_rows_detected": 0,
+        "symbol": "CAMS"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "6e6aa0710496e732da5fb9973ad0cc89b2f04c1abf760353e421bbd292a783a6",
+        "model_state_sha256": "462f66c8541c6aa679df54f2e8ed1e73d47271d76e7cc7009d89b8a8df282a3b",
+        "open_rows_detected": 0,
+        "symbol": "CANBK"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "3fc15ebcbefdf815b6fd7cb0308b3a56a97d242879f95ffe899eca9bc82e9b3c",
+        "model_state_sha256": "4e7a4786a96d5103e0176b696274e2e17d013e1eac5ca946b88f8c952a75fc28",
+        "open_rows_detected": 0,
+        "symbol": "CDSL"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "ef5c3561c90f7659a8f034aac25d98946408edaae5f4d2e6e9de9a8c74e1ec2b",
+        "model_state_sha256": "73a55abf7f175422d4bfc04c0a94549bbeb826df5c87ca7217b238613ecfb59a",
+        "open_rows_detected": 0,
+        "symbol": "CGPOWER"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "c541cf32f7cedb44ead3bc8cee178121548c8ff6a740d788f5c46f10ceefe2d5",
+        "model_state_sha256": "ad65a099dbbfc8f973d6dd02e2e11031f881b8f375fb38ffa3305a708e9f6d82",
+        "open_rows_detected": 0,
+        "symbol": "CHOLAFIN"
+      },
+      {
+        "ledger_rows": 21,
+        "ledger_sha256": "7a044ccd2f8a0a22ab1800e1ce467073eb03eff65b32669cd2d388258416af95",
+        "model_state_sha256": "c74d491045d7fef24837f51efa458fa5982db5c56f47489545bc85c0a231325c",
+        "open_rows_detected": 0,
+        "symbol": "CIPLA"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "0f03cd2bd252047dfd992f8f08caeda91bf7a8116d7047c2a1e5db0211b3741e",
+        "model_state_sha256": "4b19b834e0ab64a1b708a177add8c43fd86bd1a11942e0187d31590e61af3c14",
+        "open_rows_detected": 0,
+        "symbol": "COALINDIA"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "c2e12e0e9447c69b4b47dd19050a471be44b0677c5a4d2370f40ac55e05dbe93",
+        "model_state_sha256": "33c9d8229af25ce1fedfe28c152b21df568eef025a8e2d0da35ee11f2fa8a14c",
+        "open_rows_detected": 0,
+        "symbol": "COCHINSHIP"
+      },
+      {
+        "ledger_rows": 9,
+        "ledger_sha256": "d02279ef63056ddc9fb62221cfd628e72a183ec0bb9f390765bc19a9551ec799",
+        "model_state_sha256": "10f3f4cedf8a0f9b94a6ab6227c075a9c8d5ecea37ec130153796baf7e5ca08a",
+        "open_rows_detected": 0,
+        "symbol": "COFORGE"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "03d492d4bb991b71b90ca40fced4029cfebc1361655086db139a55216d6b5a15",
+        "model_state_sha256": "827fd2b9f9ce4327367a3c9ca99ac3ceff9f556e477b1d2dab860c4c713ef52a",
+        "open_rows_detected": 0,
+        "symbol": "COLPAL"
+      },
+      {
+        "ledger_rows": 6,
+        "ledger_sha256": "fffe892c297bb1329258a483dc90a4037d91b7e0da13124d79ffcd41f4aab2ef",
+        "model_state_sha256": "28f23c27c695d2b2aa478fd7d8dfc6b4b8980a7058d7d4af6b68cc106581189e",
+        "open_rows_detected": 0,
+        "symbol": "CONCOR"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "f0f2755b2efe65bed55048fc85a2904e093503714307d2deac472953909dc54d",
+        "model_state_sha256": "b5898a18df43a68583b380368d09fd55047384920249d875cae205db34fae8ff",
+        "open_rows_detected": 0,
+        "symbol": "CROMPTON"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "c3f829cbc3c5d6f64f1c50942b95b24a4ad7e1f631b3874c13b68008eeb697d0",
+        "model_state_sha256": "ad9c90c90a3803ab7b7cd93e39a6ff3997c0f429ed3a84c7d11d5d27d0e93c80",
+        "open_rows_detected": 0,
+        "symbol": "CUMMINSIND"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "e5fece53aef9e4633ce3551e9f2af3ca35e359ea90bc4cfcbf7d3549ff7f06b3",
+        "model_state_sha256": "ec74c9aa434d1fbef682f0d7aba43b6ff30e48cc8d25e36ffd82753c9a2f12a1",
+        "open_rows_detected": 0,
+        "symbol": "DABUR"
+      },
+      {
+        "ledger_rows": 22,
+        "ledger_sha256": "e7bf38ea2b447165799129ce60eb8b3bef88df94a9493fbf165161b6729fc3bd",
+        "model_state_sha256": "b91f15aa00b86d099fd60b516b60b0f39294db2c26a382c257cd7ade10d0fda0",
+        "open_rows_detected": 0,
+        "symbol": "DALBHARAT"
+      },
+      {
+        "ledger_rows": 22,
+        "ledger_sha256": "f4cc75688fb925118cf6c691e0d9ded9ba045d776b5adbb9c504648720da197b",
+        "model_state_sha256": "7e48a365089ae8242fe93e4271e057289d052ff671eec468d2246eee83d52119",
+        "open_rows_detected": 0,
+        "symbol": "DELHIVERY"
+      },
+      {
+        "ledger_rows": 9,
+        "ledger_sha256": "1264d6f7515c0e85f833b0e8b8c620993e0f755d77cfaf048a22af248812ef52",
+        "model_state_sha256": "c2a6830772ba7723be8f924742e61c27787bae6027f06fd61a48e390eb027f6c",
+        "open_rows_detected": 0,
+        "symbol": "DIVISLAB"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "db32b05a93bac283791aa0d1417afccf25cd5609f712cc34ecef254007c4b3dc",
+        "model_state_sha256": "1816927e107ef6add822b022888b6f1247664e547c02562b3db9ebfb3d250a3d",
+        "open_rows_detected": 0,
+        "symbol": "DIXON"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "2352930604761c2f47f781ac0052a8d3a2a8ef3d71cb93f05fc69bb8fb4bacbd",
+        "model_state_sha256": "f0f1f33a4a6d224f120c184668e9b64a97cb62192dcb299d2dc0bb8883961a6f",
+        "open_rows_detected": 0,
+        "symbol": "DLF"
+      },
+      {
+        "ledger_rows": 7,
+        "ledger_sha256": "b8a8a0917510b2ee2bae0d1c5ba90b6109d174d8cca98e5690bb750d96a195e8",
+        "model_state_sha256": "a40a68546b219fecb806f5c9ed463779e84728a54b0613aa637c52a65eda82de",
+        "open_rows_detected": 0,
+        "symbol": "DMART"
+      },
+      {
+        "ledger_rows": 7,
+        "ledger_sha256": "5ea87ae765175b0a638153569c5bc63eeec314f3f2912164216098b394232a1c",
+        "model_state_sha256": "a041bc90ee108b7fd5028c751bad96dde290168ad945fcc359f61828a1388de3",
+        "open_rows_detected": 0,
+        "symbol": "DRREDDY"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "c94f3b76d4f511eebe3283007a6133a68118e909061a49a668f16e8c69061613",
+        "model_state_sha256": "765e6f154e71da2de784735689c64ac00e99ef4b32ea8d95139e226df557f986",
+        "open_rows_detected": 0,
+        "symbol": "EICHERMOT"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "56c807bfac54f87ad639dc06be68ad5a6730ddefb74f3f9287cee66a032187c8",
+        "model_state_sha256": "0d254ae5796962d43a068858e9ab6379ae46eed3a92210a01091bce1dadba0f0",
+        "open_rows_detected": 0,
+        "symbol": "ETERNAL"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "213ccc020b20c1060eea4fc3902e5d86601deabdc3ea89aba8fa7658dea61984",
+        "model_state_sha256": "563efd69da75a8751e1715f71af1d95f1ba30388e60611c5575e56eb44ddbec9",
+        "open_rows_detected": 0,
+        "symbol": "FEDERALBNK"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "e46c834141d65c2674ee67f76b05909590b89970b27e07c7809645fb5e728c57",
+        "model_state_sha256": "f82bd9618ca6c21f7ab8043f4bb0e3b746bed556f03ccf4458cb60241acd6c43",
+        "open_rows_detected": 0,
+        "symbol": "FINNIFTY"
+      },
+      {
+        "ledger_rows": 24,
+        "ledger_sha256": "b021db05eee8c51cc17bb2c5cd41ccfd0138427134d1b2459a08beddc59496ec",
+        "model_state_sha256": "7a6ce9b6ade095bc132b5cf938e474fb435459957e3ca73abf152a688912ef71",
+        "open_rows_detected": 0,
+        "symbol": "FORCEMOT"
+      },
+      {
+        "ledger_rows": 5,
+        "ledger_sha256": "cf97c08ed75ce7464abf74f0d0fbb0916eb78d1dae653108f8a04b9111160df0",
+        "model_state_sha256": "cd399e612cbfc60cd17a3ab7cfe6e7a351f4867954d4771b906c08b7790f7dd0",
+        "open_rows_detected": 0,
+        "symbol": "FORTIS"
+      },
+      {
+        "ledger_rows": 9,
+        "ledger_sha256": "88bb732fed277230206d4a067c516537c946f8b8e878c01312696626cbcf8550",
+        "model_state_sha256": "26854817571213417be7614a785db1a291211fa8cb63d2f173240c480dbf5387",
+        "open_rows_detected": 0,
+        "symbol": "GAIL"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "92c0b9c3fadb6e98e5b940289414a82bb27002e361043c53e667d432a82e5615",
+        "model_state_sha256": "64a9441f7a31aa995ec2b58df4b60b86f90ca7c9520a7d1354bc4da7f7c459ec",
+        "open_rows_detected": 0,
+        "symbol": "GLENMARK"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "ae440bd0aa2b5250e5ce80c3e1ac4b8282ff0a00e8d0f5fd89cea3d931d7bd45",
+        "model_state_sha256": "69c9e8e68698c3becd4053f95be3c126222b502e662da3aa1061a26ba6459a94",
+        "open_rows_detected": 0,
+        "symbol": "GMRAIRPORT"
+      },
+      {
+        "ledger_rows": 23,
+        "ledger_sha256": "cb52807c69532b9fe62e030c53df4a47c8a53998935c30f14ac7ee75cca288b5",
+        "model_state_sha256": "50dad97efdb565d897ed15b8d50dca1d005cb51b55cc12f885f23289e80e1705",
+        "open_rows_detected": 0,
+        "symbol": "GODFRYPHLP"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "992a7896c92d2861045926c2f38b381d17c12ce6b986eb0be47c08451b644741",
+        "model_state_sha256": "20ee662ab3088e11d4c3b381f251baaf333a9f34ef9bfea2612599d985c7a665",
+        "open_rows_detected": 0,
+        "symbol": "GODREJCP"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "ccc5e750e7aeb43b2939836c43deb0244386df43c409b729828e1240c0edef37",
+        "model_state_sha256": "e21e1a5c08fc99ce7b7a5d6d5aefa49f95ad126acd10728af11707701cd91d44",
+        "open_rows_detected": 0,
+        "symbol": "GODREJPROP"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "042467e5ae292d3887d234f685e0820fa9c11cfb96f03916c4cdb2c2c9d53fe5",
+        "model_state_sha256": "23eadbf7340a9bcc6b19f7d2168c7b36cdbcc66bf81cf8a02f7699d490c6b633",
+        "open_rows_detected": 0,
+        "symbol": "GRASIM"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "738ad5d521b60cc163f42ab509a3d5c79435444ebccdc2b2e18a523e14023193",
+        "model_state_sha256": "c6094e653afb48bf1b23b7adb2331752bfe58b90556c031b6a7b4b2380b1c265",
+        "open_rows_detected": 0,
+        "symbol": "GVT&D"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "eb7561b17449861eef136ac9904d1f1e7acc2c8ce67aa3491d82ecb6711d1754",
+        "model_state_sha256": "f6843fd6e5cc78fb20b768124fc6796ff51f3916355123b29393191fc3564ad7",
+        "open_rows_detected": 0,
+        "symbol": "HAL"
+      },
+      {
+        "ledger_rows": 22,
+        "ledger_sha256": "9741d2f36670a0de0d018b9ace72d7940976842b84495a4e125751af00de091f",
+        "model_state_sha256": "94c242defb04608c95a92a216571d392bf4401513513990d3ab539b2c539bd29",
+        "open_rows_detected": 0,
+        "symbol": "HAVELLS"
+      },
+      {
+        "ledger_rows": 7,
+        "ledger_sha256": "9494abfbd93b64a8594ee1a81eba4076ef4828d6bfedfa760ab7c5817da6309f",
+        "model_state_sha256": "b64dcbf7fe78d60106bd89cdc99382d267fd2661c05f9d21dc25a4ecaddd5de4",
+        "open_rows_detected": 0,
+        "symbol": "HCLTECH"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "a4981da711275006b3244998df99a97ea8c832932f95cd52ae2278c8c02cac1d",
+        "model_state_sha256": "4a200280b6b9a6641bb3e1084f5fc3d22b48e4ee27b14664cc43b5c685b959c4",
+        "open_rows_detected": 0,
+        "symbol": "HDFCAMC"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "65b473dfa123f3be2f84da5af5b58802cd96700b4be297ab157cc0c2c72e0ca5",
+        "model_state_sha256": "4e18cf05d5f93e3af8c2305121358cae916423ac0695f92ec370680eee19c764",
+        "open_rows_detected": 0,
+        "symbol": "HDFCBANK"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "affcc8f9d5934fef153dedf85de1a73d1978a99f79b0d1aa387a5a1784572727",
+        "model_state_sha256": "35a3e3ab1a678dc771abd7e9217d3befcf0a0be6ed240372217076794b37aefa",
+        "open_rows_detected": 0,
+        "symbol": "HDFCLIFE"
+      },
+      {
+        "ledger_rows": 22,
+        "ledger_sha256": "e4c6c8a6f34df7a209b2135db36c8ad92b0f1356b78919a71602a19e1b0753ec",
+        "model_state_sha256": "91d30ee014db06e650beeb2d77fc7152bd623aa7d3ade0db84a0413f9e2b7925",
+        "open_rows_detected": 0,
+        "symbol": "HEROMOTOCO"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "03aac4156829173112aeccf696998019d17a06e575fcc8ed011f574c19b9187d",
+        "model_state_sha256": "e0bd92a8ce61a04f4719cc4bbb2e0bc4af48c2100f8ebe11072ce57fc0944c96",
+        "open_rows_detected": 0,
+        "symbol": "HINDALCO"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "cd62bdf9a7885e8e4281653e7a26cbfd648ad0722ca6d2105dae4002b3ea2eee",
+        "model_state_sha256": "b6c1c7b54d1e1baeaa1856637a8515f6e76710b0d60555aa1ce0459cccbedd18",
+        "open_rows_detected": 0,
+        "symbol": "HINDPETRO"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "f2b8aa7543e28509ef2d77d87be933b7454277751a59c1b14bb75a40fa2fb181",
+        "model_state_sha256": "bd1dd7d41caa6399714a73248251a300e3b5a762205fb393ac2a684b1d7d1ab2",
+        "open_rows_detected": 0,
+        "symbol": "HINDUNILVR"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "c4ff3e22ad366a16ce6c6f719388a2d864e25b6564eb2be0b91db0a6158f4e26",
+        "model_state_sha256": "2ac21fba1ec9b1716c988bf10ce983f2f592eadbc872ecf8dde36a884ee7968e",
+        "open_rows_detected": 0,
+        "symbol": "HINDZINC"
+      },
+      {
+        "ledger_rows": 4,
+        "ledger_sha256": "fbcd5ba336faa32e6d2364a82eec13b89f46b05be34e013b67112e084313a8b3",
+        "model_state_sha256": "cbe5480dfe29b3f3505234ba7d2087773f59689eb7efdb61324a5867a6ac5b02",
+        "open_rows_detected": 0,
+        "symbol": "HYUNDAI"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "f9722dd78a386f6385214362ce4f6f62c368e2b3cbf140f0c3d8fc052917689a",
+        "model_state_sha256": "7e787066199acb22e50b2dde76f16f5e05afca192998420794f371f556dbbb18",
+        "open_rows_detected": 0,
+        "symbol": "ICICIBANK"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "d15ab0d57e68d63a751fd5dfd44351a35be291d94a4b3d5a3843beedf1ea315f",
+        "model_state_sha256": "a7a9bcc24224deeed117a776c1443791504857ca8f8acd2f93ca15c004534384",
+        "open_rows_detected": 0,
+        "symbol": "ICICIGI"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "639c892c58510cca3f32d14efce9b697fe6a488d2adf4d7f2d425c32db694884",
+        "model_state_sha256": "d2513bbce09532f715fcac55347b8c7e15c1ca57c8db075111d8931fea278247",
+        "open_rows_detected": 0,
+        "symbol": "ICICIPRULI"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "1abf9fa399d7b864bc5ceb38945f54d05bdee5f545cf15f68a714bca0909ee60",
+        "model_state_sha256": "6a17c09534cdb20c0e83790be5fc2740c8154cdb224ec621dc2d9711fa72fa2f",
+        "open_rows_detected": 0,
+        "symbol": "IDEA"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "fe55fee6ab5290556d9afaded470386152533ffe07d6364734f1641561d82bd5",
+        "model_state_sha256": "6404c9faabec2f1db3d2b4eb9509768c490cd2de966aafaa4e520c95bbf5c470",
+        "open_rows_detected": 0,
+        "symbol": "IDFCFIRSTB"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "d76d3fa6b1d99530a6bf21e45830fe0bf3eec901c7715f62f89ee2e190dbc0a4",
+        "model_state_sha256": "6212cda3d2ce00fb84832f91c4b70cd64402f29387c32423d03ec4ce5afb9b33",
+        "open_rows_detected": 0,
+        "symbol": "IEX"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "851037ff8edd2c98f14b99301303a2e3e3f6e3f3e4dcd0ba8806f00e8c5a20a3",
+        "model_state_sha256": "33a590bdffcc9cde86b575b2229328c2899e07b8e56c5b169fb1438f6640f642",
+        "open_rows_detected": 0,
+        "symbol": "INDHOTEL"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "44516c254c1ecacbcfa217661364ca61031737560ace8e9f42f3f4793d488da0",
+        "model_state_sha256": "6cfa4616dd75784c3ed9eed643328d47f63ffaa0a0236d1884700efeff1f277c",
+        "open_rows_detected": 0,
+        "symbol": "INDIANB"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "fd233703f63edcf2027634314f6d456639142754806e39f9e7eb6200405340c2",
+        "model_state_sha256": "085a6bf9175fff78ec53a2fda81a7d592995c6050275941caf2df7cb65424e6f",
+        "open_rows_detected": 0,
+        "symbol": "INDIGO"
+      },
+      {
+        "ledger_rows": 6,
+        "ledger_sha256": "86fafb577df9c3dc9d3b8b64aa29c06ec4a6a140dc47a18d476ee33b35060563",
+        "model_state_sha256": "c5c727c37fb94220c471ebd3df85c470e263be41e3a245d37b28bf7b9b0da77f",
+        "open_rows_detected": 0,
+        "symbol": "INDUSINDBK"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "3e54ef7f4dc1948712cbd935206eba82820137e29390c78fe6cb0a8822abd6aa",
+        "model_state_sha256": "890b41ffdfa64f264c29d4cb2fd60668740640309fd7a40a005cf6aad6798fbc",
+        "open_rows_detected": 0,
+        "symbol": "INDUSTOWER"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "b8bc865b3213149466b015af784206dd4fe8e3ca9d805094ae9b5a2da7227b53",
+        "model_state_sha256": "e7c65b383d4c638710f629d82c96da80cbf0b0df7a4b67eee63d7d4d8600044d",
+        "open_rows_detected": 0,
+        "symbol": "INFY"
+      },
+      {
+        "ledger_rows": 9,
+        "ledger_sha256": "c70be3b50721c6ab4b8c6fcdc7aedabb149186cbddf61c7b5f08bf952ceef34a",
+        "model_state_sha256": "98cb63d864be2ef98430965c369113ec4731c7c57210e534a0c3b6202483f591",
+        "open_rows_detected": 0,
+        "symbol": "INOXWIND"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "ba724f6cb333f627dd537bd8431ba14fc2510ff655eef81563930770e4c505e1",
+        "model_state_sha256": "e9c83c6efc5cd14f9b41cef9a6a3c612ea95dc017d57d111f66ab484f14986c2",
+        "open_rows_detected": 0,
+        "symbol": "IOC"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "0b6e5d3e4b6bb25d2ac491aa07fbe239ccf17941c26ec5f410817c9d1b329fa1",
+        "model_state_sha256": "627a604e69aa43a1be4bce982191a5e0f121c9cb9a19e36652b06236715a6edf",
+        "open_rows_detected": 0,
+        "symbol": "IREDA"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "feb00a78c3651487d8b06ec236f93fd263334a2cf97d164fed83d94452f1d24e",
+        "model_state_sha256": "6bffc4cbb1a5c65852149b952f8e7a1d777d288310a1ba1c7e160d01c805c94f",
+        "open_rows_detected": 0,
+        "symbol": "IRFC"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "693668b41dbf0e564990e1b36622c9b55136db4175995f2a29b913ff709aa7e8",
+        "model_state_sha256": "2e8c2022dd587000de7f2c046b1d201c8f5bf2895d956b821bf0db55fd45ab9f",
+        "open_rows_detected": 0,
+        "symbol": "ITC"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "940072ee51f662a3fdad0ba5be82e9f1f2e9c171304d9a3f17a24875babae6f9",
+        "model_state_sha256": "b84e5f1da0aa0b79df8bfae9470d9c3e885891737e8753127313559ce1852e52",
+        "open_rows_detected": 0,
+        "symbol": "JINDALSTEL"
+      },
+      {
+        "ledger_rows": 22,
+        "ledger_sha256": "d703b599b4c9dfedbf56f52906eac378dbeecd10dfa6fd405a1918ab3e1a0fab",
+        "model_state_sha256": "ab645d5b7d56db67a1786ee066c802920ac86ab549f2929c90af21f3876a513b",
+        "open_rows_detected": 0,
+        "symbol": "JIOFIN"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "aa1612b82255e0b7a2a4d6a6dcee890177a7315787ef490d7c889acda22fe80d",
+        "model_state_sha256": "42ad2b86277a6fed3011637a472f349c8d66269ceafad5e679be67e3052d189b",
+        "open_rows_detected": 0,
+        "symbol": "JSWENERGY"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "c1aecff72e671d0e62a9edef4c69099b972066f3905e989b7d914ae7dbea6d45",
+        "model_state_sha256": "db262910be1b8a38f92d65067f539f0435c2211f4a2678a3bdd36175c1863681",
+        "open_rows_detected": 0,
+        "symbol": "JSWSTEEL"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "74d6b1772c8fdad0ff8c72e6984fd9941e8250c9b17a2e1cef1f55a664c7ad8e",
+        "model_state_sha256": "39320e8212c1cdc1de4f8c85aa674b1b0801dc4241cc3a7fd578588a24b86784",
+        "open_rows_detected": 0,
+        "symbol": "JUBLFOOD"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "156315624821c156e3705239920a6753680ddc2ee29f818d85337dbbc7dd5290",
+        "model_state_sha256": "1cb4746755763c750010d1cef002b381607e9af26cbeb7958878638f1f2db2ca",
+        "open_rows_detected": 0,
+        "symbol": "KALYANKJIL"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "0959bd9f3626f907243c17ad2b126bf24d4952c56ec8e316d3e23f8af43ed28e",
+        "model_state_sha256": "10b680138a8c8e4a1248d9647c9819cf9e6858422811be0a4993845b5cebeada",
+        "open_rows_detected": 0,
+        "symbol": "KAYNES"
+      },
+      {
+        "ledger_rows": 21,
+        "ledger_sha256": "dce7218a0c2d6e812231eea31f0cc29cba0cf1ecd030a538f8315393dee80e6b",
+        "model_state_sha256": "1fdaa92c425c372394817ed980d831bda4af9812159ab06725041a2a9b266816",
+        "open_rows_detected": 0,
+        "symbol": "KEI"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "937aff511c10a53bf73cf4037e31e09d231c9f8c8430ec2a05e5c1921299e9c4",
+        "model_state_sha256": "f889fd4a4b2bdd1a2e44f0bfb6a9a1b7cea60e1540d8599972717d6d9c372f8e",
+        "open_rows_detected": 0,
+        "symbol": "KFINTECH"
+      },
+      {
+        "ledger_rows": 4,
+        "ledger_sha256": "471c74eb6888914df1e62c841179abf8fd1c44986419552d56fa7b6005c94ae5",
+        "model_state_sha256": "a9ecfbe1059a191ba75495264e3e48409747c86177b69e18ae224ab1b1746390",
+        "open_rows_detected": 0,
+        "symbol": "KOTAKBANK"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "37c54042dbb1b9fdccc1fbb24a391e7fe5242fc3c2bfacaba6f7f75cd53666a8",
+        "model_state_sha256": "d4e75312b731b1c433b02ee29f61b592628a55f9d1cd0e0ed699096fc759e7aa",
+        "open_rows_detected": 0,
+        "symbol": "KPITTECH"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "23ecebb7c3efc293a4e220c9ef8c03d3accc22cb9f555fccb729ea1ea830180b",
+        "model_state_sha256": "12ac5df485702352aa05a0678e376109b25b9ea94098a30d5f234cad1a2626b1",
+        "open_rows_detected": 0,
+        "symbol": "LAURUSLABS"
+      },
+      {
+        "ledger_rows": 25,
+        "ledger_sha256": "ce498c92667ef0c8adbe84c05fa99d3fde0636c2a53a9096b5123b41b172cdf2",
+        "model_state_sha256": "b2096ae42a9638edab5c159abccde00aa1dd96686b2792dcf2f9c9a798c98c43",
+        "open_rows_detected": 0,
+        "symbol": "LICHSGFIN"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "dadc5bf42b21059ebcc665bb0dbd4ed04892131608f6c3c9764d68deab532970",
+        "model_state_sha256": "1358aedbc5e5e63a0a0827dbd67a349b67ba39e845f636a9586a1a3bb99e378f",
+        "open_rows_detected": 0,
+        "symbol": "LICI"
+      },
+      {
+        "ledger_rows": 22,
+        "ledger_sha256": "600039f6aff0fa705936e3fac74b803899e85deb76f1c75782a8dc0d2029edfd",
+        "model_state_sha256": "497a2025a98aa5e33678fd71c7e9caa364772605d87c3dd2063fd4b8ff04f12c",
+        "open_rows_detected": 0,
+        "symbol": "LODHA"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "476cb9c57873e76426ad2bbda40de6f2943e52f8a807078d7b177a6b0768f9a7",
+        "model_state_sha256": "837456e95755fec5dbaa2a37ad3a48d8f59d1917dd7d9963de12b5b3b75722a0",
+        "open_rows_detected": 0,
+        "symbol": "LT"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "00372eae4ca0188b835c78e4acc6f785b5775c594206d6170d90cd2ba79c559d",
+        "model_state_sha256": "35866c9b5c559be032081dc86e4e792421615c2e76a40b3f66f7f514593e253a",
+        "open_rows_detected": 0,
+        "symbol": "LTF"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "a78e5cecfba15f9fa1c12e0df0d3ba6a07903cc14292e85495b4bf5175e2198c",
+        "model_state_sha256": "69b053c90b536bd6e5f9e207a164569708a4e1802ca392acf345496198c028c1",
+        "open_rows_detected": 0,
+        "symbol": "LTM"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "30fe59d5584cf4d754b0a24f72cac091661d3bd4f3d2bc78d1ce08bc4c66c528",
+        "model_state_sha256": "3bbf191d788a0fa469cacc1d63a5502bd9ee2d6838dea7ed4bccdba905199ecf",
+        "open_rows_detected": 0,
+        "symbol": "LUPIN"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "fdbba7726e4bb80c6009406fdbce98af10de2960d15ac91472dea2015828f448",
+        "model_state_sha256": "38405d2315ab76996b895547603b8901a511c48b6ee187d7d7188ca91fcec714",
+        "open_rows_detected": 0,
+        "symbol": "M&M"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "302dfab64df60f81b1367240e8017cd60786f66b51eada753fada54dc9d1d646",
+        "model_state_sha256": "2aef090959caec9196b6fe3640dc105fbd7c6e0407ceb496ea1ce4236903f52e",
+        "open_rows_detected": 0,
+        "symbol": "MANAPPURAM"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "920c191b3ebbecf7b5d7906401c3236b576c14d91d8aca20724288f6b8048d99",
+        "model_state_sha256": "b6f443f725796708b12b23694fa25c668573e0ccff36c510432f542e061860ca",
+        "open_rows_detected": 0,
+        "symbol": "MANKIND"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "a59b381962c67a79a3e4d01704bc64d282ee84199bbd2ea927a0cbb944a5f422",
+        "model_state_sha256": "91100f55fb911610065ea726fbf2e9f330e8890132de98ee7ce34362eea19089",
+        "open_rows_detected": 0,
+        "symbol": "MARICO"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "efac9db27caef0b91308508bab54dd6fb8b8a8518d8654015900d11d1348fd1e",
+        "model_state_sha256": "c41ce098e1dd37825ae7a03bac788fc314dbd8eb021c49ffcb18ab5f8b7218ab",
+        "open_rows_detected": 0,
+        "symbol": "MARUTI"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "f5bf7b9a3328cf5881d7c16cec03af50ee0ba5852062fe311dc3e3112b296041",
+        "model_state_sha256": "b4ab74fa37bb2d26a5fe0c5edd581fc8f024b305c1905b7edea2a391a3b2cb49",
+        "open_rows_detected": 0,
+        "symbol": "MAXHEALTH"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "a1eecfc5bcec269b37c653f9a6dcf44e85f420f734c01be054f27d0e4925ba41",
+        "model_state_sha256": "1d47045268667bee3c538bd7933aa5713d67d16f0cf589956e80fea021ed0cae",
+        "open_rows_detected": 0,
+        "symbol": "MAZDOCK"
+      },
+      {
+        "ledger_rows": 9,
+        "ledger_sha256": "08a42d5bb97d37c5c8955f68cfeecf74aa60670598a1ec2c64ac645ce382ff2f",
+        "model_state_sha256": "6be8f0f358e1983137d33230acf1c6defbb3085e0cdd8dc474a4fcdbb630f618",
+        "open_rows_detected": 0,
+        "symbol": "MCX"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "b8d753036c4467af34352ef7cdb78ec426aa2654d1ecc6c1b7dcbbf6e0b1f911",
+        "model_state_sha256": "63678fb3debc698cdb751de4cbfd4a1307127e21eacf43d544578bb862a684cd",
+        "open_rows_detected": 0,
+        "symbol": "MFSL"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "6c3cd5185c091a4a786c31a9a8e0d2f62dda83c5a8cccb57d56fe17c899f5d74",
+        "model_state_sha256": "65f209fd743889f595d08665bffec087734d26bd93145fe72291c7f6389d1c74",
+        "open_rows_detected": 0,
+        "symbol": "MIDCPNIFTY"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "67911b7ca34739fa297bb7dccceb18d9ca5917e667eb111a7b9dfb563d25bbce",
+        "model_state_sha256": "119ae5cbe57b88bf1b3efea2c4ac162096f12abb804cf3ebd148a664f5a0b4cb",
+        "open_rows_detected": 0,
+        "symbol": "MOTHERSON"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "629043a038404784a4f46131b2a095af1c2d927290184a34fd33a9ef313b75a2",
+        "model_state_sha256": "0d41a0465c72f2dee8b6e8652db69fbe54f54bf981df52d615767c17a2fdda5c",
+        "open_rows_detected": 0,
+        "symbol": "MOTILALOFS"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "911ed1700c6b0450bcd960afdd4adaf39321bd4707f4c956d4be78f81694e338",
+        "model_state_sha256": "1014a36ceaa4bbe89488452f36b555d11f6e4a414a421375d84ea8b7aaa699c4",
+        "open_rows_detected": 0,
+        "symbol": "MPHASIS"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "78dcba4eb7911dd28cecc7df2c5ca785321a6e87d7f4b1ec7292adbc7425fc4d",
+        "model_state_sha256": "ca0d5304b4defcf6eaa95dc5478cad07b991331e4b7611128c63fbef7555e027",
+        "open_rows_detected": 0,
+        "symbol": "MUTHOOTFIN"
+      },
+      {
+        "ledger_rows": 22,
+        "ledger_sha256": "45d505e3101aaacd98578b877ddf2afe4ce93b8de6d4df00e7c52dbc02b302e4",
+        "model_state_sha256": "d5e136bad1304cfe5cd2cb7ddac41873caa3b184b3bd6e145bf767a2bc4bc333",
+        "open_rows_detected": 0,
+        "symbol": "NAM-INDIA"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "c799395b8a204b0166a14186a6cd66164ecbe8ad3b0b7fcde4f3d7bc4212d3d0",
+        "model_state_sha256": "6776c4e88f95f6aaf8b3ad65f356a367df89fba61fccadf314e47b8b44c68c48",
+        "open_rows_detected": 0,
+        "symbol": "NATIONALUM"
+      },
+      {
+        "ledger_rows": 5,
+        "ledger_sha256": "da797c0cb10d40a387279395ac71b04f7582321b2517698539a00357c393c9b7",
+        "model_state_sha256": "b59eb689fa40ff1ee539ff3af7c0bc7d18d3e5e890f72fa6c3fa525df8ef81f4",
+        "open_rows_detected": 0,
+        "symbol": "NAUKRI"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "ec6937f93f1c9a350fdbfb6bfd98c6ae1cdc4790dc97166edcec175f8c96e57b",
+        "model_state_sha256": "7f430e974a7952aefb9ee34e78f1e36c3bf0c310515e60162ee5286831be80e5",
+        "open_rows_detected": 0,
+        "symbol": "NBCC"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "d3a3a1c5d41ff77466bddbbd0f5222229dc782816346f709eaa9df1398095fba",
+        "model_state_sha256": "caf5a2511e9ff2f62c79272ceff0934d1dcac25d967df3ee42ec229f3332d214",
+        "open_rows_detected": 0,
+        "symbol": "NESTLEIND"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "d5834cc66159133ab7e8b33e9054055117bc4384534143bf18e1e7d9792180e3",
+        "model_state_sha256": "33709124c301e45eb5aef7dd0f167e42eb30b07ed6ef78fafc25cbed1123c3f4",
+        "open_rows_detected": 0,
+        "symbol": "NHPC"
+      },
+      {
+        "ledger_rows": 5,
+        "ledger_sha256": "f6e1c7e9142eb3dde8ad830e7eac95b29341bc000e355ed75dea3f4fd93bf70b",
+        "model_state_sha256": "ac792eda9e4fa0c06c5485085c225b3f19a9a3f0da708b1ef883aff9a06e4b5f",
+        "open_rows_detected": 0,
+        "symbol": "NIFTY"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "83081a57cb997bacc7dea6a31476df44203c62cd6d75b4a002f364102e94f918",
+        "model_state_sha256": "18a8439c820d98ef3e68050e86bd40b8d1f632a576b00f24cf7b5610aefe1363",
+        "open_rows_detected": 0,
+        "symbol": "NMDC"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "309368f2e67992dc427a70601f1d96dd7f0b761dbacc545f6c5a00b73981d978",
+        "model_state_sha256": "e7d5bae338418b5c65f5969a5266dc880adeaa4c990034ce1201252faecad241",
+        "open_rows_detected": 0,
+        "symbol": "NTPC"
+      },
+      {
+        "ledger_rows": 7,
+        "ledger_sha256": "f5ca7195de61ab2c08ecbd034413f95c1d1a07d7a99fe702352634f348e7723e",
+        "model_state_sha256": "a7557bfc7e58952b53b33cc0db87b4fe87a3d01bedb9f1c4efec144c282b5471",
+        "open_rows_detected": 0,
+        "symbol": "NYKAA"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "dbaf69f11ca85b4d0131b8a8366685f7663585a21b3635c56c3b30e08e89ecd0",
+        "model_state_sha256": "da16136f9a90882da7ec96f3f7654592ebf66410ee9d448ffa931cdd49ada41c",
+        "open_rows_detected": 0,
+        "symbol": "OBEROIRLTY"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "b0f6d692bd53d5cc9b3e984438950255d36af3e5e8b47fc82482d7fcdc1a190e",
+        "model_state_sha256": "bb2974008425cafd27d0903a7dd45d82752e7ba350b47ec34e77c127bd209765",
+        "open_rows_detected": 0,
+        "symbol": "OFSS"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "1573a65555a5a9b3d36a0407597e4bd4ca8de29be34f7733dbb09dd7a9c0cd61",
+        "model_state_sha256": "74105bb5e2af3b7504aafd757d6d732fdcc48f2a9d4890cf45c2591f18d16473",
+        "open_rows_detected": 0,
+        "symbol": "OIL"
+      },
+      {
+        "ledger_rows": 9,
+        "ledger_sha256": "ec244caa83ab1223abab11c27351c16199d2e7dd8061f181dbaee4cf8b690d0e",
+        "model_state_sha256": "c67609c78bed7e461742112462e87a9f23ccec0d2306a1a0cfd6fc2a848d397b",
+        "open_rows_detected": 0,
+        "symbol": "ONGC"
+      },
+      {
+        "ledger_rows": 25,
+        "ledger_sha256": "cf7e1372c45a4c645c878cfdf583b70010b8c452d53474fa6e897cb9e1f952bb",
+        "model_state_sha256": "d4a3b2f56668361dc35e3cfb844efb2a6c67162a66a0d8fae258910fb00878a4",
+        "open_rows_detected": 0,
+        "symbol": "PAGEIND"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "d698d24778fa5dbd81476fc5bd39a134c4861243cc653906422b48cd27e284fb",
+        "model_state_sha256": "9fd5b283fe451d298db24b4b229275441c732fe5697d38b58ed25ca2e62b22f4",
+        "open_rows_detected": 0,
+        "symbol": "PATANJALI"
+      },
+      {
+        "ledger_rows": 6,
+        "ledger_sha256": "fd7627eb85ae64b33764760ffa0b43650fe27b500b367346d21f93cdb7fc4933",
+        "model_state_sha256": "0de6adca7aabfdf3125b3c4a372427c25af2feff7c1c506b057f57911b878afb",
+        "open_rows_detected": 0,
+        "symbol": "PAYTM"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "0e8be317bf13606051f251c071fa2595e172515b6c4c49e141664c35c82c7097",
+        "model_state_sha256": "a535189589def2130bc066fe01be53d86836b1050b827f6e6100041c7a36d706",
+        "open_rows_detected": 0,
+        "symbol": "PERSISTENT"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "753b80c9eb8d7ea2935f48173fb24dd73541c47d47129217b08e7d88080c8c9b",
+        "model_state_sha256": "33c3e9c6fdb84575922892f8c3d8b6702da0531e5d238a9786cd797f3198e46f",
+        "open_rows_detected": 0,
+        "symbol": "PETRONET"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "f8380302b0cc0bd5b66e3d46e8c7715cd389aa62b9a3553e3a836525ecd5182d",
+        "model_state_sha256": "971e5c09ce7a0eead92cf56d68d21d2e0a6c47663b91a36ba3ebb5e013e7623a",
+        "open_rows_detected": 0,
+        "symbol": "PFC"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "1155162ff218de4fd81e535be080bb9e7989ea4e2c3b493bd6df6177be89e301",
+        "model_state_sha256": "0d33687b56f0e01b08a331dc105207930284f8c637dd98bf632914892887bae6",
+        "open_rows_detected": 0,
+        "symbol": "PGEL"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "c4c38ec0f6ea01616dc3637454dc60f5cef6c2b2b18ca5b3ac2a279a2824a43f",
+        "model_state_sha256": "02116de9b5f67246edb10ef3ddb55c25cc27f63f6887207121ce3251bf7e7a07",
+        "open_rows_detected": 0,
+        "symbol": "PHOENIXLTD"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "d9e7c37996a266bb2785a864a3feb84bbb210acfce46ef5aa4c21f57487202d5",
+        "model_state_sha256": "4c60807faa4b2c346ea72695b89b22444aa1a1e11a4c603499bb423e4548a4cc",
+        "open_rows_detected": 0,
+        "symbol": "PIDILITIND"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "27069a733ddb650d39d52470c2b202cd87a83cb7a2af4e13010bde2d8b8d6f81",
+        "model_state_sha256": "c759ded1b37a0c3ee14c90fd9c2bd81f93461b0dd1b1b0eb5ff6c47cfd3989ad",
+        "open_rows_detected": 0,
+        "symbol": "PIIND"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "431611c16f988060fd1a6dcee97ca54d0cd45ee58d11e698b287beb03244831f",
+        "model_state_sha256": "1027607728fe435ee886058536c2ec92b624bf8d719329c9bc6b145c488e1af0",
+        "open_rows_detected": 0,
+        "symbol": "PNB"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "390be334c190ea30f90aa320ee5d4029f36230a8f529ba45eb785adf2d3c9692",
+        "model_state_sha256": "c2dd3c8af65387465382a6c5f6f1ff3a2252ae42074b6c7c23db7e1112a2e9fe",
+        "open_rows_detected": 0,
+        "symbol": "PNBHOUSING"
+      },
+      {
+        "ledger_rows": 5,
+        "ledger_sha256": "d4521eb7cb5863d9681233414da6305f422a70a2217e81ce282962e54783909f",
+        "model_state_sha256": "ed1d9a984da19d7bd6e1bca07e46cba6755ad75d845d60b8ef6f9f2ff80f6f74",
+        "open_rows_detected": 0,
+        "symbol": "POLICYBZR"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "3e7be31973d80cd21fada0294429c44636dfa008c91edef7d640ae747e5f8312",
+        "model_state_sha256": "281ecaf7c7ef6780bb5e407a313030d0ab750a42bfa294355f82c2b7680443e3",
+        "open_rows_detected": 0,
+        "symbol": "POLYCAB"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "3692bb1fd4032a8c2da9ee17782c1a70e758978d40710b6d0742f62e15e6aaae",
+        "model_state_sha256": "197137c4394cb6e73a6c750b3dbfb9a160364dd547df759b80815bad833950a4",
+        "open_rows_detected": 0,
+        "symbol": "POWERGRID"
+      },
+      {
+        "ledger_rows": 7,
+        "ledger_sha256": "f2005f02c110863297579b11ddd01f036c5d5513e0330c8d95c8c4014de1ed70",
+        "model_state_sha256": "141eb3d19a2b43ec6e5f63dfe661185be297a8f77774c687aa891398dbbaeccc",
+        "open_rows_detected": 0,
+        "symbol": "POWERINDIA"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "51d702c9df61e59773c07396f7c3206507dc570f7c663dd0102e3c46b707e2cf",
+        "model_state_sha256": "3aa2884896ac0691026de650382361fea1dc1782039e4b7db99707f0fd51e8fb",
+        "open_rows_detected": 0,
+        "symbol": "PREMIERENE"
+      },
+      {
+        "ledger_rows": 17,
+        "ledger_sha256": "5456ebf933720d7d9b4c5188eb476261d58b40ecc18eee67d190521ad0800378",
+        "model_state_sha256": "e9ce17d75c4614241f77ea693b6b6cc47704b06caed6d51b9fede590f8277cb1",
+        "open_rows_detected": 0,
+        "symbol": "PRESTIGE"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "a63c8e46e6a789065356a0c1e6caeb6010159b063b4a030504ac5e6cb9c2f1b4",
+        "model_state_sha256": "39f941926f1f949dc5e001da219e2eda8cc67d40a2f72c3bfdbef2fe9a23ca02",
+        "open_rows_detected": 0,
+        "symbol": "RADICO"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "c2709d6aa481b80c180b61074e65c7f63419331e99e5fd299fbfe0560d6d8390",
+        "model_state_sha256": "434129b28738c251ae5945d9df93f5a878754c4af324424af59e33a51f13bc2d",
+        "open_rows_detected": 0,
+        "symbol": "RBLBANK"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "afdd192d1d4208be37e0b4bc30f6025a556c26011a306cc7bb0b0fa7817c08fe",
+        "model_state_sha256": "d3eea955e63bebd9c9c5cda83fa408ef935aa8cbe859e817a74bf2d0dec05e05",
+        "open_rows_detected": 0,
+        "symbol": "RECLTD"
+      },
+      {
+        "ledger_rows": 19,
+        "ledger_sha256": "7f763cb47028cacffbdeb06a421c1488dae0587ea1f4b0a9aa3bfacde41643e1",
+        "model_state_sha256": "a4df79a5c2a8e7a8727e7a33b79625307bacd6247976b5ac484c2747280d59b9",
+        "open_rows_detected": 0,
+        "symbol": "RELIANCE"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "e796af90e3ae98af68f5e9b2c139761f3575bf81fd42ad7368a5f06796cd2ce2",
+        "model_state_sha256": "188ad8cbb1fb7ca3b7420d7fa964c5dd7a4fd5557c01450c6c5b61138acb02f6",
+        "open_rows_detected": 0,
+        "symbol": "RVNL"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "b5a98c423b5c1b7eb5be2075127cd50243501a3cd30ffcbc952465d50da70370",
+        "model_state_sha256": "d952cda769f7e1efb6fcc044d81864c801729c9e30780a59b8e0864ca858a41e",
+        "open_rows_detected": 0,
+        "symbol": "SAIL"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "ce211fef0ef72e9301e1c4d5146cca1b1309b4a05e07f2669f81c18c6b19b13d",
+        "model_state_sha256": "13c4710068ac07804dd50ffc39eb5eedc10749ae3cac162f157ba88a5b5ce193",
+        "open_rows_detected": 0,
+        "symbol": "SBICARD"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "1c0e913c67f3fec0ad079f6da5f07b6b663e28332e65713111bff800640fec92",
+        "model_state_sha256": "536108622f26cb581aefb46ea7582c01d0a6f6b41e849debbc6bd9a8e6b6fe2b",
+        "open_rows_detected": 0,
+        "symbol": "SBILIFE"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "766af7a986d0135c8ea2fc1fa0a04ed4addff828447213e2059d5579039fad20",
+        "model_state_sha256": "1db4e1d0ef0fbe88efe6da56aa4170f2dac207e949be4775ecc316d6fe6930e3",
+        "open_rows_detected": 0,
+        "symbol": "SBIN"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "8ebd8bfe130c03a7e2f0b3db6293859e2676bbd1727dc626403a0687651d814f",
+        "model_state_sha256": "8c6999606cf835bae671eae6a53bdc29530ac70e683ab6fc5770513a7c03dfe8",
+        "open_rows_detected": 0,
+        "symbol": "SHREECEM"
+      },
+      {
+        "ledger_rows": 3,
+        "ledger_sha256": "a7097913476e6a6694104370fc07ed8d68898f088f1b2799ba0fbcf1dcdba398",
+        "model_state_sha256": "a5f923b4379f8309d72f8dabbcb2134b8cca181bba4f96fc3cc584a367e40dca",
+        "open_rows_detected": 0,
+        "symbol": "SHRIRAMFIN"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "60b11846d86b885c135ea6f2cf0b6c41c12ca4bcad892f51c3b3c53451819fd5",
+        "model_state_sha256": "760b301852db638df33c776f2e6916a7d1f66f3a6f7da8e2f491cf9e0bcfff20",
+        "open_rows_detected": 0,
+        "symbol": "SIEMENS"
+      },
+      {
+        "ledger_rows": 7,
+        "ledger_sha256": "bc908d4b827789320d0b97d93108f277a3d3daab5fb6b0eb1f24f1c30a667efa",
+        "model_state_sha256": "488a041efca7a4b5e23b0f046ba5aca2eddb0d62dbe58b3c105cc2acd663c140",
+        "open_rows_detected": 0,
+        "symbol": "SOLARINDS"
+      },
+      {
+        "ledger_rows": 11,
+        "ledger_sha256": "1857d1261f7c928e1b51b1749eceb6a501fbaec0e66c4fe8d76a4d1cb882fa4d",
+        "model_state_sha256": "6932045d7fe131c50b96a3d148270da968d545820f979ad7385091cd11b6e92d",
+        "open_rows_detected": 0,
+        "symbol": "SONACOMS"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "b41676bc3cc4a508b0845cb53ab0eec32cd9648925e59b517ea4338d3556e73f",
+        "model_state_sha256": "29285e7a2174b0431bfb955957b02650bd82cc3c5b8bc774ab29efac72c38f35",
+        "open_rows_detected": 0,
+        "symbol": "SRF"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "40846315384088733ad362991f9f32a1b3b903836d43610ac4c93ecb211454c8",
+        "model_state_sha256": "6c2236bd9a07d5347f8f2b70274f618fe3cf815a2ba1b27096bfa269e013f8ca",
+        "open_rows_detected": 0,
+        "symbol": "SUNPHARMA"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "3dd7e85a17c22308e75dcb9667b9d21ae30639477f6977c1539279b606fcf40b",
+        "model_state_sha256": "5b64676dc00166deb07e672db6c9c89b95279f2308cbfab30fa7b143f913e833",
+        "open_rows_detected": 0,
+        "symbol": "SUPREMEIND"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "b24f6e064680721e5621258748e505f1d28d651b17bbd66f08915ba66acf834e",
+        "model_state_sha256": "1fda5dc770f6f74593f098c97dde64e718adcba6a1410d5ccd17c05726a262a2",
+        "open_rows_detected": 0,
+        "symbol": "SUZLON"
+      },
+      {
+        "ledger_rows": 9,
+        "ledger_sha256": "4e823a2cafe1216a0b68d388f6c3dc0f5bf5249d7adb09721518eedae746a91d",
+        "model_state_sha256": "e32bc7caf5566db102e454deba259334b50cb6b5c783598bd5d19e200661168f",
+        "open_rows_detected": 0,
+        "symbol": "SWIGGY"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "294253dec0936f09d9965ddd46fac8a38521e2c951dab5ca3f08ba33cfc809d4",
+        "model_state_sha256": "ce55c1b1e22185d2760db0a22170e0694a855706312ae1e4ec4f1cc93e6ea9fa",
+        "open_rows_detected": 0,
+        "symbol": "TATACONSUM"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "3503514f1e81fb3905c63a88fb37aa8dd1207ef4d60e7402876c447878deb2ac",
+        "model_state_sha256": "84e6faf584f7698a6feedfbaacecf6b71440c6a3d2f05bed25953ff3947633bb",
+        "open_rows_detected": 0,
+        "symbol": "TATAELXSI"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "6741e5ef1d6eac0ad90fa215a674958e15a12590e8e9506c79873b5d865e2e22",
+        "model_state_sha256": "70d249869ad14d458d4408885e0e6912f3f10c4cc45294f5181c1a5f6607ad8b",
+        "open_rows_detected": 0,
+        "symbol": "TATAPOWER"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "4fb1c38d1b1742f1dcdf6dad0ff1efca1937bb9fdee2c10faebe30b5f2edbc3b",
+        "model_state_sha256": "2cba76ef0b3b30181057155fb1ace874f9afa4dac79ee4ede0299da685f20ea8",
+        "open_rows_detected": 0,
+        "symbol": "TATASTEEL"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "1a3248c313b78d8aef6713c33091988daf5ad8278c72b1026cfb1f64bd742aa7",
+        "model_state_sha256": "cb8ecb4491f021f5bfa03027506ef55f5efc439e947667af9d0d41bc5ecb15e4",
+        "open_rows_detected": 0,
+        "symbol": "TCS"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "2ca4bb65fc1ac1e8f35148c51f9d6eaab2e124f4fb905af6ae48102ef34692f7",
+        "model_state_sha256": "22f4dda97692bb95a8e80aab1e3635a3c3f4442d0afc51ce3df9d92b42acf2f2",
+        "open_rows_detected": 0,
+        "symbol": "TECHM"
+      },
+      {
+        "ledger_rows": 7,
+        "ledger_sha256": "9d1e449e34d1da9698da260011e746619b52be0a786446e44e7c91781cc7f553",
+        "model_state_sha256": "ada7d5e3cce9cda81470e502d478c5d807aec5c0965a506493af7b5737f90f8a",
+        "open_rows_detected": 0,
+        "symbol": "TIINDIA"
+      },
+      {
+        "ledger_rows": 5,
+        "ledger_sha256": "4162b9d15d9403e90f094c31d0fdcf7f0e944784c7095b61e93648d114ba5106",
+        "model_state_sha256": "4c8715f8a35af1ddea27bbe232ecf6b973fea69369d3a3450f2dbdf0577275cb",
+        "open_rows_detected": 0,
+        "symbol": "TITAN"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "a7c62214d87d3cef3b43d4b73da161bdbc6d5b982ce4cc8d79aa6dee3605fd36",
+        "model_state_sha256": "1a738a501edcb2824f97a31239950ece02b2f2d9fcf9cbc37bcb2a94b1def293",
+        "open_rows_detected": 0,
+        "symbol": "TMPV"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "075ca9eec33c115f4062298bde4b550205921a669eddb00da2c0da0cfc10afdd",
+        "model_state_sha256": "1c7e020ad0547d27b5ca7e2d65770b896fc2ef9c09d76bdc7aefc4f7f5396b10",
+        "open_rows_detected": 0,
+        "symbol": "TORNTPHARM"
+      },
+      {
+        "ledger_rows": 22,
+        "ledger_sha256": "161729a0f507e7c38ffc26a5efa9f3f843fea268f8eacdfdbf6149c4e3a3a693",
+        "model_state_sha256": "6d20a9a571b27e0996a96e751a8a02a502ab1c6ee21d05dd705d6c7a25919cc3",
+        "open_rows_detected": 0,
+        "symbol": "TRENT"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "7f3559d260c118046e75439e6d70d6826379040831d315194bbedc6f9b379a2f",
+        "model_state_sha256": "fd753df02958a56bad521313b56b9430890449637b5ab22cb2a75519e811562c",
+        "open_rows_detected": 0,
+        "symbol": "TVSMOTOR"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "01e119c28c67ba6096c312a729272bf7d165ccdea3ea5794800d62d47fce4c14",
+        "model_state_sha256": "7b0a8a432ccaff91ae9c107be497c6f1310cbb488107944e371c099cd2b25983",
+        "open_rows_detected": 0,
+        "symbol": "ULTRACEMCO"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "5561dd8d4dae4f1c407f9447910925e0f27a6bea6f3fb87b2e8f8c880825386d",
+        "model_state_sha256": "24b16c41251197fe7ab646f7fafef2942a8c70878ef998e35fe63c97624fc9d8",
+        "open_rows_detected": 0,
+        "symbol": "UNIONBANK"
+      },
+      {
+        "ledger_rows": 6,
+        "ledger_sha256": "637ad5b2402a398fce665102512a85fa2f0edbac5138c3431ed3b6d3d1c17106",
+        "model_state_sha256": "cf452d880da9bbaf5aa6af95808f5da030881f5b5491056a573d77285019c88d",
+        "open_rows_detected": 0,
+        "symbol": "UNITDSPR"
+      },
+      {
+        "ledger_rows": 8,
+        "ledger_sha256": "c4a209b6e8bb2deabdd186b751a701262448330bb39cadb9fed7233e710b6494",
+        "model_state_sha256": "1c63929a6ea83021d13b671cfc04e0b36173e2052f85623e51d288f4898a1ee6",
+        "open_rows_detected": 0,
+        "symbol": "UNOMINDA"
+      },
+      {
+        "ledger_rows": 12,
+        "ledger_sha256": "b5740b4230c2264eee73f0091b5367c4b2bbc5a7bca2a7eac0253562d83a75a4",
+        "model_state_sha256": "db97a067c24f38b995f82d1b274ca4daee91806e35df345a9ef3d895616d3e5c",
+        "open_rows_detected": 0,
+        "symbol": "UPL"
+      },
+      {
+        "ledger_rows": 15,
+        "ledger_sha256": "948b593195f66ce4f1fb9247241a31b6e537bf5e92d9196eab83a1089e4e7abf",
+        "model_state_sha256": "68734da50f458fa656c70b33e520c13915baded6dd6a1c85129e81c6a6d99549",
+        "open_rows_detected": 0,
+        "symbol": "VBL"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "a43ada0a524ef6e0627c0b67bf2ebabcc2862a66a5e60d6da40a93a81ad10207",
+        "model_state_sha256": "9f74823e72a06aa1a2d1ff8c64723aecc74139d5d5773b5d2cfedf17863538d3",
+        "open_rows_detected": 0,
+        "symbol": "VEDL"
+      },
+      {
+        "ledger_rows": 18,
+        "ledger_sha256": "515b0eb2ecb85c1ecfd945037fd82053abca0ace1889d60c485d643954398719",
+        "model_state_sha256": "2687b7f8415764155695d3a8bafc5954acb80515a75a5ff1a7ca8b792783c2b6",
+        "open_rows_detected": 0,
+        "symbol": "VMM"
+      },
+      {
+        "ledger_rows": 13,
+        "ledger_sha256": "73d61a4ce563c617afeab704a814e45da2961dc6a6003e8ac4b15b6b27ffe959",
+        "model_state_sha256": "118a4be414528693b75194b9eddac325e3e5fe90ba7d7312f65335e6b62c31d8",
+        "open_rows_detected": 0,
+        "symbol": "VOLTAS"
+      },
+      {
+        "ledger_rows": 14,
+        "ledger_sha256": "f2a73ae6125c6c518c4b4ccb0e870727956e3d1b740999c81bb2f40bb68874da",
+        "model_state_sha256": "c52eca9796b7227fc41f1e77847e1b2a067b3297dae05540973469be98c3aac8",
+        "open_rows_detected": 0,
+        "symbol": "WAAREEENER"
+      },
+      {
+        "ledger_rows": 20,
+        "ledger_sha256": "e1ff8d51fe5580fb12a9bc7b5877e85d3ecad19d5c87ffc6fc514944e5f340a9",
+        "model_state_sha256": "afac8f53ec161f82c87110e323ee00197fcef79830c2dcd3a8d8715ff05d36a5",
+        "open_rows_detected": 0,
+        "symbol": "WIPRO"
+      },
+      {
+        "ledger_rows": 10,
+        "ledger_sha256": "92ee90dd901e131581e18b562afb7a21d368931b23c4f9ede428cf71442c34ee",
+        "model_state_sha256": "d9f2c661e9631772336628ac8186eaf890dd46dbc8b11c233f5247d2bd6ab58e",
+        "open_rows_detected": 0,
+        "symbol": "YESBANK"
+      },
+      {
+        "ledger_rows": 16,
+        "ledger_sha256": "c4922188a8765aa92aa43f3220cba54b16b81758f816d383363d3e98d73ada3b",
+        "model_state_sha256": "2eca895a143fd7b8778a5afb89c3068dc7f4fe505e633d9848bcb9ed1e8d4147",
+        "open_rows_detected": 0,
+        "symbol": "ZYDUSLIFE"
+      }
+    ]
+  },
+  "label": "post_eod_aug25_incremental_chain",
+  "matrix": {
+    "bridge_state": {
+      "exists": true,
+      "path": "/opt/cloud-deploy-candidates/matrix-v1/state/matrix_v2_bridge_state.json",
+      "rows": null,
+      "sha256": "5ff3c8f268940c3a9425bca0287f0cb8af23ad4580bc1b49c452f684405883b6"
+    },
+    "matrix_events": {
+      "exists": true,
+      "path": "/opt/cloud-deploy-candidates/matrix-v1/state/matrix_events.jsonl",
+      "rows": 1862,
+      "sha256": "be0e631bcb434a11a8c499345927a8a4722734330cf8516f56153ba4342f910d"
+    },
+    "matrix_state": {
+      "exists": true,
+      "path": "/opt/cloud-deploy-candidates/matrix-v1/state/matrix_state.json",
+      "rows": null,
+      "sha256": "0995edfa0889d6eec6acedbec8035c43bd2abed1cb2e1a3e0e64c29ab2faf927"
+    }
+  },
+  "matrix_state_dir": "/opt/cloud-deploy-candidates/matrix-v1/state",
+  "schema": "obvfutport_v2.state_manifest.v1",
+  "state_dir": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state"
+}

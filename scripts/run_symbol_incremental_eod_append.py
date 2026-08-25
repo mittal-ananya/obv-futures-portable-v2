@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -38,8 +39,20 @@ def atomic_write_json(path: Path, payload: Any) -> None:
     tmp.replace(path)
 
 
+def copy_file_replace(source: Path, target: Path) -> int:
+    if not source.exists():
+        return 0
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, target)
+    return 1
+
+
 def safe_symbol(symbol: str) -> str:
     return "".join(ch if ch.isalnum() or ch in {"_", "-"} else "_" for ch in str(symbol))
+
+
+def safe_key(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", str(value))
 
 
 def parse_hhmm_to_epoch(trade_date: str, hhmm: str) -> int:
@@ -119,6 +132,43 @@ def source_instrument_dir(source_state: Path, symbol: str) -> Path:
         if candidate.exists():
             return candidate
     raise FileNotFoundError(f"source instrument missing for {symbol}: {source_state / 'instruments'}")
+
+
+def copy_source_bootstrap_subset(source_state: Path, run_dir: Path, task: dict[str, Any]) -> dict[str, Any]:
+    src_bootstrap = source_state / "bootstrap_state"
+    dst_bootstrap = run_dir / "bootstrap_state"
+    report = {"enabled": True, "loaded": False, "files_copied": 0, "missing_keys": []}
+    if dst_bootstrap.exists():
+        shutil.rmtree(dst_bootstrap)
+    if not src_bootstrap.exists():
+        report["reason"] = "source_bootstrap_missing"
+        return report
+
+    latest_manifest = read_json(src_bootstrap / "latest_manifest.json", {})
+    as_of_date = str(latest_manifest.get("as_of_date") or latest_manifest.get("bootstrap_end_date") or "")
+    if not as_of_date:
+        report["reason"] = "source_bootstrap_manifest_missing_as_of_date"
+        return report
+
+    dst_bootstrap.mkdir(parents=True, exist_ok=True)
+    for rel in ("latest_manifest.json", f"{as_of_date}/manifest.json"):
+        copied = copy_file_replace(src_bootstrap / rel, dst_bootstrap / rel)
+        report["files_copied"] += copied
+
+    for key in task.get("keys") or []:
+        rel = f"{as_of_date}/{safe_key(str(key))}.json.gz"
+        copied = copy_file_replace(src_bootstrap / rel, dst_bootstrap / rel)
+        report["files_copied"] += copied
+        if not copied:
+            report["missing_keys"].append(str(key))
+
+    source_status = source_state / "bootstrap_status.json"
+    if source_status.exists():
+        shutil.copy2(source_status, run_dir / "bootstrap_status.json")
+        report["files_copied"] += 1
+    report["as_of_date"] = as_of_date
+    report["loaded"] = not report["missing_keys"] and report["files_copied"] > 0
+    return report
 
 
 def load_tasks(filtered_root: Path) -> list[dict[str, Any]]:
@@ -210,6 +260,8 @@ def prepare_one_symbol_run(
     task: dict[str, Any],
     trade_date: str,
     force: bool,
+    load_source_bootstrap: bool,
+    direct_curated_stream: bool,
 ) -> Path:
     symbol = str(task["symbol"])
     shard = int(task["shard"])
@@ -224,6 +276,10 @@ def prepare_one_symbol_run(
     dst_inst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(src_inst, dst_inst)
 
+    bootstrap_report = {"enabled": False, "loaded": False}
+    if load_source_bootstrap:
+        bootstrap_report = copy_source_bootstrap_subset(source_state, run_dir, task)
+
     base_runtime = read_json(Path(str(task["runtime"])), {})
     entry = dict(task["entry"])
     universe = {
@@ -235,7 +291,7 @@ def prepare_one_symbol_run(
     universe_path = run_dir / "config" / "universe.json"
     atomic_write_json(universe_path, universe)
 
-    stream_source = symbol_stream_dir(filtered_root, shard, symbol)
+    stream_source = filtered_root / "curated_target_stream" if direct_curated_stream else symbol_stream_dir(filtered_root, shard, symbol)
     link = run_dir / "target_stream"
     if link.exists() or link.is_symlink():
         if link.is_dir() and not link.is_symlink():
@@ -251,11 +307,16 @@ def prepare_one_symbol_run(
     runtime["hurst_universe_manifest_path_local"] = str(universe_path)
     runtime["target_stream_root"] = str(link)
     runtime["target_stream_root_local"] = str(link)
-    runtime["bootstrap_load_enabled"] = False
+    runtime["bootstrap_load_enabled"] = bool(bootstrap_report.get("loaded"))
+    if bootstrap_report.get("loaded"):
+        runtime.pop("bootstrap_load_date", None)
+        runtime.pop("bootstrap_load_date_local", None)
     runtime["skip_past_due_clocks_on_start"] = False
     runtime["start_at_eof_on_market_restart"] = False
     runtime["archive_replay_disable_live_stale_entry_marking"] = False
     runtime["compute_non_clock_percentiles"] = False
+    runtime["symbol_incremental_bootstrap_subset_report"] = bootstrap_report
+    runtime["symbol_incremental_direct_curated_stream"] = bool(direct_curated_stream)
     atomic_write_json(run_dir / "config" / "runtime.json", runtime)
     return run_dir
 
@@ -275,6 +336,8 @@ def run_one_symbol(args: argparse.Namespace) -> int:
         task=task,
         trade_date=trade_date,
         force=bool(args.force),
+        load_source_bootstrap=bool(args.load_source_bootstrap),
+        direct_curated_stream=bool(args.direct_curated_stream),
     )
     if report_ok(run_dir) and not args.force:
         print(json.dumps({"event": "already_ok", "symbol": task["symbol"], "run_dir": str(run_dir)}), flush=True)
@@ -479,7 +542,15 @@ def orchestrate(args: argparse.Namespace) -> int:
     tasks = load_tasks(filtered_root)
     if not tasks:
         raise SystemExit("no tasks found")
-    materialize_report = materialize_symbol_streams(filtered_root, tasks, str(args.trade_date), bool(args.force_materialize))
+    if args.direct_curated_stream:
+        materialize_report = {
+            "event": "symbol_stream_materialize_skipped_direct_curated_stream",
+            "trade_date": str(args.trade_date),
+            "symbols": len(tasks),
+            "source": str(filtered_root / "curated_target_stream" / str(args.trade_date) / f"target_quotes_{args.trade_date}.jsonl"),
+        }
+    else:
+        materialize_report = materialize_symbol_streams(filtered_root, tasks, str(args.trade_date), bool(args.force_materialize))
     atomic_write_json(filtered_root / "reports" / f"symbol_stream_materialize_{args.trade_date}.json", materialize_report)
     print(json.dumps(materialize_report, sort_keys=True), flush=True)
 
@@ -529,6 +600,10 @@ def orchestrate(args: argparse.Namespace) -> int:
             ]
             if args.force:
                 cmd.append("--force")
+            if args.load_source_bootstrap:
+                cmd.append("--load-source-bootstrap")
+            if args.direct_curated_stream:
+                cmd.append("--direct-curated-stream")
             handle = log_path.open("wb")
             proc = subprocess.Popen(cmd, cwd=str(args.root), stdout=handle, stderr=subprocess.STDOUT)
             running[proc] = {
@@ -616,6 +691,8 @@ def main() -> int:
     parser.add_argument("--max-trade-state-passes", type=int, default=20)
     parser.add_argument("--force-materialize", action="store_true")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--load-source-bootstrap", action="store_true")
+    parser.add_argument("--direct-curated-stream", action="store_true")
     parser.add_argument("--one-symbol", action="store_true")
     parser.add_argument("--task-json", default=None)
     args = parser.parse_args()

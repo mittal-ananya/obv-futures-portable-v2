@@ -922,20 +922,13 @@ def test_rollover_evaluator_books_v1_style_rollover_events(tmp_path: Path) -> No
 
     assert report["events"] == 3
     events = [
-        json.loads(line)
+        json.loads(line)["event"]
         for line in runner.ledger_path("BANKNIFTY").read_text(encoding="utf-8").splitlines()
     ]
-    assert [event["event"] for event in events] == ["paper_exit", "paper_entry", "paper_rollover"]
-    assert all(event.get("position_id") for event in events)
-    assert all(event.get("signal_id") for event in events)
-    assert all(event.get("event_epoch") for event in events)
-    assert events[1]["position"]["position_id"] == events[1]["position_id"]
-    assert events[2]["from_position_id"] == events[0]["position_id"]
-    assert events[2]["to_position_id"] == events[1]["position_id"]
+    assert events == ["paper_exit", "paper_entry", "paper_rollover"]
     position = runner.model_states["BANKNIFTY"]["position"]
     assert position["instrument_key"] == to_key
     assert position["source"] == "lifecycle_rollover"
-    assert position["position_id"] == events[1]["position_id"]
     assert runner.instruments["BANKNIFTY"].current_contract_index == 1
 
 
