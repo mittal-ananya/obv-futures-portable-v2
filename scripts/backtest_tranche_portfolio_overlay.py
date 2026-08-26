@@ -657,7 +657,16 @@ def parse_tranche_float_map(text: str, *, default: float | None = None) -> dict[
     return out
 
 
-def summarize_transactions(transactions: list[dict[str, Any]], open_holdings: dict[str, Holding], cash: float, equity: float, peak_margin: float, peak_equity: float) -> dict[str, Any]:
+def summarize_transactions(
+    transactions: list[dict[str, Any]],
+    open_holdings: dict[str, Holding],
+    cash: float,
+    equity: float,
+    peak_margin: float,
+    peak_equity: float,
+    *,
+    initial_capital: float,
+) -> dict[str, Any]:
     exits = [row for row in transactions if row.get("event") == "portfolio_exit"]
     net = [float(row.get("net_rupees") or 0.0) for row in exits]
     wins = [x for x in net if x > 0]
@@ -674,7 +683,7 @@ def summarize_transactions(transactions: list[dict[str, Any]], open_holdings: di
         "current_margin_rupees": sum(item.margin_locked for item in open_holdings.values()),
         "peak_margin_rupees": peak_margin,
         "peak_equity_rupees": peak_equity,
-        "return_on_initial_pct": ((equity / 10_000_000.0) - 1.0) * 100.0,
+        "return_on_initial_pct": ((equity / initial_capital) - 1.0) * 100.0 if initial_capital else None,
         "return_on_peak_margin_pct": (sum(net) / peak_margin * 100.0) if peak_margin else None,
         "avg_net_rupees": statistics.mean(net) if net else None,
         "median_net_rupees": statistics.median(net) if net else None,
@@ -994,7 +1003,15 @@ def run_portfolio(
                 "unrealized_net_rupees": holding_mtm(index, v1_portfolio, holding, final_epoch),
             }
         )
-    summary = summarize_transactions(transactions, holdings, cash, final_equity, peak_margin, peak_equity)
+    summary = summarize_transactions(
+        transactions,
+        holdings,
+        cash,
+        final_equity,
+        peak_margin,
+        peak_equity,
+        initial_capital=initial_capital,
+    )
     summary.update(
         {
             "portfolio": tranche,
