@@ -1,0 +1,59 @@
+{
+  "failures": [],
+  "matrix": {
+    "bridge_last_result": {
+      "accepted": 0,
+      "failed": 0,
+      "initialized_offsets": 212,
+      "skipped": 0
+    },
+    "bridge_state_exists": true,
+    "matrix_events_exists": true,
+    "matrix_events_line_count": 2014,
+    "matrix_events_sha256": "2db6d739df0759cae94279762112fe5ab6c9803881543bf0b141f0d1497ba0cc",
+    "matrix_instrument_count": 212,
+    "matrix_state_event_count": 2014,
+    "matrix_state_exists": true,
+    "matrix_state_sha256": "42991f987207ffb98be6ea844c223ac8774960f9fdf9591e3dd935b401eeb339"
+  },
+  "matrix_state_dir": "/opt/cloud-deploy-candidates/matrix-v1/state",
+  "ok": true,
+  "override": {
+    "adaptive_count": 209,
+    "expected_quarantined_symbols": [
+      "IOC",
+      "MAXHEALTH",
+      "WAAREEENER"
+    ],
+    "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/adaptive_calibration/v2_symbol_overrides_latest.json",
+    "quarantined_count": 3,
+    "quarantined_symbols": [
+      "IOC",
+      "MAXHEALTH",
+      "WAAREEENER"
+    ],
+    "sha256": "07c54f85d72b87ce042b3e74d9c167ddc88ec6b03eb215ae576e3cd264480c5e",
+    "symbol_count": 212
+  },
+  "schema": "obvfutport_v2.post_install_audit.v1",
+  "state_dir": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state",
+  "updated_epoch": 1787759818.782538,
+  "v2_state": {
+    "event_type_counts": {
+      "paper_entry": 1049,
+      "paper_exit": 919,
+      "paper_rollover": 22,
+      "stale_entry_rejected": 111,
+      "tranche2_exit": 263,
+      "tranche3_entry": 248,
+      "tranche3_exit": 220
+    },
+    "instrument_count": 212,
+    "ledger_rows": 2832,
+    "missing_ledger_symbols": [],
+    "open_position_rows_unverified": 1049,
+    "symbols_with_ledger": 212,
+    "t3_issue_count": 0,
+    "t3_issues_sample": []
+  }
+}

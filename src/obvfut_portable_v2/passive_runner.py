@@ -2026,15 +2026,27 @@ class OnlineObvState:
         prior_p90 = as_float(snap.prior_p90)
         prior_p95 = as_float(snap.prior_p95)
         prior_p10 = as_float(snap.prior_p10)
-        prior_price_values = [value for value in self.previous_clock_price_changes if math.isfinite(value)]
+        prior_price_values = [
+            value
+            for raw in self.previous_clock_price_changes
+            if (value := as_float(raw)) is not None and math.isfinite(value)
+        ]
         if price_change_since_start is not None and prior_price_values:
             price_pct = 100.0 * sum(value <= price_change_since_start for value in prior_price_values) / len(prior_price_values)
         else:
             price_pct = math.nan
-        prior_prices = [value for value in self.previous_clock_prices[-12:] if math.isfinite(value)]
+        prior_prices = [
+            value
+            for raw in self.previous_clock_prices[-12:]
+            if (value := as_float(raw)) is not None and math.isfinite(value)
+        ]
         lookback_high = max(prior_prices) if len(prior_prices) >= 12 else math.nan
         lookback_low = min(prior_prices) if len(prior_prices) >= 12 else math.nan
-        prior_ranges = [value for value in self.prev_range_history[-20:] if math.isfinite(value)]
+        prior_ranges = [
+            value
+            for raw in self.prev_range_history[-20:]
+            if (value := as_float(raw)) is not None and math.isfinite(value)
+        ]
         prior_clock_vol = float(median(prior_ranges)) if len(prior_ranges) >= 4 else math.nan
         breakout_points = dynamic_points(
             prior_clock_vol,

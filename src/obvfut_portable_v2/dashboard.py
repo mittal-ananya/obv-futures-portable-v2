@@ -24,6 +24,15 @@ STALE_DIAGNOSTIC_DAYS = max(1, int(float(os.environ.get("OBVFUTPORT_V2_STALE_DIA
 app = FastAPI(title="OBVFUTPORT V2 Dashboard")
 
 _SNAPSHOT_CACHE: dict[str, Any] = {"built_at": 0.0, "data": None}
+_CLOCK_DIAGNOSTIC_CACHE: dict[str, Any] = {
+    "trade_date": None,
+    "path": None,
+    "offset": 0,
+    "size": 0,
+    "rows": [],
+    "seen": set(),
+    "clock_epochs": set(),
+}
 
 
 def now_ist() -> datetime:
@@ -117,6 +126,11 @@ def load_instrument_sources(universe_symbols: set[str]) -> list[tuple[str, Path]
                 continue
             seen_paths.add(path)
             sources.append((symbol, path))
+    for path in sorted(root.glob("*")):
+        if not path.is_dir() or path in seen_paths:
+            continue
+        seen_paths.add(path)
+        sources.append((path.name, path))
     return sources
 
 
@@ -222,6 +236,240 @@ def parse_time_epoch(value: Any) -> int | None:
         return int(datetime.fromisoformat(text).timestamp())
     except (TypeError, ValueError):
         return None
+
+
+def iso_date_text(value: Any) -> str | None:
+    if not value:
+        return None
+    try:
+        text = str(value).replace("Z", "+00:00")
+        return datetime.fromisoformat(text).astimezone(timezone(timedelta(hours=5, minutes=30))).date().isoformat()
+    except (TypeError, ValueError):
+        return None
+
+
+def telemetry_initial_tail_bytes() -> int:
+    raw = os.environ.get("OBVFUTPORT_V2_DASHBOARD_TELEMETRY_INITIAL_TAIL_MB", "256")
+    try:
+        mb = max(16, int(float(raw)))
+    except (TypeError, ValueError):
+        mb = 256
+    return mb * 1024 * 1024
+
+
+def compact_missing_metric_row(report: dict[str, Any], sample: dict[str, Any]) -> dict[str, Any] | None:
+    if not isinstance(sample, dict):
+        return None
+    details = sample.get("details") if isinstance(sample.get("details"), dict) else {}
+    clock_time = report.get("clock_time") or report.get("clock_time_ist")
+    clock_epoch = parse_epoch(report.get("clock_epoch")) or parse_time_epoch(clock_time)
+    recorded_at = report.get("recorded_at_ist") or report.get("recorded_at") or report.get("time")
+    symbol = str(sample.get("symbol") or "")
+    reason = str(sample.get("reason") or details.get("reason") or sample.get("status") or "")
+    status = str(sample.get("status") or "")
+    is_readiness_miss = (
+        status == "missed_not_ready"
+        or reason in {"missing_clock_metric", "not_ready", "readiness_missing"}
+        or sample.get("ready") is False
+    )
+    if not is_readiness_miss or not symbol:
+        return None
+    last_finalized = parse_epoch(details.get("last_finalized_second"))
+    latest_quote_epoch = parse_epoch(details.get("latest_quote_epoch"))
+    return {
+        "diagnostic_type": "readiness_missing_metric",
+        "clock_time": clock_time,
+        "clock_label": sample.get("required_clock_label") or (datetime.fromtimestamp(clock_epoch, tz=timezone.utc).astimezone(timezone(timedelta(hours=5, minutes=30))).strftime("%H:%M") if clock_epoch else None),
+        "clock_epoch": clock_epoch,
+        "recorded_at_ist": recorded_at,
+        "symbol": symbol,
+        "role": sample.get("role"),
+        "signal_source": sample.get("signal_source"),
+        "instrument_key": sample.get("instrument_key"),
+        "status": status or "missed_not_ready",
+        "reason": reason or "missing_clock_metric",
+        "last_finalized_second": last_finalized,
+        "last_finalized_time": fmt_epoch(last_finalized),
+        "latest_quote_epoch": latest_quote_epoch,
+        "latest_quote_time": fmt_epoch(latest_quote_epoch),
+        "latest_quote_age_seconds": safe_float(details.get("latest_quote_age_seconds")),
+    }
+
+
+def compact_skipped_edge_row(report: dict[str, Any], sample: dict[str, Any]) -> dict[str, Any] | None:
+    if not isinstance(sample, dict):
+        return None
+    clock_time = report.get("clock_time") or report.get("clock_time_ist")
+    clock_epoch = parse_epoch(report.get("clock_epoch")) or parse_time_epoch(clock_time)
+    recorded_at = report.get("recorded_at_ist") or report.get("recorded_at") or report.get("time")
+    symbol = str(sample.get("symbol") or "")
+    if not symbol:
+        return None
+    return {
+        "diagnostic_type": "entry_edge_skipped",
+        "clock_time": clock_time,
+        "clock_label": sample.get("required_clock_label") or (datetime.fromtimestamp(clock_epoch, tz=timezone.utc).astimezone(timezone(timedelta(hours=5, minutes=30))).strftime("%H:%M") if clock_epoch else None),
+        "clock_epoch": clock_epoch,
+        "recorded_at_ist": recorded_at,
+        "symbol": symbol,
+        "role": sample.get("role"),
+        "signal_source": sample.get("signal_source"),
+        "instrument_key": sample.get("instrument_key"),
+        "status": sample.get("status") or "entry_signal_skipped",
+        "reason": sample.get("reason") or sample.get("skip_reason") or "entry_signal_skipped",
+        "signal_time": sample.get("signal_time"),
+        "entry_due_time": sample.get("entry_due_time"),
+        "entry_staleness_seconds": safe_float(sample.get("entry_staleness_seconds")),
+    }
+
+
+def add_clock_diagnostic_row(
+    rows: list[dict[str, Any]],
+    seen: set[tuple[Any, ...]],
+    row: dict[str, Any] | None,
+) -> None:
+    if not row:
+        return
+    key = (
+        row.get("diagnostic_type"),
+        row.get("clock_epoch"),
+        row.get("symbol"),
+        row.get("role"),
+        row.get("reason"),
+        row.get("instrument_key"),
+    )
+    if key in seen:
+        return
+    seen.add(key)
+    rows.append(row)
+
+
+def ingest_clock_report(
+    report: dict[str, Any],
+    rows: list[dict[str, Any]],
+    seen: set[tuple[Any, ...]],
+    trade_date: str,
+    clock_epochs: set[int] | None = None,
+) -> None:
+    if not isinstance(report, dict) or report.get("event") != "clock_evaluation":
+        return
+    clock_time = report.get("clock_time") or report.get("clock_time_ist")
+    if iso_date_text(clock_time or report.get("recorded_at_ist")) != trade_date:
+        return
+    clock_epoch = parse_epoch(report.get("clock_epoch")) or parse_time_epoch(clock_time)
+    if clock_epoch is not None and clock_epochs is not None:
+        clock_epochs.add(clock_epoch)
+    samples: list[dict[str, Any]] = []
+    for sample in report.get("stale_samples") or []:
+        if isinstance(sample, dict):
+            samples.append(sample)
+    barrier = report.get("readiness_barrier") if isinstance(report.get("readiness_barrier"), dict) else {}
+    for sample in barrier.get("missing") or []:
+        if isinstance(sample, dict):
+            samples.append(sample)
+    for sample in samples:
+        add_clock_diagnostic_row(rows, seen, compact_missing_metric_row(report, sample))
+    for sample in report.get("skipped_edge_samples") or []:
+        if isinstance(sample, dict):
+            add_clock_diagnostic_row(rows, seen, compact_skipped_edge_row(report, sample))
+
+
+def expected_clock_epochs(trade_date: str, latest_epoch: int) -> list[int]:
+    start = parse_time_epoch(f"{trade_date}T09:20:00+05:30")
+    close = parse_time_epoch(f"{trade_date}T15:35:00+05:30")
+    if start is None:
+        return []
+    end = min(latest_epoch, close or latest_epoch)
+    if end < start:
+        return []
+    epochs: list[int] = []
+    current = start
+    while current <= end:
+        epochs.append(current)
+        current += 15 * 60
+    return epochs
+
+
+def add_missing_clock_reports(rows: list[dict[str, Any]], clock_epochs: set[int], trade_date: str) -> list[dict[str, Any]]:
+    if not clock_epochs:
+        return rows
+    result = list(rows)
+    seen_missing = {
+        (row.get("diagnostic_type"), row.get("clock_epoch"), row.get("symbol"), row.get("reason"))
+        for row in result
+    }
+    for epoch in expected_clock_epochs(trade_date, max(clock_epochs)):
+        if epoch in clock_epochs:
+            continue
+        clock_time = fmt_epoch(epoch)
+        row = {
+            "diagnostic_type": "clock_evaluation_missing",
+            "clock_time": clock_time,
+            "clock_label": datetime.fromtimestamp(epoch, tz=timezone.utc).astimezone(timezone(timedelta(hours=5, minutes=30))).strftime("%H:%M"),
+            "clock_epoch": epoch,
+            "recorded_at_ist": None,
+            "symbol": "CLOCK",
+            "role": "decision_clock",
+            "signal_source": "all",
+            "instrument_key": "all",
+            "status": "clock_not_evaluated",
+            "reason": "missing_clock_evaluation_report",
+        }
+        key = (row["diagnostic_type"], row["clock_epoch"], row["symbol"], row["reason"])
+        if key in seen_missing:
+            continue
+        seen_missing.add(key)
+        result.append(row)
+    return result
+
+
+def load_clock_diagnostics() -> list[dict[str, Any]]:
+    trade_date = now_ist().date().isoformat()
+    path = STATE_DIR / "telemetry.jsonl"
+    rows: list[dict[str, Any]] = _CLOCK_DIAGNOSTIC_CACHE.get("rows") or []
+    seen: set[tuple[Any, ...]] = _CLOCK_DIAGNOSTIC_CACHE.get("seen") or set()
+    clock_epochs: set[int] = _CLOCK_DIAGNOSTIC_CACHE.get("clock_epochs") or set()
+    if _CLOCK_DIAGNOSTIC_CACHE.get("trade_date") != trade_date or _CLOCK_DIAGNOSTIC_CACHE.get("path") != str(path):
+        rows = []
+        seen = set()
+        clock_epochs = set()
+        _CLOCK_DIAGNOSTIC_CACHE.update({"trade_date": trade_date, "path": str(path), "offset": 0, "size": 0, "rows": rows, "seen": seen, "clock_epochs": clock_epochs})
+    try:
+        size = path.stat().st_size
+    except OSError:
+        return rows
+    offset = int(_CLOCK_DIAGNOSTIC_CACHE.get("offset") or 0)
+    if size < offset:
+        rows = []
+        seen = set()
+        clock_epochs = set()
+        offset = 0
+    initial_scan = offset == 0
+    try:
+        with path.open("rb") as handle:
+            if initial_scan:
+                offset = max(0, size - telemetry_initial_tail_bytes())
+                handle.seek(offset)
+                if offset:
+                    handle.readline()
+            else:
+                handle.seek(offset)
+            for raw in handle:
+                try:
+                    event = json.loads(raw)
+                except (json.JSONDecodeError, UnicodeDecodeError):
+                    continue
+                ingest_clock_report(event, rows, seen, trade_date, clock_epochs)
+            offset = handle.tell()
+    except OSError:
+        return rows
+    status = read_json(STATE_DIR / "status.json", {})
+    if isinstance(status, dict):
+        ingest_clock_report(status.get("latest_decision_report") or {}, rows, seen, trade_date, clock_epochs)
+    result = add_missing_clock_reports(rows, clock_epochs, trade_date)
+    result.sort(key=lambda r: (parse_epoch(r.get("clock_epoch")) or 0, str(r.get("symbol"))), reverse=True)
+    _CLOCK_DIAGNOSTIC_CACHE.update({"trade_date": trade_date, "path": str(path), "offset": offset, "size": size, "rows": rows, "seen": seen, "clock_epochs": clock_epochs})
+    return result
 
 
 def stale_event_reason(event: dict[str, Any]) -> str:
@@ -446,7 +694,8 @@ def load_rows() -> dict[str, Any]:
     seen: set[tuple[Any, ...]] = set()
     seen_stale: set[tuple[Any, ...]] = set()
     instrument_sources = load_instrument_sources(universe_symbols)
-    instrument_symbols = sorted(universe_symbols) if universe_symbols else sorted({symbol for symbol, _ in instrument_sources})
+    source_symbols = {symbol for symbol, _ in instrument_sources}
+    instrument_symbols = sorted(universe_symbols | source_symbols) if universe_symbols else sorted(source_symbols)
 
     def add(row: dict[str, Any]) -> None:
         entry_epoch = parse_epoch(row.get("entry_epoch"))
@@ -553,11 +802,21 @@ def load_rows() -> dict[str, Any]:
         )
 
     for symbol, instrument_dir in instrument_sources:
+        ledger_events = iter_jsonl(instrument_dir / "ledger.jsonl")
+        ledger_closed_positions = {
+            str(event.get("position_id") or event.get("signal_id") or "")
+            for event in ledger_events
+            if event.get("event") == "paper_exit"
+        }
+        ledger_closed_positions.discard("")
         model = read_json(instrument_dir / "model_state.json", {})
         if isinstance(model, dict):
             position = model.get("position")
             if isinstance(position, dict) and position:
-                if is_stale_entry(position):
+                position_key = str(position.get("position_id") or position.get("signal_id") or "")
+                if position_key in ledger_closed_positions:
+                    pass
+                elif is_stale_entry(position):
                     record_stale_open_position(symbol, position)
                 else:
                     add(normalize_row(symbol=symbol, tranche="T1", source=position, status="open", margins=margins))
@@ -587,7 +846,7 @@ def load_rows() -> dict[str, Any]:
                             )
                         )
 
-        for event in iter_jsonl(instrument_dir / "ledger.jsonl"):
+        for event in ledger_events:
             event_type = event.get("event")
             if event_type == "paper_exit":
                 add(normalize_row(symbol=symbol, tranche="T1", source=event, status="closed", margins=margins))
@@ -604,6 +863,8 @@ def load_rows() -> dict[str, Any]:
                             parent=event,
                         )
                     )
+                elif event.get("tranche2_exit_source"):
+                    add(normalize_row(symbol=symbol, tranche="T2", source=event, status="closed", margins=margins))
                 tranche3 = event.get("tranche3") if isinstance(event.get("tranche3"), dict) else {}
                 if tranche3 and parse_epoch(tranche3.get("entry_epoch")) is not None and tranche3.get("status") == "closed":
                     add(
@@ -695,6 +956,7 @@ def load_rows() -> dict[str, Any]:
                     }
                 )
 
+    decision_miss_diagnostics = load_clock_diagnostics()
     all_rows = rows_by_tranche["T1"] + rows_by_tranche["T2"] + rows_by_tranche["T3"]
     stale_suppressed_entries = sorted(
         stale_suppressed_open_positions + stale_suppressed_entry_diagnostics,
@@ -713,6 +975,7 @@ def load_rows() -> dict[str, Any]:
         ),
         "stale_suppressed_entry_diagnostics": stale_suppressed_entry_diagnostics,
         "stale_suppressed_entries": stale_suppressed_entries,
+        "decision_miss_diagnostics": decision_miss_diagnostics,
         "rows_by_tranche": {k: sorted(v, key=lambda r: (r.get("entry_epoch") or 0, r.get("exit_epoch") or 0)) for k, v in rows_by_tranche.items()},
         "rows": sorted(all_rows, key=lambda r: (r.get("entry_epoch") or 0, r.get("tranche") or "", r.get("exit_epoch") or 0)),
     }
@@ -786,13 +1049,20 @@ def build_snapshot() -> dict[str, Any]:
     stale_suppressed_open_positions = loaded.get("stale_suppressed_open_positions", [])
     stale_suppressed_entry_diagnostics = loaded.get("stale_suppressed_entry_diagnostics", [])
     stale_suppressed_entries = loaded.get("stale_suppressed_entries", stale_suppressed_open_positions)
+    decision_miss_diagnostics = loaded.get("decision_miss_diagnostics", [])
     stale_suppressed_by_tranche = {
         "T1": sum(1 for item in stale_suppressed_entries if item.get("has_t1")),
         "T2": sum(1 for item in stale_suppressed_entries if item.get("has_t2")),
         "T3": sum(1 for item in stale_suppressed_entries if item.get("has_t3")),
     }
+    readiness_miss_count = sum(1 for item in decision_miss_diagnostics if item.get("diagnostic_type") == "readiness_missing_metric")
+    skipped_edge_count = sum(1 for item in decision_miss_diagnostics if item.get("diagnostic_type") == "entry_edge_skipped")
+    missing_clock_count = sum(1 for item in decision_miss_diagnostics if item.get("diagnostic_type") == "clock_evaluation_missing")
     summary["stale_suppressed_open_count"] = len(stale_suppressed_open_positions)
     summary["stale_suppressed_entry_count"] = len(stale_suppressed_entries)
+    summary["readiness_miss_count"] = readiness_miss_count
+    summary["skipped_edge_diagnostic_count"] = skipped_edge_count
+    summary["missing_clock_count"] = missing_clock_count
     for tranche, count in stale_suppressed_by_tranche.items():
         tranche_summary.setdefault(tranche, {})["stale_suppressed_open_count"] = count
     margins = margin_timeline(rows)
@@ -841,6 +1111,10 @@ def build_snapshot() -> dict[str, Any]:
         "stale_suppressed_by_tranche": stale_suppressed_by_tranche,
         "stale_suppressed_open_count": len(stale_suppressed_open_positions),
         "stale_suppressed_entry_count": len(stale_suppressed_entries),
+        "decision_miss_diagnostics": decision_miss_diagnostics,
+        "readiness_miss_count": readiness_miss_count,
+        "skipped_edge_diagnostic_count": skipped_edge_count,
+        "missing_clock_count": missing_clock_count,
         "transactions": sorted([r for r in rows if r.get("status") == "closed"], key=lambda r: (r.get("exit_epoch") or 0, r.get("entry_epoch") or 0), reverse=True),
         "symbols": sorted(by_symbol.values(), key=lambda item: item["symbol"]),
         "runner_status": status,
@@ -986,6 +1260,10 @@ def dashboard_html() -> str:
       <h2>Suppressed Stale Entries</h2>
       <div class="table-wrap"><table id="staleTable"></table></div>
     </section>
+    <section>
+      <h2>Decision Miss Diagnostics</h2>
+      <div class="table-wrap"><table id="missTable"></table></div>
+    </section>
     <footer>V2 dashboard reads only OBVFUTPORT-v2 state and does not write ledgers, orders, Compass, or v1 state.</footer>
   </main>
   <script>
@@ -1029,6 +1307,8 @@ def dashboard_html() -> str:
         card('Closed Success', pct(s.success_rate_pct)),
         card('Open Legs', String(s.open)),
         card('Suppressed Stale Entries', String(snapshot.stale_suppressed_entry_count || 0), 'small'),
+        card('Readiness Misses', String(snapshot.readiness_miss_count || 0), 'small'),
+        card('Missing Clocks', String(snapshot.missing_clock_count || 0), 'small'),
         card('Closed Legs', String(s.closed)),
         card('Symbols', String(snapshot.instrument_count)),
         card('Adaptive Symbols', String(adaptiveSymbols)),
@@ -1066,6 +1346,29 @@ def dashboard_html() -> str:
       </tr>`).join('');
       document.getElementById('staleTable').innerHTML =
         `<thead><tr><th>Symbol</th><th>Side</th><th>Suppressed Legs</th><th>Signal Time</th><th>Due Time</th><th>Recorded</th><th>Entry Fill</th><th>Stale By</th><th>Reason</th><th>Position Id</th></tr></thead><tbody>${body}</tbody>`;
+    }
+    function renderDecisionMisses(){
+      const rows = snapshot.decision_miss_diagnostics || [];
+      if(!rows.length){
+        document.getElementById('missTable').innerHTML = '<tbody><tr><td class="empty">No readiness, skipped-edge, or missing-clock diagnostics</td></tr></tbody>';
+        return;
+      }
+      const body = rows.map(r => `<tr>
+        <td class="mono">${r.clock_label || t(r.clock_time)}</td>
+        <td>${String(r.diagnostic_type || '--')}</td>
+        <td><strong>${r.symbol}</strong></td>
+        <td>${String(r.role || '--')}</td>
+        <td>${String(r.signal_source || '--')}</td>
+        <td class="mono">${r.instrument_key || '--'}</td>
+        <td>${String(r.status || '--')}</td>
+        <td>${String(r.reason || '--')}</td>
+        <td class="mono">${t(r.last_finalized_time)}</td>
+        <td class="mono">${t(r.latest_quote_time)}</td>
+        <td>${r.latest_quote_age_seconds == null ? '--' : pctFmt.format(Number(r.latest_quote_age_seconds)) + 's'}</td>
+        <td class="mono">${t(r.recorded_at_ist)}</td>
+      </tr>`).join('');
+      document.getElementById('missTable').innerHTML =
+        `<thead><tr><th>Clock</th><th>Type</th><th>Symbol</th><th>Role</th><th>Source</th><th>Instrument Key</th><th>Status</th><th>Reason</th><th>Last Finalized</th><th>Latest Quote</th><th>Quote Age</th><th>Recorded</th></tr></thead><tbody>${body}</tbody>`;
     }
     function populateSymbols(){
       const select=document.getElementById('symbol');
@@ -1114,7 +1417,7 @@ def dashboard_html() -> str:
       snapshot = await res.json();
       document.getElementById('health').textContent = 'Dashboard Live';
       document.getElementById('stamp').textContent = new Date(snapshot.created_at_utc).toLocaleString('en-IN', {hour12:false});
-      renderCards(); populateSymbols(); renderRows(); renderTranches(); renderStaleSuppressed();
+      renderCards(); populateSymbols(); renderRows(); renderTranches(); renderStaleSuppressed(); renderDecisionMisses();
     }
     document.querySelectorAll('button[data-filter]').forEach(btn => btn.addEventListener('click', () => {
       filter = btn.dataset.filter;

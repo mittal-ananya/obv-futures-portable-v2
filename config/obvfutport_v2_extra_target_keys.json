@@ -1,1483 +1,1483 @@
 {
-  "generated_at_ist": "2026-08-25T08:52:01.924604+05:30",
+  "generated_at_ist": "2026-08-26T09:26:24.305130+05:30",
   "generated_from": "/opt/cloud-deploy-candidates/intraday-short-straddle-v1/config/runtime/zerodha_nfo_master.csv",
   "holiday_calendar": "/opt/cloud-deploy-candidates/intraday-short-straddle-v1/strategy/data/runtime/nse_holidays.csv",
   "holiday_count": 2,
   "inactive_lifecycle_contract_count": 211,
   "inactive_lifecycle_contracts": [
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "360ONE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ABB"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ABCAPITAL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ADANIENSOL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ADANIENT"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ADANIGREEN"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ADANIPORTS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ADANIPOWER"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ALKEM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "AMBER"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "AMBUJACEM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ANGELONE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "APLAPOLLO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "APOLLOHOSP"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ASHOKLEY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ASIANPAINT"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ASTRAL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "AUBANK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "AUROPHARMA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "AXISBANK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BAJAJ-AUTO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BAJAJFINSV"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
-      "candidate_contracts": 3,
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
+      "candidate_contracts": 2,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BAJAJHLDNG"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BAJFINANCE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BANDHANBNK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BANKBARODA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BANKINDIA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BANKNIFTY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BDL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BEL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BHARATFORG"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BHARTIARTL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BHEL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BIOCON"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BLUESTARCO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BOSCHLTD"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BPCL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BRITANNIA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "BSE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "CAMS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "CANBK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "CDSL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "CGPOWER"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "CHOLAFIN"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "CIPLA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "COALINDIA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "COCHINSHIP"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "COFORGE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "COLPAL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "CONCOR"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "CROMPTON"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "CUMMINSIND"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "DABUR"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "DELHIVERY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "DIVISLAB"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "DIXON"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "DLF"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "DMART"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "DRREDDY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "EICHERMOT"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ETERNAL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "FEDERALBNK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "FINNIFTY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "FORCEMOT"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "FORTIS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "GAIL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "GLENMARK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "GMRAIRPORT"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "GODFRYPHLP"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "GODREJCP"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "GODREJPROP"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "GRASIM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "GVT&D"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HAL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HAVELLS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HCLTECH"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HDFCAMC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HDFCBANK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HDFCLIFE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HEROMOTOCO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HINDALCO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HINDPETRO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HINDUNILVR"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HINDZINC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "HYUNDAI"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ICICIBANK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ICICIGI"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ICICIPRULI"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "IDEA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "IDFCFIRSTB"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "IEX"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "INDHOTEL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "INDIANB"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "INDIGO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "INDUSINDBK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "INDUSTOWER"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "INFY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "INOXWIND"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "IOC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "IREDA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "IRFC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ITC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "JINDALSTEL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "JIOFIN"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "JSWENERGY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "JSWSTEEL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "JUBLFOOD"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "KALYANKJIL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "KAYNES"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "KEI"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "KFINTECH"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "KOTAKBANK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "KPITTECH"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "LAURUSLABS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "LICHSGFIN"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "LICI"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "LODHA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "LT"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "LTF"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "LTM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "LUPIN"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "M&M"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MANAPPURAM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MANKIND"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MARICO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MARUTI"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MAXHEALTH"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MAZDOCK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MCX"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MFSL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MIDCPNIFTY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MOTHERSON"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MOTILALOFS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MPHASIS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "MUTHOOTFIN"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NAM-INDIA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NATIONALUM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NAUKRI"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NBCC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NESTLEIND"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NHPC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NIFTY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NMDC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NTPC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "NYKAA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "OBEROIRLTY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "OFSS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "OIL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ONGC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PAGEIND"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PATANJALI"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PAYTM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PERSISTENT"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PETRONET"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PFC"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PGEL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PHOENIXLTD"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PIDILITIND"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PIIND"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PNB"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PNBHOUSING"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "POLICYBZR"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "POLYCAB"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "POWERGRID"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "POWERINDIA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PREMIERENE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "PRESTIGE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "RADICO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "RBLBANK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "RECLTD"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "RELIANCE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "RVNL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SAIL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SBICARD"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SBILIFE"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SBIN"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SHREECEM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SHRIRAMFIN"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SIEMENS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SOLARINDS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SONACOMS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SRF"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SUNPHARMA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SUPREMEIND"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SUZLON"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "SWIGGY"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TATACONSUM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TATAELXSI"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TATAPOWER"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TATASTEEL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TCS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TECHM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TIINDIA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TITAN"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TMPV"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TORNTPHARM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TRENT"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "TVSMOTOR"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ULTRACEMCO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "UNIONBANK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "UNITDSPR"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "UNOMINDA"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "UPL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "VBL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "VEDL"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "VMM"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "VOLTAS"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "WAAREEENER"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "WIPRO"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "YESBANK"
     },
     {
-      "active_contracts": 2,
-      "as_of_date": "2026-08-25",
+      "active_contracts": 1,
+      "as_of_date": "2026-08-26",
       "candidate_contracts": 3,
       "reason": "future_contracts_available_but_not_lifecycle_active",
       "symbol": "ZYDUSLIFE"
@@ -1700,6 +1700,11 @@
     "NFO:YESBANK26SEPFUT",
     "NFO:ZYDUSLIFE26SEPFUT"
   ],
-  "unavailable_target_key_count": 0,
-  "unavailable_target_keys": []
+  "unavailable_target_key_count": 1,
+  "unavailable_target_keys": [
+    {
+      "reason": "no_future_contracts_in_nfo_master",
+      "symbol": "DALBHARAT"
+    }
+  ]
 }

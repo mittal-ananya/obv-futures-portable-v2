@@ -161,6 +161,7 @@ def build_manifests(
         if not isinstance(entry, dict):
             continue
         symbol = str(entry.get("symbol") or "")
+        manifest_fut_key = str(entry.get("fut_key") or "")
         rows_all = by_name.get(symbol, [])
         rows = [
             row
@@ -193,7 +194,9 @@ def build_manifests(
                 else:
                     contract["lifecycle_start_date"] = lifecycle_start
             contracts.append(contract)
-            if idx > 0:
+            if idx == 0 and str(row["instrument_key"]) != manifest_fut_key:
+                extra_keys.append(str(row["instrument_key"]))
+            elif idx > 0:
                 extra_keys.append(str(row["instrument_key"]))
         inactive_contracts = len(rows) - len(contracts)
         if inactive_contracts:

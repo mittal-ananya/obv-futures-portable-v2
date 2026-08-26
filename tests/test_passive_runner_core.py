@@ -733,9 +733,10 @@ def test_dynamic_retention_protects_open_and_transition_symbols(tmp_path: Path) 
     assert report["changed"] >= 2
     assert report["unlimited_targets"] == 0
     expected_retention = runner.active_second_row_retention_seconds
+    expected_transition_retention = runner.desired_retention_by_key()[reliance.signal_key]
     assert runner.states[bank.execution_key].second_row_retention_seconds == expected_retention
     assert runner.states[bank.signal_key].second_row_retention_seconds == expected_retention
-    assert runner.states[reliance.signal_key].second_row_retention_seconds == runner.transition_second_row_retention_seconds
+    assert runner.states[reliance.signal_key].second_row_retention_seconds == expected_transition_retention
 
 
 def test_v1_contract_state_exposes_v53_diagnostic_edges(tmp_path: Path) -> None:

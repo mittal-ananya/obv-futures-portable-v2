@@ -1,0 +1,206 @@
+{
+  "accepted_entries_with_late_edges_filtered_count": 219,
+  "accepted_entries_with_late_edges_filtered_note": "These accepted entries have current valid transaction fields; the flag means stale retained edges were filtered separately, not accepted as trades.",
+  "accepted_late_due_transactions": 0,
+  "accepted_stale_or_stale_reason_transactions": 0,
+  "bad_t3_time_order_count": 0,
+  "created_epoch": 1787761688.2088337,
+  "date_range": [
+    "2026-08-10",
+    "2026-08-26"
+  ],
+  "diagnostic_counts": {
+    "stale_entry_rejected": 111
+  },
+  "event_counts": {
+    "paper_entry": 1049,
+    "paper_exit": 919,
+    "paper_rollover": 22,
+    "stale_entry_rejected": 111,
+    "tranche2_exit": 263,
+    "tranche3_entry": 248,
+    "tranche3_exit": 220
+  },
+  "pass": true,
+  "samples": {
+    "accepted_late_due_transactions": [],
+    "bad_t3": [],
+    "late_edges_filtered": [
+      {
+        "entry_time": "2026-08-26T09:36:00+05:30",
+        "event": "paper_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ABB:long:1787717100:fe1acf57e5d8ea7e:position",
+        "signal_time": "2026-08-26T09:35:00+05:30",
+        "symbol": "ABB"
+      },
+      {
+        "entry_time": "2026-08-24T09:15:00+05:30",
+        "event": "tranche3_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_SELECTED:ABCAPITAL:long:1787286000:1ec2c3862274485a",
+        "signal_time": null,
+        "symbol": "ABCAPITAL"
+      },
+      {
+        "entry_time": "2026-08-21T09:51:00+05:30",
+        "event": "tranche2_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_SELECTED:ABCAPITAL:long:1787286000:1ec2c3862274485a",
+        "signal_time": "2026-08-21T09:50:00+05:30",
+        "symbol": "ABCAPITAL"
+      },
+      {
+        "entry_time": "2026-08-21T09:51:00+05:30",
+        "event": "paper_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_SELECTED:ABCAPITAL:long:1787286000:1ec2c3862274485a",
+        "signal_time": "2026-08-21T09:50:00+05:30",
+        "symbol": "ABCAPITAL"
+      },
+      {
+        "entry_time": "2026-08-24T15:21:00+05:30",
+        "event": "paper_entry",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ABCAPITAL:long:1787565000:0106445f58ce9e55:position",
+        "signal_time": "2026-08-24T15:20:00+05:30",
+        "symbol": "ABCAPITAL"
+      },
+      {
+        "entry_time": "2026-08-24T15:25:00+05:30",
+        "event": "paper_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ADANIENT:long:1787565300:roll:9f6c5fa4f8db0125:position",
+        "signal_time": "2026-08-24T15:25:00+05:30",
+        "symbol": "ADANIENT"
+      },
+      {
+        "entry_time": "2026-08-25T11:06:00+05:30",
+        "event": "paper_entry",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ADANIENT:long:1787636100:51850f9530e7592e:position",
+        "signal_time": "2026-08-25T11:05:00+05:30",
+        "symbol": "ADANIENT"
+      },
+      {
+        "entry_time": "2026-08-25T15:05:01+05:30",
+        "event": "tranche3_entry",
+        "late_entry_edges_filtered": 4,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ADANIENT:long:1787636100:51850f9530e7592e:position",
+        "signal_time": null,
+        "symbol": "ADANIENT"
+      },
+      {
+        "entry_time": "2026-08-24T15:25:00+05:30",
+        "event": "paper_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:short:1787565300:roll:79048544425166a4:position",
+        "signal_time": "2026-08-24T15:25:00+05:30",
+        "symbol": "ADANIPOWER"
+      },
+      {
+        "entry_time": "2026-08-25T14:36:00+05:30",
+        "event": "paper_entry",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b:position",
+        "signal_time": "2026-08-25T14:35:00+05:30",
+        "symbol": "ADANIPOWER"
+      },
+      {
+        "entry_time": "2026-08-26T12:20:01+05:30",
+        "event": "tranche3_entry",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b:position",
+        "signal_time": null,
+        "symbol": "ADANIPOWER"
+      },
+      {
+        "entry_time": "2026-08-26T12:20:01+05:30",
+        "event": "tranche3_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b:position",
+        "signal_time": null,
+        "symbol": "ADANIPOWER"
+      },
+      {
+        "entry_time": "2026-08-25T14:36:00+05:30",
+        "event": "tranche2_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b:position",
+        "signal_time": "2026-08-25T14:35:00+05:30",
+        "symbol": "ADANIPOWER"
+      },
+      {
+        "entry_time": "2026-08-25T14:36:00+05:30",
+        "event": "paper_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ADANIPOWER:long:1787648700:7009f2092871799b:position",
+        "signal_time": "2026-08-25T14:35:00+05:30",
+        "symbol": "ADANIPOWER"
+      },
+      {
+        "entry_time": "2026-08-25T09:17:16+05:30",
+        "event": "tranche3_exit",
+        "late_entry_edges_filtered": 5,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ALKEM:short:1787550600:ade75f9fc010e050:position",
+        "signal_time": null,
+        "symbol": "ALKEM"
+      },
+      {
+        "entry_time": "2026-08-24T11:21:00+05:30",
+        "event": "tranche2_exit",
+        "late_entry_edges_filtered": 5,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:ALKEM:short:1787550600:ade75f9fc010e050:position",
+        "signal_time": "2026-08-24T11:20:00+05:30",
+        "symbol": "ALKEM"
+      },
+      {
+        "entry_time": "2026-08-24T09:21:00+05:30",
+        "event": "paper_exit",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787543400:3c04a02ae8859ba6:position",
+        "signal_time": "2026-08-24T09:20:00+05:30",
+        "symbol": "AMBER"
+      },
+      {
+        "entry_time": "2026-08-24T10:06:00+05:30",
+        "event": "paper_entry",
+        "late_entry_edges_filtered": 1,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787546100:904bcaafe194893c:position",
+        "signal_time": "2026-08-24T10:05:00+05:30",
+        "symbol": "AMBER"
+      },
+      {
+        "entry_time": "2026-08-24T10:06:00+05:30",
+        "event": "paper_exit",
+        "late_entry_edges_filtered": 2,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787546100:904bcaafe194893c:position",
+        "signal_time": "2026-08-24T10:05:00+05:30",
+        "symbol": "AMBER"
+      },
+      {
+        "entry_time": "2026-08-26T12:50:01+05:30",
+        "event": "tranche3_entry",
+        "late_entry_edges_filtered": 2,
+        "position_id": "OBVFUTPORT_V2_PASSIVE:AMBER:long:1787650500:992b4508707796ba:position",
+        "signal_time": null,
+        "symbol": "AMBER"
+      }
+    ],
+    "missing_entry": [],
+    "missing_exit": [],
+    "stale_like_transactions": [],
+    "unmatched_paper_exits": [],
+    "unmatched_t3_entries": [],
+    "unmatched_t3_exits": []
+  },
+  "schema": "obvfutport_v2.transaction_integrity_audit.v1",
+  "state": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state",
+  "symbols_with_transactions": 212,
+  "transaction_event_rows_audited": 2721,
+  "transaction_rows_missing_effective_entry_time_or_epoch": 0,
+  "transaction_rows_missing_effective_exit_time_or_epoch": 0,
+  "unmatched_paper_exits": 0,
+  "unmatched_t3_entries": 0,
+  "unmatched_t3_exits": 0
+}

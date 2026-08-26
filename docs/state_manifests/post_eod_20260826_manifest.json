@@ -1,0 +1,45 @@
+{
+  "baseline_state": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260826",
+  "checksums": {
+    "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260826/archive_replay_report.json": "3d71c6f790d0155326b0be7cdf11cd0595300a765a3fbffa42a10a3b3c6589b2",
+    "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/reports/v2_eod_aug26_incremental_chain_install_20260826_retry2.json": "f91503bb293bae3fc8b9f2bf1c61898b21f9dc1506364048a38e2859952d37c9",
+    "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/reports/v2_post_eod_aug26_incremental_chain_audit_20260826_after_matrix_rebuild.json": "bbc69201af6b9060b80e4cc267815f49f2dd434b76896ee8a24110423f4e7ce4",
+    "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/reports/v2_tranche_performance_20260810_20260826.json": "0cb19cd47191b38e4cf3282b4c070f299f2300dcde31b9da132a7934bc7a0532"
+  },
+  "created_epoch": 1787759845.1624322,
+  "decision_event_history_repair": {
+    "checksums": {
+      "baseline:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260826/decision_events/decision_events_2026-08-24.jsonl": "d71a9b44fa3f01ab5c5ee93aa5886adbdb3fcefb05f4ae4dc6189fb31aadc4d1",
+      "baseline:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260826/decision_events/decision_events_2026-08-25.jsonl": "d141582518e73c8898ce8c20c34e158747276065516825429ae2abdede90c235",
+      "baseline:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260826/decision_events/decision_events_2026-08-26.jsonl": "4d059365d0c37239fc04a894e31946b61a5f7cc94992474d3cfd2e94e5d5e9f2",
+      "production:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-24.jsonl": "d71a9b44fa3f01ab5c5ee93aa5886adbdb3fcefb05f4ae4dc6189fb31aadc4d1",
+      "production:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-25.jsonl": "d141582518e73c8898ce8c20c34e158747276065516825429ae2abdede90c235",
+      "production:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-26.jsonl": "4d059365d0c37239fc04a894e31946b61a5f7cc94992474d3cfd2e94e5d5e9f2"
+    },
+    "counts": {
+      "baseline:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260826/decision_events/decision_events_2026-08-24.jsonl": 349,
+      "baseline:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260826/decision_events/decision_events_2026-08-25.jsonl": 273,
+      "baseline:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260826/decision_events/decision_events_2026-08-26.jsonl": 192,
+      "production:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-24.jsonl": 349,
+      "production:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-25.jsonl": 273,
+      "production:/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/decision_events/decision_events_2026-08-26.jsonl": 192
+    },
+    "created_epoch": 1787760330.2495441,
+    "dates": [
+      "2026-08-24",
+      "2026-08-25",
+      "2026-08-26"
+    ],
+    "reason": "ensure post_eod_20260826 baseline and production v2 event history include Aug24, Aug25, and Aug26 for next-session baseline continuity"
+  },
+  "install_report": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/reports/v2_eod_aug26_incremental_chain_install_20260826_retry2.json",
+  "next_eod_source_state": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260826",
+  "ok": true,
+  "performance_report": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/reports/v2_tranche_performance_20260810_20260826.json",
+  "post_install_audit": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/reports/v2_post_eod_aug26_incremental_chain_audit_20260826_after_matrix_rebuild.json",
+  "schema": "obvfutport_v2.post_eod_baseline_manifest.v1",
+  "source_chain": "selected_materialized_20260823_plus_incremental_2026-08-24_2026-08-25_2026-08-26",
+  "source_run_root": "/tmp/obvfutport_v2_aug26_eod_chain_recover_20260826_124806",
+  "symbols": 212,
+  "trade_date": "2026-08-26"
+}
