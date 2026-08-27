@@ -49,8 +49,8 @@
       "live_observation": "Stale-suppressed live entry around 2026-08-27T15:14:54+05:30 to 2026-08-27T15:14:58+05:30 with about 902-907 seconds staleness.",
       "replay_treatment": "No accepted stale Matrix entry; final dashboard stale suppressed open count zero.",
       "cause": "live_near_close_stale_clock_or_feed_issue",
-      "fix_or_prevention": "Existing stale guard suppressed the entry; keep near-close clock/feed alert in EOD RCA checks.",
-      "regression_or_smoke": "Final audit passed; accepted stale count zero."
+      "fix_or_prevention": "Existing stale guard suppressed the entry; live watchdog now emits explicit decision-catchup, missed-not-ready, stale-open-position, and compact latest-decision context alerts.",
+      "regression_or_smoke": "Final audit passed; accepted stale count zero; watchdog timing-visibility regression passed."
     },
     {
       "symbol": "DLF",
@@ -58,8 +58,8 @@
       "live_observation": "Same near-close stale-suppressed window as TITAN.",
       "replay_treatment": "No accepted stale Matrix entry; final dashboard stale suppressed open count zero.",
       "cause": "live_near_close_stale_clock_or_feed_issue",
-      "fix_or_prevention": "Existing stale guard suppressed the entry; Matrix did not accept it.",
-      "regression_or_smoke": "Final audit passed; accepted stale count zero."
+      "fix_or_prevention": "Existing stale guard suppressed the entry; Matrix did not accept it; live watchdog now exposes the upstream timing condition directly.",
+      "regression_or_smoke": "Final audit passed; accepted stale count zero; watchdog timing-visibility regression passed."
     },
     {
       "symbol": "PNB",
@@ -67,8 +67,8 @@
       "live_observation": "Same near-close stale-suppressed window as TITAN.",
       "replay_treatment": "No accepted stale Matrix entry; PNB remains active only where v2 replay ledger expects an open selected leg.",
       "cause": "live_near_close_stale_clock_or_feed_issue",
-      "fix_or_prevention": "Existing stale guard suppressed the stale entry; Matrix state matches replay expected active T2.",
-      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73."
+      "fix_or_prevention": "Existing stale guard suppressed the stale entry; Matrix state matches replay expected active T2; live watchdog now exposes the upstream timing condition directly.",
+      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73; watchdog timing-visibility regression passed."
     },
     {
       "symbol": "PHOENIXLTD",
@@ -76,8 +76,8 @@
       "live_observation": "Same near-close stale-suppressed window as TITAN.",
       "replay_treatment": "No accepted stale Matrix entry; PHOENIXLTD remains active only where v2 replay ledger expects an open selected leg.",
       "cause": "live_near_close_stale_clock_or_feed_issue",
-      "fix_or_prevention": "Existing stale guard suppressed the stale entry; Matrix state matches replay expected active T2.",
-      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73."
+      "fix_or_prevention": "Existing stale guard suppressed the stale entry; Matrix state matches replay expected active T2; live watchdog now exposes the upstream timing condition directly.",
+      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73; watchdog timing-visibility regression passed."
     },
     {
       "symbol": "YESBANK",
@@ -85,15 +85,24 @@
       "live_observation": "Same near-close stale-suppressed window as TITAN.",
       "replay_treatment": "No accepted stale Matrix entry; final dashboard stale suppressed open count zero.",
       "cause": "live_near_close_stale_clock_or_feed_issue",
-      "fix_or_prevention": "Existing stale guard suppressed the entry; Matrix did not accept it.",
-      "regression_or_smoke": "Final audit passed; accepted stale count zero."
+      "fix_or_prevention": "Existing stale guard suppressed the entry; Matrix did not accept it; live watchdog now exposes the upstream timing condition directly.",
+      "regression_or_smoke": "Final audit passed; accepted stale count zero; watchdog timing-visibility regression passed."
     }
   ],
+  "near_close_timing_rca": {
+    "classification": "live_path_timing_visibility",
+    "root_condition": "Around 15:30 IST the target-stream tail stopped advancing; passive later reported decisions_deferred_stream_catchup with reason feed_not_caught_up, feed_latest_age_seconds above the 120s catch-up limit, and latest_tail_report.bytes_read=0.",
+    "missed_trade_impact": "TITAN, DLF, PNB, PHOENIXLTD, and YESBANK stale live entry candidates were emitted around 15:30 with entry timestamps around 15:14:54-15:14:58. The stale-entry guard suppressed them, Matrix did not accept them, and EOD replay did not retain stale open entries.",
+    "why_not_caught_earlier": "The outer monitor sampled every 15 minutes and the existing watchdog exposed generic feed/clock age, not the latest decision defer reason or symbol-level stale-entry context. The symbol-level stale entries appeared only in the 15:30 close handling window.",
+    "fix": "Live watchdog now alerts on decisions_deferred_stream_catchup, missed_not_ready clock reports, stale open-position counts, and includes compact latest-decision context in watchdog status/alerts.",
+    "strategy_change_required": false
+  },
   "fixes_applied": [
     "Rebuilt Matrix from corrected v2 selected-leg ledgers after active T2 contamination was detected.",
     "Added post-install audit checks for Matrix active T2 parity against v2 ledgers.",
     "Added audit failure checks for Matrix positions that are both active and selected-exited.",
     "Updated Matrix selected-exit reconstruction so nested T2 exits inside paper_exit rows are handled as selected T2 exits.",
+    "Updated live watchdog timing visibility for decision catch-up deferrals, missed-not-ready reports, stale open positions, and compact latest-decision context.",
     "Restored the Aug27 consolidated post-EOD baseline manifest so the next EOD appends only the next trade date."
   ],
   "verification": [
@@ -103,10 +112,11 @@
     "Matrix missing active T2 zero.",
     "Matrix active-and-exited contradictions zero.",
     "Local targeted audit and nested selected T2 exit regressions passed.",
+    "Local live-watchdog timing visibility regression passed.",
     "Cloud targeted audit and nested selected T2 exit regressions passed.",
     "Passive runner targeted smoke subset passed."
   ],
   "open_follow_up": [
-    "Add a narrow live cadence or visibility regression/telemetry gate before changing delayed T2/T3 exit semantics."
+    "Evaluate active-evaluation cadence for delayed T2/T3 exits separately before changing strategy semantics."
   ]
 }

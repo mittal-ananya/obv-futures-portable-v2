@@ -18,6 +18,10 @@ Before market open:
 - Check CPU, memory, disk, and log growth.
 - Watch the 09:20 and 09:35 decision windows for stale entries, missed_not_ready,
   stream lag, or unexpected queue buildup.
+- During live hours, treat watchdog `decision_catchup_deferred`,
+  `missed_not_ready`, and `stale_open_positions` alerts as immediate RCA items.
+  They expose timing/visibility failures before stale entries can be mistaken
+  for strategy behavior.
 
 ## Daily EOD
 
@@ -37,6 +41,9 @@ Daily EOD is incremental by default:
 - Treat stale live entries as an execution defect. Corrected replay must remove
   stale `paper_entry` rows from installed state and preserve rejected entries as
   explicit `stale_entry_rejected` diagnostics with symbol and reason.
+- Include any live watchdog timing alerts in the EOD RCA with the latest compact
+  decision report, stream catch-up reason, and whether Matrix accepted or skipped
+  the impacted event.
 - Rebuild Matrix from the corrected selected-leg ledger using the bridge's
   historical `--once` mode after reset; the service tail mode intentionally skips
   historical rows and is not sufficient for EOD rebuilds.

@@ -92,6 +92,63 @@ def as_float(value: Any) -> float | None:
         return None
 
 
+def as_int(value: Any) -> int | None:
+    try:
+        if value is None:
+            return None
+        return int(value)
+    except Exception:
+        return None
+
+
+def compact_list(value: Any, *, limit: int = 12) -> list[Any]:
+    if not isinstance(value, list):
+        return []
+    return value[:limit]
+
+
+def compact_latest_tail_report(report: Any) -> dict[str, Any]:
+    if not isinstance(report, dict):
+        return {}
+    keys = (
+        "path",
+        "file_size",
+        "offset",
+        "new_offset",
+        "bytes_read",
+        "rows",
+        "quotes",
+        "truncated",
+    )
+    return {key: report.get(key) for key in keys if key in report}
+
+
+def compact_decision_report(report: Any) -> dict[str, Any]:
+    if not isinstance(report, dict):
+        return {}
+    compact: dict[str, Any] = {}
+    for key in (
+        "event",
+        "reason",
+        "clock_time",
+        "clock_label",
+        "status",
+        "feed_latest_age_seconds",
+        "max_age_seconds",
+        "missed_not_ready_count",
+    ):
+        if key in report:
+            compact[key] = report.get(key)
+    if "missed_not_ready_symbols" in report:
+        compact["missed_not_ready_symbols"] = compact_list(report.get("missed_not_ready_symbols"))
+    if "symbols" in report:
+        compact["symbols"] = compact_list(report.get("symbols"))
+    tail = compact_latest_tail_report(report.get("latest_tail_report"))
+    if tail:
+        compact["latest_tail_report"] = tail
+    return compact
+
+
 def systemctl_show(service: str) -> dict[str, Any]:
     props = [
         "ActiveState",
@@ -208,8 +265,17 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
         add("critical", "decisions_suppressed", "v2 decisions are suppressed")
     v2_target_keys = int(v2.get("target_keys") or 0)
     stream_target_keys = int(stream.get("target_keys") or 0)
+    latest_decision_report = compact_decision_report(v2.get("latest_decision_report"))
+    stale_open_positions = as_int(v2.get("stale_open_positions"))
     if v2_target_keys <= 0:
         add("critical", "v2_target_key_count", "v2 target key count is missing", target_keys=v2.get("target_keys"))
+    if stale_open_positions and stale_open_positions > 0:
+        add(
+            "critical",
+            "stale_open_positions",
+            "v2 status contains stale open positions",
+            stale_open_positions=stale_open_positions,
+        )
 
     if stream.get("ok") is not True:
         add("critical", "stream_not_ok", "v2 owned stream status is not ok", status=stream.get("status"))
@@ -240,6 +306,25 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
             add("critical", "feed_age_critical", "v2 feed age is too high", feed_age_seconds=feed_age)
         elif feed_age > FEED_AGE_WARN_SECONDS:
             add("warning", "feed_age_warning", "v2 feed age is elevated", feed_age_seconds=feed_age)
+
+        if latest_decision_report.get("event") == "decisions_deferred_stream_catchup":
+            add(
+                "critical",
+                "decision_catchup_deferred",
+                "v2 decision evaluation is deferred because the stream is not caught up",
+                latest_decision_report=latest_decision_report,
+            )
+
+        missed_not_ready_count = as_int(latest_decision_report.get("missed_not_ready_count"))
+        if missed_not_ready_count and missed_not_ready_count > 0:
+            add(
+                "critical",
+                "missed_not_ready",
+                "v2 clock evaluation missed symbols that were not ready",
+                missed_not_ready_count=missed_not_ready_count,
+                symbols=latest_decision_report.get("missed_not_ready_symbols") or latest_decision_report.get("symbols") or [],
+                latest_decision_report=latest_decision_report,
+            )
 
     if load1 is not None:
         if load1 > LOAD1_CRIT:
@@ -282,6 +367,7 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
             "v2 latest evaluated clock is behind expected clock",
             expected_clock=expected.isoformat(),
             last_evaluated_clock=last_clock.isoformat() if last_clock else None,
+            latest_decision_report=latest_decision_report,
         )
 
     last_oom_check = float(loop_state.get("last_oom_check_epoch") or 0)
@@ -305,6 +391,8 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
             "v2_clock_watermark": v2.get("clock_watermark"),
             "v2_partial_live_start": v2.get("partial_live_start"),
             "v2_decisions_suppressed": v2.get("decisions_suppressed"),
+            "v2_stale_open_positions": stale_open_positions,
+            "v2_latest_decision_report": latest_decision_report,
             "stream_ok": stream.get("ok"),
             "stream_target_keys": stream.get("target_keys"),
             "stream_latest_quote_age_seconds": quote_age,
