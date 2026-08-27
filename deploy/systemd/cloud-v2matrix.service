@@ -1,0 +1,22 @@
+[Unit]
+Description=v2Matrix smooth-survivor signal dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/cloud-deploy-candidates/v2matrix
+Environment=PYTHONUNBUFFERED=1
+Environment=PACKAGE_ROOT=/opt/cloud-deploy-candidates/v2matrix
+Environment=MATRIX_PORT=8098
+Environment=MATRIX_PORTFOLIO_STATE_ROOT=/opt/cloud-deploy-candidates/obv-futures-portable-v2/state
+ExecStart=/opt/cloud-deploy-candidates/v2matrix/scripts/run_service.sh
+Restart=always
+RestartSec=10
+Nice=12
+CPUQuota=10%
+MemoryMax=600M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -555,6 +555,24 @@ def write_summary_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     tmp.replace(path)
 
 
+def select_period_legs(
+    legs: list[base.TrancheLeg],
+    *,
+    start_epoch: int,
+    end_epoch: int,
+    scope: str,
+) -> list[base.TrancheLeg]:
+    if scope == "entry":
+        return [leg for leg in legs if start_epoch <= leg.entry_epoch <= end_epoch]
+    if scope == "overlap":
+        return [
+            leg
+            for leg in legs
+            if leg.entry_epoch <= end_epoch and (leg.exit_epoch is None or leg.exit_epoch >= start_epoch)
+        ]
+    raise ValueError(f"unsupported leg scope: {scope}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path("/opt/cloud-deploy-candidates/obv-futures-portable-v2"))
@@ -566,6 +584,15 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--quote-index-cache-dir", type=Path, default=None)
     parser.add_argument("--allow-raw-scan", action="store_true")
+    parser.add_argument(
+        "--leg-scope",
+        choices=("entry", "overlap"),
+        default="entry",
+        help=(
+            "entry keeps the historical behavior: include T2 legs whose original entry is inside the date range. "
+            "overlap includes carry-in legs whose lifetime overlaps the date range, useful for incremental extensions."
+        ),
+    )
     args = parser.parse_args()
 
     started = time.monotonic()
@@ -582,8 +609,10 @@ def main() -> int:
     manifest = base.load_contract_manifest(root)
     margins = base.load_margin_lookup(root)
     all_t2_legs = base.build_legs(loaded.get("rows_by_tranche") or {}, manifest, margins)["T2"]
-    period_legs = [leg for leg in all_t2_legs if start_epoch <= leg.entry_epoch <= end_epoch]
+    period_legs = select_period_legs(all_t2_legs, start_epoch=start_epoch, end_epoch=end_epoch, scope=args.leg_scope)
     closed_period_legs = [leg for leg in period_legs if leg.exit_epoch is not None and leg.exit_epoch <= end_epoch]
+    carry_in_legs = [leg for leg in period_legs if leg.entry_epoch < start_epoch]
+    open_after_period_legs = [leg for leg in period_legs if leg.exit_epoch is None or leg.exit_epoch > end_epoch]
     required_keys: set[str] = set()
     for leg in period_legs:
         required_keys.add(leg.signal_key)
@@ -607,7 +636,10 @@ def main() -> int:
             "input_stream": input_report,
             "period_t2_leg_count": len(period_legs),
             "closed_period_t2_leg_count": len(closed_period_legs),
+            "carry_in_t2_leg_count": len(carry_in_legs),
+            "open_after_period_t2_leg_count": len(open_after_period_legs),
             "required_key_count": len(required_keys),
+            "leg_scope": args.leg_scope,
         },
     )
     panel, feature_report = portfolio_rules.build_feature_panel(
@@ -644,7 +676,10 @@ def main() -> int:
             "opportunity_frame_storage": frame_storage,
             "period_t2_leg_count": len(period_legs),
             "closed_period_t2_leg_count": len(closed_period_legs),
+            "carry_in_t2_leg_count": len(carry_in_legs),
+            "open_after_period_t2_leg_count": len(open_after_period_legs),
             "required_key_count": len(required_keys),
+            "leg_scope": args.leg_scope,
         },
     )
     policies = continuation_policy_grid()
@@ -700,7 +735,10 @@ def main() -> int:
         },
         "period_t2_leg_count": len(period_legs),
         "closed_period_t2_leg_count": len(closed_period_legs),
+        "carry_in_t2_leg_count": len(carry_in_legs),
+        "open_after_period_t2_leg_count": len(open_after_period_legs),
         "required_key_count": len(required_keys),
+        "leg_scope": args.leg_scope,
         "policy_count": len(policies),
         "quality_pass_count": len(quality_summaries),
         "input_stream": input_report,

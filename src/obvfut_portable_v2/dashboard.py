@@ -591,6 +591,18 @@ def row_key(row: dict[str, Any]) -> tuple[Any, ...]:
     )
 
 
+def lifecycle_row_key(row: dict[str, Any]) -> tuple[Any, ...] | None:
+    position_ref = row.get("position_id") or row.get("signal_id")
+    if not position_ref:
+        return None
+    return (
+        row.get("symbol"),
+        row.get("tranche"),
+        position_ref,
+        row.get("entry_epoch"),
+    )
+
+
 def margin_for_row(
     source: dict[str, Any],
     symbol: str,
@@ -692,6 +704,7 @@ def load_rows() -> dict[str, Any]:
     stale_suppressed_open_positions: list[dict[str, Any]] = []
     stale_suppressed_entry_diagnostics: list[dict[str, Any]] = []
     seen: set[tuple[Any, ...]] = set()
+    lifecycle_rows: dict[tuple[Any, ...], dict[str, Any]] = {}
     seen_stale: set[tuple[Any, ...]] = set()
     instrument_sources = load_instrument_sources(universe_symbols)
     source_symbols = {symbol for symbol, _ in instrument_sources}
@@ -721,7 +734,25 @@ def load_rows() -> dict[str, Any]:
         key = row_key(row)
         if key in seen:
             return
+        lifecycle_key = lifecycle_row_key(row)
+        status = str(row.get("status") or "")
+        if lifecycle_key is not None:
+            existing = lifecycle_rows.get(lifecycle_key)
+            existing_status = str(existing.get("status") or "") if existing else ""
+            if existing is not None:
+                if existing_status != "closed" and status == "closed":
+                    existing_tranche = str(existing.get("tranche"))
+                    try:
+                        rows_by_tranche.setdefault(existing_tranche, []).remove(existing)
+                    except ValueError:
+                        pass
+                    seen.add(key)
+                    lifecycle_rows[lifecycle_key] = row
+                    rows_by_tranche.setdefault(str(row.get("tranche")), []).append(row)
+                return
         seen.add(key)
+        if lifecycle_key is not None:
+            lifecycle_rows[lifecycle_key] = row
         rows_by_tranche.setdefault(str(row.get("tranche")), []).append(row)
 
     def record_stale_open_position(symbol: str, position: dict[str, Any]) -> None:

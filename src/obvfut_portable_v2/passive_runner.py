@@ -2497,6 +2497,34 @@ class PassiveV2Runner:
         adaptive_overrides = self.load_adaptive_calibrations()
         out: dict[str, InstrumentMeta] = {}
         index_symbols = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"}
+
+        def lifecycle_active_shadow_keys(
+            chain: list[dict[str, Any]],
+            shadow_index: int | None,
+            shadow_execution_key: str | None,
+            shadow_signal_key: str | None,
+        ) -> set[str]:
+            if shadow_index is None:
+                return set()
+            shadow_start = contract_lifecycle_start(chain, shadow_index, self.holiday_dates)
+            if shadow_start and self.today.isoformat() < str(shadow_start):
+                return set()
+            return {key for key in {shadow_execution_key, shadow_signal_key} if key}
+
+        def live_target_keys(
+            *,
+            signal_key: str | None,
+            execution_key: str | None,
+            cash_key: str | None,
+            chain: list[dict[str, Any]],
+            shadow_index: int | None,
+            shadow_execution_key: str | None,
+            shadow_signal_key: str | None,
+        ) -> list[str]:
+            keys = {key for key in {signal_key, execution_key, cash_key} if key}
+            keys.update(lifecycle_active_shadow_keys(chain, shadow_index, shadow_execution_key, shadow_signal_key))
+            return sorted(str(key) for key in keys if key)
+
         for entry in entries:
             symbol = str(entry["symbol"])
             if symbol in v1_by_symbol:
@@ -2518,16 +2546,16 @@ class PassiveV2Runner:
                 execution_key = current_key
                 shadow_execution_key = str(shadow_contract.get("instrument_key") or "") or None
                 shadow_signal_key = signal_key if signal_source == "cash" and shadow_execution_key else shadow_execution_key
-                target_keys = [
-                    key
-                    for key in {
-                        signal_key,
-                        execution_key,
-                        item.get("cash_instrument_key") or entry.get("cash_key"),
-                        *[contract.get("instrument_key") for contract in chain],
-                    }
-                    if key
-                ]
+                cash_key = str(item.get("cash_instrument_key") or entry.get("cash_key") or "")
+                target_keys = live_target_keys(
+                    signal_key=signal_key,
+                    execution_key=execution_key,
+                    cash_key=cash_key,
+                    chain=chain,
+                    shadow_index=shadow_index,
+                    shadow_execution_key=shadow_execution_key,
+                    shadow_signal_key=shadow_signal_key,
+                )
                 signal_point_config = dict(item.get("cash_signal_point_thresholds") or item.get("point_thresholds") or cash_signal_defaults or base_point_config) if signal_source == "cash" else dict(item.get("point_thresholds") or base_point_config)
                 execution_point_config = dict(item.get("cash_execution_point_thresholds") or item.get("point_thresholds") or cash_exec_defaults or base_point_config) if signal_source == "cash" else dict(item.get("point_thresholds") or base_point_config)
                 signal_point_config, execution_point_config, adaptive_meta = self.apply_adaptive_calibration(
@@ -2543,7 +2571,7 @@ class PassiveV2Runner:
                     signal_source=signal_source,
                     signal_key=signal_key,
                     execution_key=execution_key,
-                    cash_key=item.get("cash_instrument_key") or entry.get("cash_key"),
+                    cash_key=cash_key,
                     lot_size=int(item.get("lot_size") or entry.get("lot_size") or 1),
                     margin_long=as_float(item.get("margin_per_lot_long_rupees") or entry.get("margin_long")),
                     margin_short=as_float(item.get("margin_per_lot_short_rupees") or entry.get("margin_short")),
@@ -2644,16 +2672,15 @@ class PassiveV2Runner:
                 shadow_execution_key=shadow_execution_key,
                 shadow_signal_key=shadow_signal_key,
                 roll_execution_time_ist="15:25",
-                target_keys=[
-                    str(key)
-                    for key in {
-                        signal_key,
-                        current_key,
-                        cash_key,
-                        *[contract.get("instrument_key") for contract in contract_chain],
-                    }
-                    if key
-                ],
+                target_keys=live_target_keys(
+                    signal_key=signal_key,
+                    execution_key=current_key,
+                    cash_key=str(cash_key) if cash_key else None,
+                    chain=contract_chain,
+                    shadow_index=shadow_index,
+                    shadow_execution_key=shadow_execution_key,
+                    shadow_signal_key=shadow_signal_key,
+                ),
                 source="hurst_manifest_synthesized",
                 synthesized=True,
                 adaptive_calibration=adaptive_meta,

@@ -678,8 +678,14 @@ def test_online_clock_math_matches_v1_replay_clock_math(tmp_path: Path) -> None:
 def test_frozen_v1_adapter_books_paper_entry_and_initializes_tranches(tmp_path: Path) -> None:
     runner = _runner(tmp_path)
     _seed_forced_banknifty_long(runner, final_price=57025.0)
+    evaluation_epoch = int(datetime(2026, 8, 17, 9, 21, 1, tzinfo=IST).timestamp())
 
-    report = runner.evaluate_frozen_trade_state("2026-08-17", symbols=["BANKNIFTY"], reason="unit_forced_entry")
+    report = runner.evaluate_frozen_trade_state(
+        "2026-08-17",
+        symbols=["BANKNIFTY"],
+        reason="unit_forced_entry",
+        evaluation_epoch=evaluation_epoch,
+    )
 
     assert report["events"] == 1
     ledger_events = [
@@ -696,8 +702,14 @@ def test_frozen_v1_adapter_books_paper_entry_and_initializes_tranches(tmp_path: 
 def test_frozen_v1_adapter_books_hard_sl_exit(tmp_path: Path) -> None:
     runner = _runner(tmp_path)
     _seed_forced_banknifty_long(runner, final_price=56500.0)
+    evaluation_epoch = int(datetime(2026, 8, 17, 9, 21, 1, tzinfo=IST).timestamp())
 
-    report = runner.evaluate_frozen_trade_state("2026-08-17", symbols=["BANKNIFTY"], reason="unit_forced_exit")
+    report = runner.evaluate_frozen_trade_state(
+        "2026-08-17",
+        symbols=["BANKNIFTY"],
+        reason="unit_forced_exit",
+        evaluation_epoch=evaluation_epoch,
+    )
 
     assert report["events"] == 2
     ledger_events = [
@@ -763,12 +775,13 @@ def test_v1_contract_state_exposes_v53_diagnostic_edges(tmp_path: Path) -> None:
     assert diagnostics[0]["diagnostic_type"] == "long_warning"
 
 
-def test_transition_signal_watcher_emits_post_exhaustion_edge(tmp_path: Path) -> None:
+def test_transition_signal_watcher_emits_post_exhaustion_edge(tmp_path: Path, monkeypatch) -> None:
     runner = _runner(tmp_path)
     meta = runner.instruments["BANKNIFTY"]
     signal_state = runner.states[meta.signal_key]
     previous_clock_epoch = int(datetime(2026, 8, 16, 15, 20, tzinfo=IST).timestamp())
     transition_epoch = int(datetime(2026, 8, 17, 9, 16, tzinfo=IST).timestamp())
+    monkeypatch.setattr(passive_runner_module.time, "time", lambda: transition_epoch + 61)
     signal_state.clock_rows = [
         {
             "trade_date": "2026-08-16",

@@ -1,0 +1,20 @@
+[Unit]
+Description=OBVFUTPORT v2 smooth-survivor overlay publisher for v2Matrix
+After=network-online.target cloud-v2matrix.service cloud-obvfutport-v2-target-stream.service
+Wants=network-online.target cloud-v2matrix.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/cloud-deploy-candidates/obv-futures-portable-v2
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=/opt/cloud-deploy-candidates/obv-futures-portable-v2/src:/opt/cloud-deploy-candidates/obv-futures-portable-v2/scripts:/opt/cloud-deploy-candidates/obv-futures-portable-v1/src
+ExecStart=/opt/cloud-deploy-candidates/intraday-short-straddle-v1/.venv/bin/python /opt/cloud-deploy-candidates/obv-futures-portable-v2/scripts/run_v2matrix_overlay.py --interval-seconds 5 --initial-stream-mode tail
+Restart=always
+RestartSec=10
+Nice=12
+CPUQuota=15%
+MemoryMax=512M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

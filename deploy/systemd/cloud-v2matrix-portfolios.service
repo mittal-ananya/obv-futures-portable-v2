@@ -1,0 +1,22 @@
+[Unit]
+Description=v2Matrix paper portfolio dashboard
+After=network-online.target cloud-v2matrix-overlay.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/cloud-deploy-candidates/obv-futures-portable-v2
+Environment=PYTHONUNBUFFERED=1
+Environment=OBVFUTPORT_V2_ROOT=/opt/cloud-deploy-candidates/obv-futures-portable-v2
+Environment=V2MATRIX_ROOT=/opt/cloud-deploy-candidates/v2matrix
+Environment=V2MATRIX_PORTFOLIOS_PORT=8099
+ExecStart=/opt/cloud-deploy-candidates/obv-futures-portable-v2/scripts/run_v2matrix_portfolios.sh
+Restart=always
+RestartSec=10
+Nice=12
+CPUQuota=10%
+MemoryMax=300M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
