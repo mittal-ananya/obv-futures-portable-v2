@@ -11,7 +11,9 @@ Before market open:
 - Confirm the v2 passive service is active only when intended for the session.
 - Confirm the dashboard and Matrix services are active.
 - Confirm the active adaptive override version and quarantined-symbol list.
-- Confirm all 212 symbols and 631 target keys become fresh after the stream starts.
+- Confirm all 212 symbols are represented and the runner target-key count matches
+  the owned target-stream key count after the stream starts. Do not hard-code the
+  key count across rollover/lifecycle modes.
 - Confirm there are no raw rebuilds, stale compact states, or missed readiness gates.
 - Check CPU, memory, disk, and log growth.
 - Watch the 09:20 and 09:35 decision windows for stale entries, missed_not_ready,
@@ -41,6 +43,10 @@ Daily EOD is incremental by default:
 - Pin historical research/recalibration proof runs with `--contract-as-of-iso`
   when replaying a pre-rollover date range after rollover has already occurred.
 - Generate a state manifest after every install/update.
+- After EOD install, dashboard rebuild, Matrix rebuild, and post-install audit
+  pass, stop live-only v2 runner/stream/watchdog services for the overnight
+  period unless an explicit live-monitor task is still active. Keep dashboard and
+  Matrix available. The next market-day timers start the live path again.
 - Do not run a full Aug10 onward replay unless the user explicitly approves after
   a detailed explanation.
 

@@ -144,6 +144,39 @@ def matrix_exit_event_id(position_key: str, exit_epoch: Any, selected_type: str)
     return f"MATRIX:v2:selected_{selected_type}_exit:{position_key}:{exit_epoch}"
 
 
+def selected_paper_exit(event: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    """Return the Matrix-selected exit represented by a paper_exit row."""
+    two_lot = event.get("two_lot_ttsl") if isinstance(event.get("two_lot_ttsl"), dict) else {}
+    tranche2 = two_lot.get("tranche2") if isinstance(two_lot.get("tranche2"), dict) else {}
+    t2_closed = (
+        str(event.get("t2_status") or "").strip().lower() == "closed"
+        or str(tranche2.get("status") or "").strip().lower() == "closed"
+    )
+    if not t2_closed:
+        return "base", event
+
+    selected = dict(event)
+    field_sources = {
+        "exit_epoch": (tranche2.get("exit_epoch"), event.get("t2_exit_epoch"), event.get("tranche2_exit_epoch"), event.get("exit_epoch")),
+        "exit_time": (tranche2.get("exit_time"), event.get("t2_exit_time"), event.get("tranche2_exit_time"), event.get("exit_time")),
+        "exit_price": (tranche2.get("exit_price"), event.get("t2_exit_ltp_price"), event.get("tranche2_exit_ltp_price"), event.get("exit_price")),
+        "exit_fill_price": (
+            tranche2.get("exit_fill_price"),
+            event.get("t2_exit_fill_price"),
+            event.get("tranche2_exit_fill_price"),
+            event.get("exit_fill_price"),
+        ),
+        "instrument_key": (tranche2.get("instrument_key"), event.get("instrument_key")),
+        "exit_reason": (tranche2.get("exit_reason"), event.get("tranche2_exit_source"), event.get("t2_exit_source"), event.get("exit_reason")),
+    }
+    for key, values in field_sources.items():
+        for value in values:
+            if value not in {None, ""}:
+                selected[key] = value
+                break
+    return "t2", selected
+
+
 def safe_symbol(value: Any) -> str:
     return str(value or "").strip().upper()
 
@@ -437,19 +470,20 @@ def sync_once(*, dry_run: bool = False) -> dict[str, Any]:
             if not position_key or position_key in selected_exited or position_key in t2_selected_keys:
                 skipped += 1
                 continue
+            selected_type, selected_event = selected_paper_exit(event)
             if position_key in suppressed_stale_entries:
                 skipped += 1
                 continue
             entry = entries.get(position_key) or event
             if position_key not in entries:
                 entries[position_key] = entry
-            symbol = safe_symbol(event.get("symbol") or entry.get("symbol"))
+            symbol = safe_symbol(selected_event.get("symbol") or entry.get("symbol"))
             if symbol and active_by_symbol.get(symbol) not in {None, "", position_key}:
-                posted.add(matrix_exit_event_id(position_key, event.get("exit_epoch"), "base"))
+                posted.add(matrix_exit_event_id(position_key, selected_event.get("exit_epoch"), selected_type))
                 skipped_unmatched_exits += 1
                 selected_exited.add(position_key)
                 continue
-            payload = exit_payload(event, entry, selected_type="base")
+            payload = exit_payload(selected_event, entry, selected_type=selected_type)
             payload["matrix_rebuild_event"] = True
             payload["suppress_notification"] = True
             selected_exited.add(position_key)
@@ -617,18 +651,19 @@ def sync_tail_once(*, dry_run: bool = False) -> dict[str, Any]:
                 if not position_key or position_key in selected_exited:
                     skipped += 1
                     continue
+                selected_type, selected_event = selected_paper_exit(event)
                 if position_key in suppressed_stale_entries:
                     skipped += 1
                     continue
                 entry = entries.get(position_key) or event
                 entries.setdefault(position_key, entry)
-                symbol = safe_symbol(event.get("symbol") or entry.get("symbol"))
+                symbol = safe_symbol(selected_event.get("symbol") or entry.get("symbol"))
                 if symbol and active_by_symbol.get(symbol) not in {None, "", position_key}:
-                    posted.add(matrix_exit_event_id(position_key, event.get("exit_epoch"), "base"))
+                    posted.add(matrix_exit_event_id(position_key, selected_event.get("exit_epoch"), selected_type))
                     skipped_unmatched_exits += 1
                     selected_exited.add(position_key)
                     continue
-                payload = exit_payload(event, entry, selected_type="base")
+                payload = exit_payload(selected_event, entry, selected_type=selected_type)
                 selected_exited.add(position_key)
                 if symbol and active_by_symbol.get(symbol) == position_key:
                     active_by_symbol.pop(symbol, None)

@@ -1,0 +1,67 @@
+{
+  "failures": [],
+  "matrix": {
+    "active_exited_contradiction_count": 0,
+    "active_exited_contradictions_sample": {},
+    "actual_active_t2_count": 73,
+    "bridge_last_result": {
+      "accepted": 0,
+      "failed": 0,
+      "initialized_offsets": 212,
+      "skipped": 0
+    },
+    "bridge_state_exists": true,
+    "expected_active_t2_count": 73,
+    "extra_active_t2_count": 0,
+    "extra_active_t2_sample": {},
+    "matrix_events_exists": true,
+    "matrix_events_line_count": 2113,
+    "matrix_events_sha256": "abf5a2da933329da72ded5df3392d8e161e83ce1535755c0b585f67eba3c3e6f",
+    "matrix_instrument_count": 212,
+    "matrix_state_event_count": 2113,
+    "matrix_state_exists": true,
+    "matrix_state_sha256": "52e28cac152915a6833df2b25ba028436f2835efc438ef42fb4870c251d4fb63",
+    "missing_active_t2_count": 0,
+    "missing_active_t2_sample": {}
+  },
+  "matrix_state_dir": "/opt/cloud-deploy-candidates/matrix-v1/state",
+  "ok": true,
+  "override": {
+    "adaptive_count": 209,
+    "expected_quarantined_symbols": [
+      "IOC",
+      "MAXHEALTH",
+      "WAAREEENER"
+    ],
+    "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/adaptive_calibration/v2_symbol_overrides_latest.json",
+    "quarantined_count": 3,
+    "quarantined_symbols": [
+      "IOC",
+      "MAXHEALTH",
+      "WAAREEENER"
+    ],
+    "sha256": "07c54f85d72b87ce042b3e74d9c167ddc88ec6b03eb215ae576e3cd264480c5e",
+    "symbol_count": 212
+  },
+  "schema": "obvfutport_v2.post_install_audit.v1",
+  "state_dir": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state",
+  "updated_epoch": 1787839453.7844899,
+  "v2_state": {
+    "event_type_counts": {
+      "paper_entry": 1089,
+      "paper_exit": 948,
+      "paper_rollover": 22,
+      "stale_entry_rejected": 111,
+      "tranche2_exit": 305,
+      "tranche3_entry": 262,
+      "tranche3_exit": 239
+    },
+    "instrument_count": 212,
+    "ledger_rows": 2976,
+    "missing_ledger_symbols": [],
+    "open_position_rows_unverified": 1089,
+    "symbols_with_ledger": 212,
+    "t3_issue_count": 0,
+    "t3_issues_sample": []
+  }
+}

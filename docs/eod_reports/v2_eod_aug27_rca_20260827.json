@@ -1,0 +1,112 @@
+{
+  "schema": "obvfutport_v2.eod_rca.v1",
+  "trade_date": "2026-08-27",
+  "scope": "OBVFUTPORT-v2 and Matrix only",
+  "final_state": {
+    "eod_mode": "single_day_incremental_append",
+    "previous_baseline": "post_eod_20260826",
+    "new_baseline": "post_eod_20260827",
+    "post_install_audit_ok": true,
+    "post_install_audit_failures": [],
+    "instrument_count": 212,
+    "ledger_rows": 2976,
+    "matrix_active_t2_actual": 73,
+    "matrix_active_t2_expected": 73,
+    "matrix_extra_active_t2": 0,
+    "matrix_missing_active_t2": 0,
+    "accepted_stale_entries": 0,
+    "stale_entry_rejected": 111,
+    "quarantined_symbols": [
+      "IOC",
+      "MAXHEALTH",
+      "WAAREEENER"
+    ]
+  },
+  "rca_items": [
+    {
+      "symbol": "JUBLFOOD",
+      "category": "delayed_t2_ttsl_emission",
+      "live_observation": "Trigger 2026-08-27T09:33:16+05:30; v2 created around 2026-08-27T09:35:31+05:30; Matrix received around 2026-08-27T09:35:34+05:30.",
+      "replay_treatment": "Replay retained closed selected T2 exit; Matrix rebuild marked selected leg closed.",
+      "cause": "upstream_v2_active_evaluation_cadence_or_visibility",
+      "matrix_bridge_delay_seconds": 3,
+      "fix_or_prevention": "Carry as live-path timing item; EOD comparison explicitly checks delayed T2/T3 exit emissions.",
+      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73; nested selected T2 exit tests passed locally and on cloud."
+    },
+    {
+      "symbol": "HCLTECH",
+      "category": "delayed_t2_ttsl_emission",
+      "live_observation": "Trigger around 2026-08-27T12:51:56+05:30; v2 created around 2026-08-27T13:51:09+05:30; Matrix received around 2026-08-27T13:51:12+05:30.",
+      "replay_treatment": "Replay retained closed selected T2 exit; Matrix rebuild marked selected leg closed.",
+      "cause": "upstream_v2_active_evaluation_cadence_or_visibility",
+      "matrix_bridge_delay_seconds": 3,
+      "fix_or_prevention": "Carry as live-path timing item; EOD comparison explicitly checks delayed T2/T3 exit emissions.",
+      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73; nested selected T2 exit tests passed locally and on cloud."
+    },
+    {
+      "symbol": "TITAN",
+      "category": "stale_suppressed_live_entry",
+      "live_observation": "Stale-suppressed live entry around 2026-08-27T15:14:54+05:30 to 2026-08-27T15:14:58+05:30 with about 902-907 seconds staleness.",
+      "replay_treatment": "No accepted stale Matrix entry; final dashboard stale suppressed open count zero.",
+      "cause": "live_near_close_stale_clock_or_feed_issue",
+      "fix_or_prevention": "Existing stale guard suppressed the entry; keep near-close clock/feed alert in EOD RCA checks.",
+      "regression_or_smoke": "Final audit passed; accepted stale count zero."
+    },
+    {
+      "symbol": "DLF",
+      "category": "stale_suppressed_live_entry",
+      "live_observation": "Same near-close stale-suppressed window as TITAN.",
+      "replay_treatment": "No accepted stale Matrix entry; final dashboard stale suppressed open count zero.",
+      "cause": "live_near_close_stale_clock_or_feed_issue",
+      "fix_or_prevention": "Existing stale guard suppressed the entry; Matrix did not accept it.",
+      "regression_or_smoke": "Final audit passed; accepted stale count zero."
+    },
+    {
+      "symbol": "PNB",
+      "category": "stale_suppressed_live_entry",
+      "live_observation": "Same near-close stale-suppressed window as TITAN.",
+      "replay_treatment": "No accepted stale Matrix entry; PNB remains active only where v2 replay ledger expects an open selected leg.",
+      "cause": "live_near_close_stale_clock_or_feed_issue",
+      "fix_or_prevention": "Existing stale guard suppressed the stale entry; Matrix state matches replay expected active T2.",
+      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73."
+    },
+    {
+      "symbol": "PHOENIXLTD",
+      "category": "stale_suppressed_live_entry",
+      "live_observation": "Same near-close stale-suppressed window as TITAN.",
+      "replay_treatment": "No accepted stale Matrix entry; PHOENIXLTD remains active only where v2 replay ledger expects an open selected leg.",
+      "cause": "live_near_close_stale_clock_or_feed_issue",
+      "fix_or_prevention": "Existing stale guard suppressed the stale entry; Matrix state matches replay expected active T2.",
+      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73."
+    },
+    {
+      "symbol": "YESBANK",
+      "category": "stale_suppressed_live_entry",
+      "live_observation": "Same near-close stale-suppressed window as TITAN.",
+      "replay_treatment": "No accepted stale Matrix entry; final dashboard stale suppressed open count zero.",
+      "cause": "live_near_close_stale_clock_or_feed_issue",
+      "fix_or_prevention": "Existing stale guard suppressed the entry; Matrix did not accept it.",
+      "regression_or_smoke": "Final audit passed; accepted stale count zero."
+    }
+  ],
+  "fixes_applied": [
+    "Rebuilt Matrix from corrected v2 selected-leg ledgers after active T2 contamination was detected.",
+    "Added post-install audit checks for Matrix active T2 parity against v2 ledgers.",
+    "Added audit failure checks for Matrix positions that are both active and selected-exited.",
+    "Updated Matrix selected-exit reconstruction so nested T2 exits inside paper_exit rows are handled as selected T2 exits.",
+    "Restored the Aug27 consolidated post-EOD baseline manifest so the next EOD appends only the next trade date."
+  ],
+  "verification": [
+    "Final post-install audit passed.",
+    "Matrix active T2 parity 73 actual / 73 expected.",
+    "Matrix extra active T2 zero.",
+    "Matrix missing active T2 zero.",
+    "Matrix active-and-exited contradictions zero.",
+    "Local targeted audit and nested selected T2 exit regressions passed.",
+    "Cloud targeted audit and nested selected T2 exit regressions passed.",
+    "Passive runner targeted smoke subset passed."
+  ],
+  "open_follow_up": [
+    "Add a narrow live cadence or visibility regression/telemetry gate before changing delayed T2/T3 exit semantics."
+  ]
+}

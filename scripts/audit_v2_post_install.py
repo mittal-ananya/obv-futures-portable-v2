@@ -70,6 +70,136 @@ def first_present(row: dict[str, Any], names: tuple[str, ...]) -> Any:
     return None
 
 
+def safe_symbol(value: Any) -> str:
+    return str(value or "").strip().upper()
+
+
+def ledger_position_key(row: dict[str, Any]) -> str:
+    position = row.get("position") if isinstance(row.get("position"), dict) else {}
+    return str(
+        position.get("position_id")
+        or row.get("position_id")
+        or position.get("signal_id")
+        or row.get("signal_id")
+        or ""
+    )
+
+
+def ledger_symbol(row: dict[str, Any], entry: dict[str, Any] | None = None) -> str:
+    position = row.get("position") if isinstance(row.get("position"), dict) else {}
+    return safe_symbol(row.get("symbol") or position.get("symbol") or (entry or {}).get("symbol"))
+
+
+def truthy(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    return str(value).strip().lower() in {"1", "true", "yes", "y", "stale"}
+
+
+def safe_float(value: Any) -> float | None:
+    try:
+        if value is None:
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def entry_event_is_stale(row: dict[str, Any], max_staleness_seconds: float = 5.0) -> bool:
+    position = row.get("position") if isinstance(row.get("position"), dict) else {}
+    if truthy(position.get("entry_stale")) or truthy(row.get("entry_stale")):
+        return True
+    staleness_seconds = safe_float(
+        position.get("entry_staleness_seconds")
+        or row.get("entry_staleness_seconds")
+        or position.get("fill_lag_seconds")
+        or row.get("fill_lag_seconds")
+    )
+    return bool(staleness_seconds is not None and staleness_seconds > max_staleness_seconds)
+
+
+def ledger_event_epoch(row: dict[str, Any], event: str) -> float:
+    if event == "paper_entry":
+        position = row.get("position") if isinstance(row.get("position"), dict) else {}
+        return as_epoch(position.get("entry_epoch") or row.get("entry_epoch") or row.get("event_epoch")) or 0.0
+    if event in {"tranche2_exit", "paper_exit"}:
+        return as_epoch(row.get("exit_epoch") or row.get("event_epoch")) or 0.0
+    return as_epoch(row.get("event_epoch")) or 0.0
+
+
+def ledger_event_sort_rank(row: dict[str, Any], event: str) -> int:
+    if event == "paper_exit" and row.get("exit_reason") == "lifecycle_rollover":
+        return -2
+    if event == "tranche2_exit" and row.get("rollover_id"):
+        return -1
+    if event == "paper_entry":
+        return 0
+    if event == "tranche2_exit":
+        return 1
+    if event == "paper_exit":
+        return 2
+    return 3
+
+
+def expected_matrix_active_t2(state_dir: Path) -> dict[str, str]:
+    """Replay the Matrix-selected T2 lifecycle from v2 ledgers."""
+    collected: list[tuple[float, int, int, str, dict[str, Any]]] = []
+    sequence = 0
+    for ledger_path in sorted((state_dir / "instruments").glob("*/ledger.jsonl")):
+        for row in iter_jsonl(ledger_path):
+            event = str(row.get("event") or "")
+            if event not in {"paper_entry", "tranche2_exit", "paper_exit"}:
+                continue
+            collected.append((ledger_event_epoch(row, event), ledger_event_sort_rank(row, event), sequence, event, row))
+            sequence += 1
+
+    entries: dict[str, dict[str, Any]] = {}
+    active_by_symbol: dict[str, str] = {}
+    selected_exited: set[str] = set()
+    suppressed_stale_entries: set[str] = set()
+    for _, _, _, event, row in sorted(collected, key=lambda item: (item[0], item[1], item[2])):
+        position_key = ledger_position_key(row)
+        if not position_key:
+            continue
+        if event == "paper_entry":
+            if entry_event_is_stale(row):
+                suppressed_stale_entries.add(position_key)
+                continue
+            position = row.get("position") if isinstance(row.get("position"), dict) else {}
+            entries[position_key] = {
+                **position,
+                "symbol": position.get("symbol") or row.get("symbol"),
+                "model_version": position.get("model_version") or row.get("model_version"),
+            }
+            symbol = ledger_symbol(row, entries[position_key])
+            if symbol:
+                active_by_symbol[symbol] = position_key
+            continue
+        if position_key in suppressed_stale_entries:
+            continue
+        if event == "paper_exit" and position_key in selected_exited:
+            continue
+        entry = entries.get(position_key) or row
+        symbol = ledger_symbol(row, entry)
+        selected_exited.add(position_key)
+        if symbol and active_by_symbol.get(symbol) == position_key:
+            active_by_symbol.pop(symbol, None)
+    return dict(sorted(active_by_symbol.items()))
+
+
+def matrix_active_t2(matrix_instruments: dict[str, Any]) -> dict[str, str]:
+    active: dict[str, str] = {}
+    for symbol, record in matrix_instruments.items():
+        if not isinstance(record, dict):
+            continue
+        position_id = str(record.get("active_position_id") or "")
+        if position_id:
+            active[safe_symbol(symbol)] = position_id
+    return dict(sorted(active.items()))
+
+
 def nested_rows(row: dict[str, Any]) -> list[dict[str, Any]]:
     out = [row]
     for value in row.values():
@@ -174,6 +304,18 @@ def main() -> int:
     matrix_events_path = matrix_state_dir / "matrix_events.jsonl"
     matrix_event_count = len(iter_jsonl(matrix_events_path))
     matrix_instruments = matrix_state.get("instruments") if isinstance(matrix_state.get("instruments"), dict) else {}
+    expected_active_t2 = expected_matrix_active_t2(state_dir)
+    actual_active_t2 = matrix_active_t2(matrix_instruments)
+    bridge_selected_exited = set(bridge_state.get("selected_exited_position_ids") or []) if isinstance(bridge_state, dict) else set()
+    active_exited_contradictions = {
+        symbol: position_id for symbol, position_id in actual_active_t2.items() if position_id in bridge_selected_exited
+    }
+    extra_active_t2 = {
+        symbol: position_id for symbol, position_id in actual_active_t2.items() if expected_active_t2.get(symbol) != position_id
+    }
+    missing_active_t2 = {
+        symbol: position_id for symbol, position_id in expected_active_t2.items() if actual_active_t2.get(symbol) != position_id
+    }
 
     manifest = {
         "schema": "obvfutport_v2.post_install_audit.v1",
@@ -207,6 +349,14 @@ def main() -> int:
             "matrix_events_line_count": matrix_event_count,
             "matrix_instrument_count": len(matrix_instruments),
             "bridge_last_result": bridge_state.get("last_result") if isinstance(bridge_state, dict) else None,
+            "actual_active_t2_count": len(actual_active_t2),
+            "expected_active_t2_count": len(expected_active_t2),
+            "active_exited_contradiction_count": len(active_exited_contradictions),
+            "extra_active_t2_count": len(extra_active_t2),
+            "missing_active_t2_count": len(missing_active_t2),
+            "active_exited_contradictions_sample": dict(list(active_exited_contradictions.items())[:20]),
+            "extra_active_t2_sample": dict(list(extra_active_t2.items())[:20]),
+            "missing_active_t2_sample": dict(list(missing_active_t2.items())[:20]),
             "matrix_state_sha256": sha256_file(matrix_state_dir / "matrix_state.json"),
             "matrix_events_sha256": sha256_file(matrix_events_path),
         },
@@ -226,6 +376,10 @@ def main() -> int:
         failures.append("impossible_t3_rows")
     if not matrix_state or matrix_event_count <= 0:
         failures.append("matrix_empty")
+    if active_exited_contradictions:
+        failures.append("matrix_active_exited_contradiction")
+    if extra_active_t2 or missing_active_t2:
+        failures.append("matrix_active_t2_mismatch")
     manifest["ok"] = not failures
     manifest["failures"] = failures
 
@@ -237,4 +391,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
