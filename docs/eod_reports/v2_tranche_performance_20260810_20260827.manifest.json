@@ -1,0 +1,87 @@
+{
+  "artifact": "v2_tranche_performance_20260810_20260827.json",
+  "basis": "entry_epoch >= 2026-08-10T00:00:00+05:30; open rows marked to latest model_state price",
+  "by_symbol_counts": {
+    "T1": 212,
+    "T2": 212,
+    "T3": 158
+  },
+  "commit_policy": "full by-symbol and row-level detail is intentionally excluded from git; this manifest preserves provenance, checksum, and summary metrics",
+  "created_at_utc": "2026-08-27T13:39:46+00:00",
+  "date_range": {
+    "end_date": "2026-08-27",
+    "start_date": "2026-08-10"
+  },
+  "instrument_dirs": 212,
+  "local_path": "docs/eod_reports/v2_tranche_performance_20260810_20260827.json",
+  "open_positions": 141,
+  "rows_by_tranche_counts": {
+    "T1": 1089,
+    "T2": 1100,
+    "T3": 248
+  },
+  "schema": "obvfutport_v2.report_artifact_manifest.v1",
+  "sha256": "c929be6f585aae64ad6922d179366e782c41937c5ab7779c16bc337c812e7afe",
+  "size_bytes": 1676786,
+  "state_dir": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state",
+  "summary": {
+    "T1": {
+      "avg_closed_net_pct_margin": -1.3152616958656196,
+      "avg_net_pct_margin": -0.973903487733703,
+      "charges_rupees": 159769.02931482627,
+      "closed": 948,
+      "closed_losses": 657,
+      "closed_net_rupees": -2079725.8275347438,
+      "closed_success_rate_pct": 30.696202531645568,
+      "closed_wins": 291,
+      "gross_rupees": -233677.006035,
+      "max_net_pct_margin": 59.1429264361339,
+      "median_closed_net_pct_margin": -2.076323702624016,
+      "median_net_pct_margin": -1.9634298171079512,
+      "min_net_pct_margin": -31.338233737287457,
+      "open_mark": 141,
+      "open_net_rupees": 445321.89483234665,
+      "rows": 1089,
+      "total_net_rupees": -1634403.9327023951
+    },
+    "T2": {
+      "avg_closed_net_pct_margin": -0.6893358262709783,
+      "avg_net_pct_margin": -0.6563150348105874,
+      "charges_rupees": 154720.54372866565,
+      "closed": 1027,
+      "closed_losses": 673,
+      "closed_net_rupees": -1091986.1174287111,
+      "closed_success_rate_pct": 34.469328140214216,
+      "closed_wins": 354,
+      "gross_rupees": 117168.84984499993,
+      "max_net_pct_margin": 59.17102389861158,
+      "median_closed_net_pct_margin": -1.748177233228117,
+      "median_net_pct_margin": -1.7352358521046214,
+      "min_net_pct_margin": -31.317628358235787,
+      "open_mark": 73,
+      "open_net_rupees": -13305.933178534098,
+      "rows": 1100,
+      "total_net_rupees": -1105292.0506072454
+    },
+    "T3": {
+      "avg_closed_net_pct_margin": -0.5648188455310953,
+      "avg_net_pct_margin": -0.4548373897845279,
+      "charges_rupees": 41949.617579126425,
+      "closed": 239,
+      "closed_losses": 161,
+      "closed_net_rupees": -218706.12135674368,
+      "closed_success_rate_pct": 32.63598326359833,
+      "closed_wins": 78,
+      "gross_rupees": -33239.626712500256,
+      "max_net_pct_margin": 62.70376213871851,
+      "median_closed_net_pct_margin": -1.388556774799103,
+      "median_net_pct_margin": -1.3855149316481872,
+      "min_net_pct_margin": -11.67655552647102,
+      "open_mark": 9,
+      "open_net_rupees": 64501.532704005236,
+      "rows": 248,
+      "total_net_rupees": -154204.58865273846
+    }
+  },
+  "trade_date": "2026-08-27"
+}

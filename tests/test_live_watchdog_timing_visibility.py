@@ -138,3 +138,58 @@ def test_watchdog_alerts_on_missed_not_ready_clock_report(tmp_path: Path, monkey
     assert "missed_not_ready" in criticals
     assert criticals["missed_not_ready"]["symbols"] == ["ABC", "XYZ"]
     assert status["metrics"]["v2_latest_decision_report"]["missed_not_ready_count"] == 2
+
+
+def test_watchdog_alerts_on_passive_memory_growth_slope(tmp_path: Path, monkeypatch) -> None:
+    watchdog = configure_watchdog(
+        monkeypatch,
+        tmp_path,
+        now=datetime(2026, 8, 27, 11, 0, 0, tzinfo=IST),
+    )
+    write_json(
+        watchdog.V2_STATUS_PATH,
+        {
+            "ok": True,
+            "target_keys": 418,
+            "feed_latest_age_seconds": 1.0,
+            "clock_watermark": "2026-08-27T10:50:00+05:30",
+            "latest_decision_report": {"event": "clock_evaluation", "missed_not_ready_count": 0},
+        },
+    )
+    write_json(
+        watchdog.STREAM_STATUS_PATH,
+        {
+            "ok": True,
+            "target_keys": 418,
+            "latest_quote_age_seconds": 1.0,
+            "quotes_written": 100,
+        },
+    )
+    memory_current = {"bytes": 1024 * 1024 * 1024}
+    now_epoch = {"value": 1_787_827_800.0}
+
+    monkeypatch.setattr(
+        watchdog,
+        "systemctl_show",
+        lambda service: {
+            "ActiveState": "active",
+            "SubState": "running",
+            "NRestarts": 0,
+            "MemoryCurrent": memory_current["bytes"],
+            "MemoryMax": 12 * 1024 * 1024 * 1024,
+            "Result": "success",
+        },
+    )
+    monkeypatch.setattr(watchdog.time, "time", lambda: now_epoch["value"])
+
+    loop_state: dict[str, object] = {}
+    first = watchdog.evaluate(loop_state)
+    assert "service_memory_growth_critical" not in {row["code"] for row in first["criticals"]}
+
+    memory_current["bytes"] = 2 * 1024 * 1024 * 1024
+    now_epoch["value"] += 300
+    second = watchdog.evaluate(loop_state)
+
+    criticals = {row["code"]: row for row in second["criticals"]}
+    assert "service_memory_growth_critical" in criticals
+    assert criticals["service_memory_growth_critical"]["slope_mb_per_min"] > 128

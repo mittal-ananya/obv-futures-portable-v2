@@ -17,6 +17,8 @@ backups/
 *.tar
 *.tar.gz
 *.zip
+docs/eod_reports/v2_tranche_performance_*.json
+!docs/eod_reports/v2_tranche_performance_*.manifest.json
 
 # Python/runtime noise
 __pycache__/

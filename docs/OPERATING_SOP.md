@@ -31,6 +31,9 @@ Daily EOD is incremental by default:
   The broad multi-symbol replay path is not the default because it was proven
   memory-heavy on Aug 24; per-symbol append keeps cloud memory bounded and gives
   symbol-level retry/reporting.
+- After market close and before starting the EOD replay/append, stop only the
+  v2 live-runner, v2 target-stream, and v2 live-watchdog services if they are
+  still active. Keep the dashboard, Matrix service, and Matrix bridge active.
 - Append only the new trade date's quote-valid compact stream/archive-canonical input.
 - Update v2 ledgers, decision events, open T1/T2/T3 positions, tranche state,
   margins, summaries, dashboard state, and Matrix state.

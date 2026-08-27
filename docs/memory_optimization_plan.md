@@ -26,15 +26,20 @@ The main contributors are:
 - Pending/active/transition/shadow lifecycle retention is separated.
 - Stale open positions are ignored for live retention, so dead carry rows do not keep widening memory.
 - Watchdog checks v2 service health, stream freshness, restarts, OOMs, disk/log pressure, and stale-entry diagnostics.
+- Watchdog now checks passive memory soft limits below the temporary systemd cap
+  and reports per-service memory growth slope.
 - After-close mitigation now stops live-only v2 runner/stream/watchdog after EOD
   install, dashboard rebuild, Matrix rebuild, and post-install audit pass.
+- Future daily EOD runs stop only v2 live-runner/stream/watchdog before replay
+  once market is closed, keeping dashboard and Matrix active.
 
 ## Durable Fixes Still To Build
 
 1. Replace active-position row retention with compact per-position state plus small ring buffers.
 2. Maintain MFE/MAE, hard SL, trail, T2, and T3 state incrementally instead of retaining full active paths.
 3. Add a parity-proven compact percentile/quantile structure for live OBV percentiles while keeping exact archive replay as the EOD oracle.
-4. Add per-service memory slope alerts, not only absolute cap alerts.
+4. Replace the temporary 12 GB passive service cap once compact active-state
+   retention has been parity-tested.
 5. Require RCA before any future memory-cap increase.
 
 ## Operating Rule

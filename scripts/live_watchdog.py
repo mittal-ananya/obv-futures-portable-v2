@@ -36,9 +36,24 @@ LOAD1_WARN = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_LOAD1_WARN", "5"))
 LOAD1_CRIT = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_LOAD1_CRIT", "7.5"))
 SERVICE_MEMORY_WARN_FRACTION = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_SERVICE_MEMORY_WARN_FRACTION", "0.85"))
 SERVICE_MEMORY_CRIT_FRACTION = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_SERVICE_MEMORY_CRIT_FRACTION", "0.95"))
+PASSIVE_MEMORY_WARN_MB = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_PASSIVE_MEMORY_WARN_MB", "8192"))
+PASSIVE_MEMORY_CRIT_MB = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_PASSIVE_MEMORY_CRIT_MB", "10240"))
+SERVICE_MEMORY_SLOPE_WARN_MB_PER_MIN = float(
+    os.environ.get("OBVFUTPORT_V2_WATCHDOG_SERVICE_MEMORY_SLOPE_WARN_MB_PER_MIN", "64")
+)
+SERVICE_MEMORY_SLOPE_CRIT_MB_PER_MIN = float(
+    os.environ.get("OBVFUTPORT_V2_WATCHDOG_SERVICE_MEMORY_SLOPE_CRIT_MB_PER_MIN", "128")
+)
+SERVICE_MEMORY_SLOPE_MIN_WINDOW_SECONDS = float(
+    os.environ.get("OBVFUTPORT_V2_WATCHDOG_SERVICE_MEMORY_SLOPE_MIN_WINDOW_SECONDS", "180")
+)
+SERVICE_MEMORY_SLOPE_SAMPLE_WINDOW_SECONDS = float(
+    os.environ.get("OBVFUTPORT_V2_WATCHDOG_SERVICE_MEMORY_SLOPE_SAMPLE_WINDOW_SECONDS", "900")
+)
 CLOCK_EVAL_GRACE_SECONDS = int(os.environ.get("OBVFUTPORT_V2_WATCHDOG_CLOCK_GRACE_SECONDS", "90"))
 ALERT_REPEAT_SECONDS = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_ALERT_REPEAT_SECONDS", "300"))
 OOM_CHECK_SECONDS = float(os.environ.get("OBVFUTPORT_V2_WATCHDOG_OOM_CHECK_SECONDS", "180"))
+BYTES_PER_MB = 1024 * 1024
 
 
 def now_ist() -> datetime:
@@ -149,6 +164,37 @@ def compact_decision_report(report: Any) -> dict[str, Any]:
     return compact
 
 
+def update_memory_slope(
+    loop_state: dict[str, Any],
+    service: str,
+    memory_current: int,
+    current_epoch: float,
+) -> dict[str, Any] | None:
+    samples_by_service = loop_state.setdefault("memory_samples", {})
+    samples = samples_by_service.setdefault(service, [])
+    samples.append({"epoch": float(current_epoch), "memory_current": int(memory_current)})
+    cutoff = float(current_epoch) - SERVICE_MEMORY_SLOPE_SAMPLE_WINDOW_SECONDS
+    samples[:] = [
+        item
+        for item in samples
+        if float(item.get("epoch") or 0) >= cutoff and int(item.get("memory_current") or 0) >= 0
+    ]
+    if len(samples) < 2:
+        return None
+    oldest = samples[0]
+    elapsed = float(current_epoch) - float(oldest.get("epoch") or current_epoch)
+    if elapsed < SERVICE_MEMORY_SLOPE_MIN_WINDOW_SECONDS:
+        return None
+    delta_mb = (int(memory_current) - int(oldest.get("memory_current") or 0)) / BYTES_PER_MB
+    slope = delta_mb / (elapsed / 60.0)
+    return {
+        "window_seconds": round(elapsed, 3),
+        "delta_mb": round(delta_mb, 3),
+        "slope_mb_per_min": round(slope, 3),
+        "memory_current_mb": round(int(memory_current) / BYTES_PER_MB, 3),
+    }
+
+
 def systemctl_show(service: str) -> dict[str, Any]:
     props = [
         "ActiveState",
@@ -232,6 +278,7 @@ def market_data_expected(current: datetime) -> bool:
 
 def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
     current = now_ist()
+    current_epoch = time.time()
     v2 = load_json(V2_STATUS_PATH)
     stream = load_json(STREAM_STATUS_PATH)
     services = {name: systemctl_show(name) for name in WATCHED_SERVICES}
@@ -335,6 +382,46 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
     for service, info in services.items():
         mem_current = info.get("MemoryCurrent")
         mem_max = info.get("MemoryMax")
+        if service == PASSIVE_SERVICE and isinstance(mem_current, int):
+            mem_mb = mem_current / BYTES_PER_MB
+            if mem_mb >= PASSIVE_MEMORY_CRIT_MB:
+                add(
+                    "critical",
+                    "passive_memory_soft_limit",
+                    "v2 passive memory is above the operational soft limit",
+                    service=service,
+                    memory_current_mb=mem_mb,
+                    soft_limit_mb=PASSIVE_MEMORY_CRIT_MB,
+                )
+            elif mem_mb >= PASSIVE_MEMORY_WARN_MB:
+                add(
+                    "warning",
+                    "passive_memory_soft_limit",
+                    "v2 passive memory is near the operational soft limit",
+                    service=service,
+                    memory_current_mb=mem_mb,
+                    soft_limit_mb=PASSIVE_MEMORY_WARN_MB,
+                )
+        if isinstance(mem_current, int):
+            slope = update_memory_slope(loop_state, service, mem_current, current_epoch)
+            if slope is not None:
+                slope_value = float(slope.get("slope_mb_per_min") or 0.0)
+                if slope_value >= SERVICE_MEMORY_SLOPE_CRIT_MB_PER_MIN:
+                    add(
+                        "critical",
+                        "service_memory_growth_critical",
+                        f"{service} memory is growing too quickly",
+                        service=service,
+                        **slope,
+                    )
+                elif slope_value >= SERVICE_MEMORY_SLOPE_WARN_MB_PER_MIN:
+                    add(
+                        "warning",
+                        "service_memory_growth_warning",
+                        f"{service} memory growth is elevated",
+                        service=service,
+                        **slope,
+                    )
         if isinstance(mem_current, int) and isinstance(mem_max, int) and mem_max > 0:
             fraction = mem_current / mem_max
             if fraction >= SERVICE_MEMORY_CRIT_FRACTION:
