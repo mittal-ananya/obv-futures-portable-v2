@@ -28,20 +28,20 @@
       "category": "delayed_t2_ttsl_emission",
       "live_observation": "Trigger 2026-08-27T09:33:16+05:30; v2 created around 2026-08-27T09:35:31+05:30; Matrix received around 2026-08-27T09:35:34+05:30.",
       "replay_treatment": "Replay retained closed selected T2 exit; Matrix rebuild marked selected leg closed.",
-      "cause": "upstream_v2_active_evaluation_cadence_or_visibility",
+      "cause": "open_position_evaluated_under_model_clock_entry_symbols_used_full_retained_history_fallback_instead_of_compact_clock_update",
       "matrix_bridge_delay_seconds": 3,
-      "fix_or_prevention": "Carry as live-path timing item; EOD comparison explicitly checks delayed T2/T3 exit emissions.",
-      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73; nested selected T2 exit tests passed locally and on cloud."
+      "fix_or_prevention": "Patched model_clock_entry_symbols open positions to use the compact model-clock position update path, matching model_clock_active_symbols; EOD comparison explicitly checks delayed T2/T3 exit emissions.",
+      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73; nested selected T2 exit tests passed; compact-entry-symbol routing regression passed locally and on cloud."
     },
     {
       "symbol": "HCLTECH",
       "category": "delayed_t2_ttsl_emission",
       "live_observation": "Trigger around 2026-08-27T12:51:56+05:30; v2 created around 2026-08-27T13:51:09+05:30; Matrix received around 2026-08-27T13:51:12+05:30.",
       "replay_treatment": "Replay retained closed selected T2 exit; Matrix rebuild marked selected leg closed.",
-      "cause": "upstream_v2_active_evaluation_cadence_or_visibility",
+      "cause": "open_position_evaluated_under_model_clock_entry_symbols_only_when_later_same_symbol_clock_signal_touched_hcltech",
       "matrix_bridge_delay_seconds": 3,
-      "fix_or_prevention": "Carry as live-path timing item; EOD comparison explicitly checks delayed T2/T3 exit emissions.",
-      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73; nested selected T2 exit tests passed locally and on cloud."
+      "fix_or_prevention": "Patched model_clock_entry_symbols open positions to use the compact model-clock position update path, matching model_clock_active_symbols; EOD comparison explicitly checks delayed T2/T3 exit emissions.",
+      "regression_or_smoke": "Final audit passed; Matrix active T2 parity 73/73; nested selected T2 exit tests passed; compact-entry-symbol routing regression passed locally and on cloud."
     },
     {
       "symbol": "TITAN",
@@ -103,6 +103,7 @@
     "Added audit failure checks for Matrix positions that are both active and selected-exited.",
     "Updated Matrix selected-exit reconstruction so nested T2 exits inside paper_exit rows are handled as selected T2 exits.",
     "Updated live watchdog timing visibility for decision catch-up deferrals, missed-not-ready reports, stale open positions, and compact latest-decision context.",
+    "Patched open-position evaluations under model_clock_entry_symbols to use the compact model-clock position updater instead of the full retained-history fallback path.",
     "Restored the Aug27 consolidated post-EOD baseline manifest so the next EOD appends only the next trade date."
   ],
   "verification": [
@@ -113,10 +114,11 @@
     "Matrix active-and-exited contradictions zero.",
     "Local targeted audit and nested selected T2 exit regressions passed.",
     "Local live-watchdog timing visibility regression passed.",
-    "Cloud targeted audit and nested selected T2 exit regressions passed.",
+    "Local delayed-cadence routing regression passed.",
+    "Cloud delayed-cadence routing, watchdog timing visibility, dashboard table, audit, and Matrix nested selected T2 exit regressions passed.",
     "Passive runner targeted smoke subset passed."
   ],
   "open_follow_up": [
-    "Evaluate active-evaluation cadence for delayed T2/T3 exits separately before changing strategy semantics."
+    "Watch the next live session for any delayed T2/T3 exit emission after the narrow routing fix; do not change strategy semantics without replay evidence."
   ]
 }

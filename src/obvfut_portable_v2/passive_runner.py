@@ -5104,7 +5104,7 @@ class PassiveV2Runner:
                     event_samples.extend(enriched[: max(0, 10 - len(event_samples))])
                 updated += 1
                 continue
-            if reason in {"model_clock", "model_clock_active_symbols"} and isinstance(position, dict):
+            if reason in {"model_clock", "model_clock_active_symbols", "model_clock_entry_symbols"} and isinstance(position, dict):
                 try:
                     model_state, events = self._compact_model_clock_position_update(
                         model_state=current_model_state,

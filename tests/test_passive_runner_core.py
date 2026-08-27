@@ -721,6 +721,58 @@ def test_frozen_v1_adapter_books_hard_sl_exit(tmp_path: Path) -> None:
     assert runner.model_states["BANKNIFTY"]["last_closed_trade"]["exit_reason"] == "hard_sl"
 
 
+def test_model_clock_entry_symbols_uses_compact_position_update_for_open_positions(tmp_path: Path) -> None:
+    runner = _runner(tmp_path)
+    meta = runner.instruments["RELIANCE"]
+    evaluation_epoch = int(datetime(2026, 8, 17, 9, 35, tzinfo=IST).timestamp())
+    entry_epoch = evaluation_epoch - 120
+    signal_state = runner.states[meta.signal_key]
+    execution_state = runner.states[meta.execution_key]
+    signal_state.second_rows = [_execution_second(evaluation_epoch, 2500.0, evaluation_epoch)]
+    execution_state.second_rows = [
+        _execution_second(entry_epoch, 2500.0, entry_epoch),
+        _execution_second(evaluation_epoch, 2505.0, entry_epoch),
+    ]
+    runner.model_states[meta.symbol] = {
+        "position": {
+            "position_id": "test-open-position",
+            "signal_id": "test-signal",
+            "side": "long",
+            "instrument_key": meta.execution_key,
+            "signal_instrument_key": meta.signal_key,
+            "entry_price": 2500.0,
+            "entry_fill_price": 2500.0,
+            "entry_epoch": entry_epoch,
+            "entry_time": datetime.fromtimestamp(entry_epoch, IST).isoformat(),
+            "hard_sl_points": 20.0,
+            "trail_activation_points": 30.0,
+        }
+    }
+    called: dict[str, object] = {}
+
+    def compact_update(**kwargs: object) -> tuple[dict[str, object], list[dict[str, object]]]:
+        called["position_id"] = dict(kwargs["position"])["position_id"]
+        called["cutoff_epoch"] = kwargs["cutoff_epoch"]
+        return dict(kwargs["model_state"]), []
+
+    def fail_legacy_path(*args: object, **kwargs: object) -> dict[str, object]:
+        raise AssertionError("open positions from model_clock_entry_symbols must use compact clock update")
+
+    runner._compact_model_clock_position_update = compact_update  # type: ignore[method-assign]
+    runner.v1_contract_state_from_online = fail_legacy_path  # type: ignore[method-assign]
+
+    report = runner.evaluate_frozen_trade_state(
+        "2026-08-17",
+        symbols=[meta.symbol],
+        reason="model_clock_entry_symbols",
+        evaluation_epoch=evaluation_epoch,
+    )
+
+    assert report["symbols_updated"] == 1
+    assert report["events"] == 0
+    assert called == {"position_id": "test-open-position", "cutoff_epoch": evaluation_epoch}
+
+
 def test_dynamic_retention_protects_open_and_transition_symbols(tmp_path: Path) -> None:
     runner = _runner(tmp_path)
     for state in runner.states.values():
