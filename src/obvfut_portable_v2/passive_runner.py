@@ -3,7 +3,9 @@ from __future__ import annotations
 import argparse
 import base64
 import bisect
+import ctypes
 import csv
+import gc
 import gzip
 import hashlib
 import importlib
@@ -317,6 +319,16 @@ def atomic_write_json_gz(path: Path, payload: dict[str, Any]) -> None:
     with gzip.open(tmp, "wt", encoding="utf-8", compresslevel=5) as handle:
         json.dump(json_clean(payload), handle, sort_keys=True)
     tmp.replace(path)
+
+
+def release_unused_process_memory() -> None:
+    gc.collect()
+    if not sys.platform.startswith("linux"):
+        return
+    try:
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except Exception:
+        pass
 
 
 def safe_key(value: str) -> str:
@@ -3185,7 +3197,21 @@ class PassiveV2Runner:
         )
         loaded = 0
         missing = 0
+        pruned_targets = 0
+        pruned_second_rows = 0
         errors: list[dict[str, Any]] = []
+        today_text = now_ist().date().isoformat()
+        raw_load_retention = self.config.get("bootstrap_load_second_row_retention_seconds")
+        if raw_load_retention is None:
+            raw_load_retention = self.config.get("bootstrap_second_row_retention_seconds")
+        load_retention_seconds = retention_seconds_from_config(raw_load_retention)
+        prune_prior_session_second_rows = bool(self.config.get("prune_prior_session_bootstrap_second_rows", True))
+        prune_bootstrap_rows = (
+            prune_prior_session_second_rows
+            and bool(as_of_date)
+            and as_of_date < today_text
+            and load_retention_seconds is not None
+        )
         for key in sorted(load_keys):
             path = self.bootstrap_state_file(as_of_date, key)
             if not path.exists():
@@ -3195,11 +3221,42 @@ class PassiveV2Runner:
             if not payload:
                 errors.append({"target": key, "reason": "empty_or_invalid_state"})
                 continue
+            payload_for_state = payload
+            if prune_bootstrap_rows:
+                raw_rows = payload.get("second_rows")
+                if isinstance(raw_rows, list) and raw_rows:
+                    if load_retention_seconds <= 0:
+                        retained_rows: list[dict[str, Any]] = []
+                    else:
+                        anchor = int(as_float(payload.get("last_finalized_second")) or 0)
+                        if anchor <= 0:
+                            anchor = max(
+                                (
+                                    int(as_float(row.get("epoch_second")) or 0)
+                                    for row in raw_rows
+                                    if isinstance(row, dict)
+                                ),
+                                default=0,
+                            )
+                        cutoff = anchor - int(load_retention_seconds)
+                        retained_rows = [
+                            row
+                            for row in raw_rows
+                            if isinstance(row, dict) and int(as_float(row.get("epoch_second")) or 0) >= cutoff
+                        ]
+                    if len(retained_rows) != len(raw_rows):
+                        payload_for_state = dict(payload)
+                        payload_for_state["second_rows"] = retained_rows
+                        payload_for_state["second_row_retention_seconds"] = load_retention_seconds
+                        pruned_targets += 1
+                        pruned_second_rows += len(raw_rows) - len(retained_rows)
             try:
-                self.states[key] = OnlineObvState.from_payload(payload, self.clock_epochs)
+                self.states[key] = OnlineObvState.from_payload(payload_for_state, self.clock_epochs)
             except Exception as exc:
                 errors.append({"target": key, "reason": f"{type(exc).__name__}: {exc}"})
                 continue
+            if payload_for_state is not payload:
+                payload.clear()
             state = self.states[key]
             state.second_row_retention_seconds = self.second_row_retention_seconds
             state.compute_non_clock_percentiles = self.compute_non_clock_percentiles
@@ -3207,6 +3264,8 @@ class PassiveV2Runner:
             if state.latest_received_epoch is not None:
                 self.latest_feed_epoch = max(self.latest_feed_epoch or state.latest_received_epoch, state.latest_received_epoch)
             loaded += 1
+        if pruned_second_rows:
+            release_unused_process_memory()
         return {
             "enabled": True,
             "loaded": loaded > 0,
@@ -3215,6 +3274,10 @@ class PassiveV2Runner:
             "targets_missing": missing,
             "targets_deferred": len(deferred_keys),
             "deferred_samples": deferred_keys[:10],
+            "pruned_prior_session_second_rows": pruned_second_rows,
+            "pruned_prior_session_targets": pruned_targets,
+            "prune_prior_session_second_rows": prune_bootstrap_rows,
+            "bootstrap_load_second_row_retention_seconds": load_retention_seconds,
             "error_count": len(errors),
             "error_samples": errors[:10],
             "manifest": manifest,

@@ -101,6 +101,54 @@ def test_watchdog_alerts_when_decisions_are_deferred_for_stream_catchup(tmp_path
     assert status["metrics"]["v2_latest_decision_report"]["event"] == "decisions_deferred_stream_catchup"
 
 
+def test_watchdog_ignores_stale_catchup_report_after_feed_recovers(tmp_path: Path, monkeypatch) -> None:
+    watchdog = configure_watchdog(
+        monkeypatch,
+        tmp_path,
+        now=datetime(2026, 8, 28, 9, 17, 0, tzinfo=IST),
+    )
+    write_json(
+        watchdog.V2_STATUS_PATH,
+        {
+            "ok": True,
+            "target_keys": 418,
+            "target_keys_ready": 418,
+            "feed_latest_age_seconds": 1.0,
+            "latest_tail_report": {
+                "exists": True,
+                "rows": 189,
+                "quotes": 189,
+            },
+            "latest_decision_report": {
+                "event": "decisions_deferred_stream_catchup",
+                "reason": "feed_not_caught_up",
+                "feed_latest_age_seconds": 63897.4,
+                "max_age_seconds": 120,
+                "latest_tail_report": {
+                    "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/target_stream.jsonl",
+                    "rows": 0,
+                    "quotes": 0,
+                },
+            },
+        },
+    )
+    write_json(
+        watchdog.STREAM_STATUS_PATH,
+        {
+            "ok": True,
+            "target_keys": 418,
+            "latest_quote_age_seconds": 1.0,
+            "quotes_written": 30000,
+        },
+    )
+
+    status = watchdog.evaluate({})
+
+    criticals = {row["code"]: row for row in status["criticals"]}
+    assert "decision_catchup_deferred" not in criticals
+    assert status["ok"] is True
+
+
 def test_watchdog_alerts_on_missed_not_ready_clock_report(tmp_path: Path, monkeypatch) -> None:
     watchdog = configure_watchdog(
         monkeypatch,

@@ -552,8 +552,20 @@ def risk_adjusted_momentum(index: QuoteRingIndex, leg: base.TrancheLeg, clock_ep
     direction = directional_return(index, leg, clock_epoch, lookback_minutes)
     if direction is None:
         return None
-    realized_risk = portfolio_rules.sample_std(returns) * math.sqrt(max(1, len(returns)))
+    realized_risk = sample_std(returns) * math.sqrt(max(1, len(returns)))
     return direction / max(risk_floor, realized_risk)
+
+
+def sample_std(values: list[float]) -> float:
+    """Population standard deviation used by the historical portfolio scorer."""
+    if len(values) < 2:
+        return 0.0
+    helper = getattr(portfolio_rules, "sample_std", None)
+    if helper is not None:
+        return float(helper(values))
+    mean = sum(values) / len(values)
+    variance = sum((value - mean) ** 2 for value in values) / len(values)
+    return math.sqrt(variance)
 
 
 def calc_ram_bundle(index: QuoteRingIndex, leg: base.TrancheLeg, clock_epoch: int, risk_floor: float) -> dict[str, float | None]:

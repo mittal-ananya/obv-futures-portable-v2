@@ -354,7 +354,10 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
         elif feed_age > FEED_AGE_WARN_SECONDS:
             add("warning", "feed_age_warning", "v2 feed age is elevated", feed_age_seconds=feed_age)
 
-        if latest_decision_report.get("event") == "decisions_deferred_stream_catchup":
+        if (
+            latest_decision_report.get("event") == "decisions_deferred_stream_catchup"
+            and (feed_age is None or feed_age > FEED_AGE_WARN_SECONDS)
+        ):
             add(
                 "critical",
                 "decision_catchup_deferred",

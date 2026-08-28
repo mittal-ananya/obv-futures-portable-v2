@@ -21,8 +21,10 @@ from obvfut_portable_v2.passive_runner import (
     build_target_stream_packs,
     target_items_from_batch_line,
     load_v1_obv_model_module,
+    atomic_write_json_gz,
     read_json_gz,
     run_streaming_bootstrap,
+    safe_key,
 )
 
 
@@ -801,6 +803,63 @@ def test_dynamic_retention_protects_open_and_transition_symbols(tmp_path: Path) 
     assert runner.states[bank.execution_key].second_row_retention_seconds == expected_retention
     assert runner.states[bank.signal_key].second_row_retention_seconds == expected_retention
     assert runner.states[reliance.signal_key].second_row_retention_seconds == expected_transition_retention
+
+
+def test_live_bootstrap_prunes_prior_session_second_rows(tmp_path: Path) -> None:
+    passive_runner_module.now_ist = lambda: datetime(2026, 8, 17, 8, 55, tzinfo=IST)
+    config = json.loads((Path(__file__).resolve().parents[1] / "config" / "runtime.json").read_text())
+    config["state_dir"] = str(tmp_path)
+    config["state_dir_local"] = str(tmp_path)
+    config["bootstrap_load_enabled"] = False
+    config["bootstrap_second_row_retention_seconds"] = 0
+    path = tmp_path / "runtime.json"
+    path.write_text(json.dumps(config), encoding="utf-8")
+    probe = PassiveV2Runner(path)
+
+    key = probe.instruments["RELIANCE"].signal_key
+    as_of_date = "2026-08-16"
+    first_epoch = int(datetime(2026, 8, 16, 15, 19, 59, tzinfo=IST).timestamp())
+    second_epoch = first_epoch + 1
+    state = OnlineObvState(
+        key=key,
+        clock_epochs=set(
+            clock_epochs_for_day(
+                date(2026, 8, 16),
+                clock_start="09:20",
+                clock_end="15:20",
+                clock_step_minutes=15,
+            )
+        ),
+        second_row_retention_seconds=18000,
+    )
+    first_row = dict(_execution_second(first_epoch, 2500.0, first_epoch))
+    second_row = dict(_execution_second(second_epoch, 2501.0, first_epoch))
+    for row in (first_row, second_row):
+        row["trade_date"] = as_of_date
+        row["received_at_ist"] = datetime.fromtimestamp(int(row["epoch_second"]), IST).isoformat()
+        row["exchange_timestamp"] = datetime.fromtimestamp(int(row["epoch_second"]), IST).isoformat()
+    state.second_rows = [first_row, second_row]
+    state.last_finalized_second = second_epoch
+    state.latest_received_epoch = float(second_epoch)
+
+    bootstrap_root = tmp_path / "bootstrap_state"
+    (bootstrap_root / as_of_date).mkdir(parents=True)
+    (bootstrap_root / "latest_manifest.json").write_text(json.dumps({"as_of_date": as_of_date}), encoding="utf-8")
+    atomic_write_json_gz(bootstrap_root / as_of_date / f"{safe_key(key)}.json.gz", state.to_payload())
+
+    config["bootstrap_load_enabled"] = True
+    path.write_text(json.dumps(config), encoding="utf-8")
+    runner = PassiveV2Runner(path)
+
+    loaded_state = runner.states[key]
+    assert runner.bootstrap_report["loaded"] is True
+    assert runner.bootstrap_report["prune_prior_session_second_rows"] is True
+    assert runner.bootstrap_report["bootstrap_load_second_row_retention_seconds"] == 0
+    assert runner.bootstrap_report["pruned_prior_session_targets"] == 1
+    assert runner.bootstrap_report["pruned_prior_session_second_rows"] == 2
+    assert loaded_state.second_rows == []
+    assert loaded_state.last_finalized_second == second_epoch
+    assert loaded_state.latest_received_epoch == float(second_epoch)
 
 
 def test_v1_contract_state_exposes_v53_diagnostic_edges(tmp_path: Path) -> None:
