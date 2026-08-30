@@ -1,0 +1,80 @@
+{
+  "artifact": "state/reports/v2_tranche_performance_20260810_20260828.json",
+  "basis": "entry_epoch >= 2026-08-10T00:00:00+05:30; open rows marked to latest model_state price",
+  "commit_policy": "commit compact manifest only; keep full by-symbol artifact out of git unless explicitly requested",
+  "date_range": {
+    "end": "2026-08-28",
+    "start": "2026-08-10"
+  },
+  "instrument_dirs": 212,
+  "open_positions": 153,
+  "rows_by_tranche_counts": {
+    "T1": 1120,
+    "T2": 1131,
+    "T3": 260
+  },
+  "schema": "obvfutport_v2.tranche_performance_manifest.v1",
+  "sha256": "2733cd7db4ff6b4ea28e2b622420f0faf226ad1571613954d781f87c6ac63798",
+  "size_bytes": 1727663,
+  "state_dir": "state",
+  "summary": {
+    "T1": {
+      "avg_closed_net_pct_margin": -1.4125085684987158,
+      "avg_net_pct_margin": -1.0277752318291735,
+      "charges_rupees": 173609.97758235308,
+      "closed": 967,
+      "closed_losses": 674,
+      "closed_net_rupees": -2254932.503076073,
+      "closed_success_rate_pct": 30.29989658738366,
+      "closed_wins": 293,
+      "gross_rupees": -339845.3348449998,
+      "max_net_pct_margin": 59.1429264361339,
+      "median_closed_net_pct_margin": -2.1059000463665476,
+      "median_net_pct_margin": -2.0247712452111606,
+      "min_net_pct_margin": -31.338233737287457,
+      "open_mark": 153,
+      "open_net_rupees": 500519.2932961495,
+      "rows": 1120,
+      "total_net_rupees": -1754413.2097799215
+    },
+    "T2": {
+      "avg_closed_net_pct_margin": -0.6735320410084017,
+      "avg_net_pct_margin": -0.7161712952108312,
+      "charges_rupees": 168394.19015343444,
+      "closed": 1061,
+      "closed_losses": 693,
+      "closed_net_rupees": -1069681.153401284,
+      "closed_success_rate_pct": 34.68426013195099,
+      "closed_wins": 368,
+      "gross_rupees": -14573.622811250483,
+      "max_net_pct_margin": 59.17102389861158,
+      "median_closed_net_pct_margin": -1.748177233228117,
+      "median_net_pct_margin": -1.7408945026216163,
+      "min_net_pct_margin": -31.317628358235787,
+      "open_mark": 70,
+      "open_net_rupees": -181027.01628698016,
+      "rows": 1131,
+      "total_net_rupees": -1250708.1696882644
+    },
+    "T3": {
+      "avg_closed_net_pct_margin": -0.5212488322289963,
+      "avg_net_pct_margin": -0.5391272534014661,
+      "charges_rupees": 47399.063501901954,
+      "closed": 248,
+      "closed_losses": 166,
+      "closed_net_rupees": -186349.77571147625,
+      "closed_success_rate_pct": 33.064516129032256,
+      "closed_wins": 82,
+      "gross_rupees": -78453.23303125029,
+      "max_net_pct_margin": 62.70376213871851,
+      "median_closed_net_pct_margin": -1.388701500095491,
+      "median_net_pct_margin": -1.3855149316481872,
+      "min_net_pct_margin": -11.96079648656514,
+      "open_mark": 12,
+      "open_net_rupees": -18517.865182787747,
+      "rows": 260,
+      "total_net_rupees": -204867.64089426404
+    }
+  },
+  "trade_date": "2026-08-28"
+}

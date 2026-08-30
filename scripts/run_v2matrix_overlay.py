@@ -733,6 +733,16 @@ def dict_to_portfolio_holding(payload: dict[str, Any]) -> PortfolioHolding:
     return PortfolioHolding(**{field: payload[field] for field in PortfolioHolding.__dataclass_fields__ if field in payload})
 
 
+def entry_display_reference(position: OverlayPosition) -> tuple[float, str, str | None]:
+    features = position.entry_features if isinstance(position.entry_features, dict) else {}
+    price = safe_float(features.get("entry_display_price_underlying"))
+    source = str(features.get("entry_display_price_source") or "").strip()
+    key = str(features.get("entry_display_instrument_key") or "").strip()
+    if price is not None:
+        return float(price), source or "v2matrix_overlay_signal_stream", key or None
+    return float(position.entry_ltp_price), "v2matrix_overlay_entry_ltp_fallback", None
+
+
 def overlay_return(index: QuoteRingIndex, v1_portfolio: Any, leg: base.TrancheLeg, position: OverlayPosition, clock_epoch: int) -> tuple[float | None, float | None, dict[str, Any] | None]:
     fill = execution_fill(index, v1_portfolio, leg, clock_epoch, phase="exit")
     if fill is None:
@@ -806,6 +816,7 @@ def matrix_payload(
     position_closed: bool = False,
 ) -> dict[str, Any]:
     regime_side = "long" if leg.side == "long" else "short"
+    entry_display_price, entry_display_source, entry_display_key = entry_display_reference(position)
     return {
         "event_id": f"V2MATRIX:{variant}:{event_type}:{leg.position_id}:{event_epoch_value}",
         "source_strategy": "OBVFUTPORT_V2_T2_SMOOTH_SURVIVOR",
@@ -838,8 +849,9 @@ def matrix_payload(
         "signal_id": leg.position_id,
         "source_t2_position_id": leg.position_id,
         "matrix_entry_time_ist": position.entry_time,
-        "matrix_entry_price_underlying": position.entry_ltp_price,
-        "matrix_entry_price_source": "v2matrix_overlay_entry_signal_ltp",
+        "matrix_entry_price_underlying": entry_display_price,
+        "matrix_entry_price_source": entry_display_source,
+        "matrix_entry_instrument_key": entry_display_key,
         "exit_reason": exit_reason,
         "created_at_ist": now_ist().isoformat(),
     }
@@ -1155,6 +1167,21 @@ def run_clock(
             entry_ltp = safe_float(fill.get("ltp_price")) or entry_fill
             if entry_fill is None or entry_ltp is None:
                 continue
+            signal_quote = index.quote_at_or_before(leg.signal_key, clock_epoch, max_age_seconds=300)
+            entry_display_price = float(signal_quote.price) if signal_quote else float(entry_ltp)
+            entry_display_source = "v2matrix_overlay_signal_stream" if signal_quote else "v2matrix_overlay_entry_ltp_fallback"
+            entry_display_key = leg.signal_key if signal_quote else leg.execution_key
+            entry_features = dict(feature)
+            entry_features.update(
+                {
+                    "entry_display_price_underlying": entry_display_price,
+                    "entry_display_price_source": entry_display_source,
+                    "entry_display_instrument_key": entry_display_key,
+                    "entry_execution_fill_price": float(entry_fill),
+                    "entry_execution_ltp_price": float(entry_ltp),
+                    "entry_execution_instrument_key": leg.execution_key,
+                }
+            )
             position = OverlayPosition(
                 variant=variant,
                 row_id=row_id,
@@ -1166,7 +1193,7 @@ def run_clock(
                 entry_fill_price=float(entry_fill),
                 entry_ltp_price=float(entry_ltp),
                 entry_score=float(feature.get("portfolio_score") or 0.0),
-                entry_features=dict(feature),
+                entry_features=entry_features,
             )
             active_overlay[key] = asdict(position)
             event = {
@@ -1182,9 +1209,12 @@ def run_clock(
                 "entry_epoch": clock_epoch,
                 "entry_time": position.entry_time,
                 "entry_score": position.entry_score,
-                "entry_features": feature,
+                "entry_features": entry_features,
                 "entry_fill_price": entry_fill,
                 "entry_ltp_price": entry_ltp,
+                "entry_display_price_underlying": entry_display_price,
+                "entry_display_price_source": entry_display_source,
+                "entry_display_instrument_key": entry_display_key,
                 "created_at_ist": now_ist().isoformat(),
             }
             append_jsonl(overlay_events_path, event)
@@ -1193,8 +1223,6 @@ def run_clock(
             if isinstance(portfolio, dict):
                 open_portfolio_holding(portfolio=portfolio, variant=variant, position=position, leg=leg)
             if variant == PRIMARY_VARIANT:
-                signal_quote = index.quote_at_or_before(leg.signal_key, clock_epoch, max_age_seconds=300)
-                trigger_price = signal_quote.price if signal_quote else entry_ltp
                 posted_payloads.append(
                     matrix_payload(
                         event_type="paper_entry",
@@ -1202,9 +1230,9 @@ def run_clock(
                         leg=leg,
                         position=position,
                         event_epoch_value=clock_epoch,
-                        trigger_price=float(trigger_price),
-                        trigger_source="v2matrix_overlay_signal_stream",
-                        features=feature,
+                        trigger_price=entry_display_price,
+                        trigger_source=entry_display_source,
+                        features=entry_features,
                     )
                 )
 

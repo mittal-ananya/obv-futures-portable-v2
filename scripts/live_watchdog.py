@@ -273,12 +273,50 @@ def latest_expected_clock(current: datetime) -> datetime | None:
 
 
 def market_data_expected(current: datetime) -> bool:
-    return dtime(9, 15) <= current.time() <= dtime(15, 35)
+    return current.weekday() < 5 and dtime(9, 15) <= current.time() <= dtime(15, 35)
+
+
+def live_readiness_expected(current: datetime) -> bool:
+    return current.weekday() < 5 and dtime(8, 45) <= current.time() <= dtime(15, 45)
+
+
+def market_session_phase(current: datetime) -> str:
+    if current.weekday() >= 5:
+        return "weekend"
+    if current.time() < dtime(9, 15):
+        return "pre_open"
+    if market_data_expected(current):
+        return "market_data_expected"
+    return "post_close"
+
+
+def iso_date_text(value: Any) -> str | None:
+    dt = parse_dt(value)
+    if dt is not None:
+        return dt.date().isoformat()
+    text = str(value or "").strip()
+    if len(text) >= 10 and text[4:5] == "-" and text[7:8] == "-":
+        return text[:10]
+    return None
+
+
+def payload_trade_date(payload: dict[str, Any]) -> str | None:
+    for key in ("trade_date", "trading_date"):
+        date_text = iso_date_text(payload.get(key))
+        if date_text:
+            return date_text
+    for key in ("last_evaluated_clock", "clock_watermark", "updated_at_ist", "started_at_ist"):
+        date_text = iso_date_text(payload.get(key))
+        if date_text:
+            return date_text
+    return None
 
 
 def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
     current = now_ist()
     current_epoch = time.time()
+    session_phase = market_session_phase(current)
+    live_expected = live_readiness_expected(current)
     v2 = load_json(V2_STATUS_PATH)
     stream = load_json(STREAM_STATUS_PATH)
     services = {name: systemctl_show(name) for name in WATCHED_SERVICES}
@@ -295,7 +333,7 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
             warnings.append(row)
 
     for service, info in services.items():
-        if info.get("ActiveState") != "active":
+        if live_expected and info.get("ActiveState") != "active":
             add("critical", "service_inactive", f"{service} is not active", service=service, state=info)
         prev_restarts = loop_state.setdefault("restart_counts", {}).get(service)
         restarts = info.get("NRestarts")
@@ -304,19 +342,21 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
                 add("critical", "service_restart", f"{service} restart count increased", service=service, previous=prev_restarts, current=restarts)
             loop_state["restart_counts"][service] = restarts
 
-    if v2.get("ok") is not True:
+    if live_expected and v2.get("ok") is not True:
         add("critical", "v2_not_ok", "v2 status is not ok", status=v2.get("status"))
-    if v2.get("partial_live_start") is True:
+    if live_expected and v2.get("partial_live_start") is True:
         add("critical", "partial_live_start", "v2 partial_live_start is true")
-    if v2.get("decisions_suppressed") is True:
+    if live_expected and v2.get("decisions_suppressed") is True:
         add("critical", "decisions_suppressed", "v2 decisions are suppressed")
     v2_target_keys = int(v2.get("target_keys") or 0)
     stream_target_keys = int(stream.get("target_keys") or 0)
     latest_decision_report = compact_decision_report(v2.get("latest_decision_report"))
     stale_open_positions = as_int(v2.get("stale_open_positions"))
-    if v2_target_keys <= 0:
+    v2_status_trade_date = payload_trade_date(v2)
+    v2_status_current_session = v2_status_trade_date == current.date().isoformat()
+    if live_expected and v2_status_current_session and v2_target_keys <= 0:
         add("critical", "v2_target_key_count", "v2 target key count is missing", target_keys=v2.get("target_keys"))
-    if stale_open_positions and stale_open_positions > 0:
+    if live_expected and v2_status_current_session and stale_open_positions and stale_open_positions > 0:
         add(
             "critical",
             "stale_open_positions",
@@ -324,11 +364,11 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
             stale_open_positions=stale_open_positions,
         )
 
-    if stream.get("ok") is not True:
+    if live_expected and stream.get("ok") is not True:
         add("critical", "stream_not_ok", "v2 owned stream status is not ok", status=stream.get("status"))
-    if stream_target_keys <= 0:
+    if live_expected and stream_target_keys <= 0:
         add("critical", "stream_target_key_count", "v2 owned stream key count is missing", target_keys=stream.get("target_keys"))
-    elif v2_target_keys > 0 and stream_target_keys != v2_target_keys:
+    elif live_expected and v2_status_current_session and v2_target_keys > 0 and stream_target_keys != v2_target_keys:
         add(
             "critical",
             "stream_target_key_count_mismatch",
@@ -450,7 +490,7 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
 
     expected = latest_expected_clock(current)
     last_clock = parse_dt(v2.get("last_evaluated_clock") or v2.get("clock_watermark"))
-    if expected is not None and (last_clock is None or last_clock < expected):
+    if market_data_expected(current) and expected is not None and (last_clock is None or last_clock < expected):
         add(
             "critical",
             "clock_eval_stale",
@@ -474,6 +514,11 @@ def evaluate(loop_state: dict[str, Any]) -> dict[str, Any]:
         "criticals": criticals,
         "metrics": {
             "load1": load1,
+            "market_session_phase": session_phase,
+            "market_data_expected": market_data_expected(current),
+            "live_readiness_expected": live_expected,
+            "v2_status_trade_date": v2_status_trade_date,
+            "v2_status_current_session": v2_status_current_session,
             "v2_ok": v2.get("ok"),
             "v2_target_keys": v2.get("target_keys"),
             "v2_feed_latest_age_seconds": feed_age,

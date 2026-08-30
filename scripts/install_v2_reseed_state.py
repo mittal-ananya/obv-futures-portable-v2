@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -61,6 +62,44 @@ def copy_file_replace(source: Path, target: Path) -> int:
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source, target)
     return 1
+
+
+def write_access_preflight(paths: list[Path], *, max_issues: int = 100) -> dict[str, Any]:
+    checked = 0
+    issues: list[dict[str, Any]] = []
+
+    def add_issue(path: Path, reason: str) -> None:
+        if len(issues) < max_issues:
+            issues.append({"path": str(path), "reason": reason})
+
+    for path in paths:
+        parent = path.parent
+        checked += 1
+        if not os.access(parent, os.W_OK | os.X_OK):
+            add_issue(parent, "parent_not_writable_or_searchable")
+        if not path.exists():
+            continue
+        if path.is_dir():
+            for current, _dirs, files in os.walk(path):
+                current_path = Path(current)
+                checked += 1
+                if not os.access(current_path, os.W_OK | os.X_OK):
+                    add_issue(current_path, "directory_not_writable_or_searchable")
+                for name in files:
+                    file_path = current_path / name
+                    checked += 1
+                    if not os.access(file_path, os.W_OK):
+                        add_issue(file_path, "file_not_writable")
+        else:
+            if not os.access(path, os.W_OK):
+                add_issue(path, "file_not_writable")
+    return {
+        "checked": checked,
+        "ok": not issues,
+        "issue_count": len(issues),
+        "issues": issues,
+        "truncated": len(issues) >= max_issues,
+    }
 
 
 def run_selected_candidate_gate(
@@ -187,6 +226,21 @@ def main() -> int:
         )
         selected_gate_ok = bool(selected_gate.get("ok"))
     ok = source_ok and symbol_count >= int(args.require_symbol_count) and selected_gate_ok
+    preflight = {"checked": 0, "ok": True, "issue_count": 0, "issues": [], "truncated": False}
+    if ok and not args.dry_run:
+        preflight = write_access_preflight(
+            [
+                prod_state / "instruments",
+                prod_state / "decision_events",
+                prod_state / "bootstrap_state",
+                prod_state / "bootstrap_status.json",
+                prod_state / "status.json",
+                prod_state / "target_stream_consumer_pointer.json",
+                prod_state / "reports",
+                prod_state / "backups",
+            ]
+        )
+        ok = bool(preflight.get("ok"))
 
     backup_dir = prod_state / "backups" / f"pre_v2_reseed_install_{stamp}"
     backup = {}
@@ -210,6 +264,7 @@ def main() -> int:
         "selected_candidate_gate_required": bool(args.require_selected_candidate_match or args.selected_candidate_root),
         "selected_candidate_gate_ok": selected_gate_ok,
         "selected_candidate_gate": selected_gate,
+        "write_access_preflight": preflight,
         "backup_dir": str(backup_dir) if not args.dry_run else None,
         "backup": backup,
         "install": install_report,

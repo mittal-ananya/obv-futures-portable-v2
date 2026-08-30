@@ -147,6 +147,138 @@ def test_watchdog_ignores_stale_catchup_report_after_feed_recovers(tmp_path: Pat
     criticals = {row["code"]: row for row in status["criticals"]}
     assert "decision_catchup_deferred" not in criticals
     assert status["ok"] is True
+    assert status["metrics"]["market_session_phase"] == "market_data_expected"
+    assert status["metrics"]["live_readiness_expected"] is True
+
+
+def test_watchdog_classifies_post_close_timing_context(tmp_path: Path, monkeypatch) -> None:
+    watchdog = configure_watchdog(
+        monkeypatch,
+        tmp_path,
+        now=datetime(2026, 8, 28, 15, 47, 0, tzinfo=IST),
+    )
+    write_json(
+        watchdog.V2_STATUS_PATH,
+        {
+            "ok": True,
+            "target_keys": 418,
+            "feed_latest_age_seconds": 1000.0,
+            "clock_watermark": "2026-08-28T15:20:00+05:30",
+            "latest_decision_report": {"event": "clock_evaluation", "missed_not_ready_count": 0},
+        },
+    )
+    write_json(
+        watchdog.STREAM_STATUS_PATH,
+        {
+            "ok": True,
+            "target_keys": 418,
+            "latest_quote_age_seconds": 1000.0,
+            "quotes_written": 100,
+        },
+    )
+
+    status = watchdog.evaluate({})
+
+    assert status["metrics"]["market_session_phase"] == "post_close"
+    assert status["metrics"]["market_data_expected"] is False
+    assert status["metrics"]["live_readiness_expected"] is False
+    assert "feed_age_critical" not in {row["code"] for row in status["criticals"]}
+    assert "quote_age_critical" not in {row["code"] for row in status["criticals"]}
+
+
+def test_watchdog_does_not_raise_live_market_alerts_on_weekend(tmp_path: Path, monkeypatch) -> None:
+    watchdog = configure_watchdog(
+        monkeypatch,
+        tmp_path,
+        now=datetime(2026, 8, 30, 10, 0, 0, tzinfo=IST),
+    )
+    monkeypatch.setattr(
+        watchdog,
+        "systemctl_show",
+        lambda service: {
+            "ActiveState": "inactive",
+            "SubState": "dead",
+            "NRestarts": 0,
+            "MemoryCurrent": "[not set]",
+            "MemoryMax": 10 * 1024 * 1024 * 1024,
+            "Result": "success",
+        },
+    )
+    write_json(
+        watchdog.V2_STATUS_PATH,
+        {
+            "ok": False,
+            "status": "prior_day_stopped",
+            "target_keys": 421,
+            "feed_latest_age_seconds": 1000.0,
+            "clock_watermark": "2026-08-28T15:20:00+05:30",
+            "stale_open_positions": 3,
+            "latest_decision_report": {
+                "event": "decisions_deferred_stream_catchup",
+                "reason": "feed_not_caught_up",
+                "feed_latest_age_seconds": 1000.0,
+            },
+        },
+    )
+    write_json(
+        watchdog.STREAM_STATUS_PATH,
+        {
+            "ok": True,
+            "target_keys": 418,
+            "latest_quote_age_seconds": 1000.0,
+            "quotes_written": 100,
+        },
+    )
+
+    status = watchdog.evaluate({})
+
+    assert status["metrics"]["market_session_phase"] == "weekend"
+    assert status["metrics"]["market_data_expected"] is False
+    assert status["metrics"]["live_readiness_expected"] is False
+    assert status["criticals"] == []
+
+
+def test_watchdog_ignores_prior_session_status_during_pre_open_readiness(tmp_path: Path, monkeypatch) -> None:
+    watchdog = configure_watchdog(
+        monkeypatch,
+        tmp_path,
+        now=datetime(2026, 8, 31, 9, 0, 0, tzinfo=IST),
+    )
+    write_json(
+        watchdog.V2_STATUS_PATH,
+        {
+            "ok": True,
+            "trade_date": "2026-08-28",
+            "target_keys": 421,
+            "feed_latest_age_seconds": 1000.0,
+            "clock_watermark": "2026-08-28T15:20:00+05:30",
+            "stale_open_positions": 3,
+            "latest_decision_report": {
+                "event": "decisions_deferred_stream_catchup",
+                "reason": "feed_not_caught_up",
+                "feed_latest_age_seconds": 1000.0,
+            },
+        },
+    )
+    write_json(
+        watchdog.STREAM_STATUS_PATH,
+        {
+            "ok": True,
+            "target_keys": 418,
+            "latest_quote_age_seconds": 1000.0,
+            "quotes_written": 100,
+        },
+    )
+
+    status = watchdog.evaluate({})
+
+    critical_codes = {row["code"] for row in status["criticals"]}
+    assert "stale_open_positions" not in critical_codes
+    assert "stream_target_key_count_mismatch" not in critical_codes
+    assert status["metrics"]["market_session_phase"] == "pre_open"
+    assert status["metrics"]["live_readiness_expected"] is True
+    assert status["metrics"]["v2_status_trade_date"] == "2026-08-28"
+    assert status["metrics"]["v2_status_current_session"] is False
 
 
 def test_watchdog_alerts_on_missed_not_ready_clock_report(tmp_path: Path, monkeypatch) -> None:

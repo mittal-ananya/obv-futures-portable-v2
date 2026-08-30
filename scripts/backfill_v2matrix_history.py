@@ -526,6 +526,21 @@ def simulate_overlay_history(
                     entry_ltp = live_overlay.safe_float(fill.get("ltp_price")) or entry_fill
                     if entry_fill is None or entry_ltp is None:
                         continue
+                    signal_quote = index.quote_at_or_before(leg.signal_key, clock_epoch, max_age_seconds=300)
+                    entry_display_price = float(signal_quote.price) if signal_quote else float(entry_ltp)
+                    entry_display_source = "v2matrix_overlay_signal_stream" if signal_quote else "v2matrix_overlay_entry_ltp_fallback"
+                    entry_display_key = leg.signal_key if signal_quote else leg.execution_key
+                    entry_features = dict(feature)
+                    entry_features.update(
+                        {
+                            "entry_display_price_underlying": entry_display_price,
+                            "entry_display_price_source": entry_display_source,
+                            "entry_display_instrument_key": entry_display_key,
+                            "entry_execution_fill_price": float(entry_fill),
+                            "entry_execution_ltp_price": float(entry_ltp),
+                            "entry_execution_instrument_key": leg.execution_key,
+                        }
+                    )
                     position = live_overlay.OverlayPosition(
                         variant=variant,
                         row_id=row_id,
@@ -537,7 +552,7 @@ def simulate_overlay_history(
                         entry_fill_price=float(entry_fill),
                         entry_ltp_price=float(entry_ltp),
                         entry_score=float(feature.get("portfolio_score") or 0.0),
-                        entry_features=dict(feature),
+                        entry_features=entry_features,
                     )
                     active_overlay[key] = asdict(position)
                     event = {
@@ -553,9 +568,12 @@ def simulate_overlay_history(
                         "entry_epoch": clock_epoch,
                         "entry_time": position.entry_time,
                         "entry_score": position.entry_score,
-                        "entry_features": feature,
+                        "entry_features": entry_features,
                         "entry_fill_price": entry_fill,
                         "entry_ltp_price": entry_ltp,
+                        "entry_display_price_underlying": entry_display_price,
+                        "entry_display_price_source": entry_display_source,
+                        "entry_display_instrument_key": entry_display_key,
                         "history_backfilled": True,
                         "created_at_ist": now_ist_iso(),
                     }
@@ -564,8 +582,6 @@ def simulate_overlay_history(
                     if isinstance(portfolio, dict):
                         live_overlay.open_portfolio_holding(portfolio=portfolio, variant=variant, position=position, leg=leg)
                     if variant == live_overlay.PRIMARY_VARIANT:
-                        signal_quote = index.quote_at_or_before(leg.signal_key, clock_epoch, max_age_seconds=300)
-                        trigger_price = signal_quote.price if signal_quote else entry_ltp
                         matrix_payloads.append(
                             live_overlay.matrix_payload(
                                 event_type="paper_entry",
@@ -573,9 +589,9 @@ def simulate_overlay_history(
                                 leg=leg,
                                 position=position,
                                 event_epoch_value=clock_epoch,
-                                trigger_price=float(trigger_price),
-                                trigger_source="v2matrix_overlay_signal_stream",
-                                features=feature,
+                                trigger_price=entry_display_price,
+                                trigger_source=entry_display_source,
+                                features=entry_features,
                             )
                         )
     state["completed_overlay_keys"] = sorted(completed_overlay)

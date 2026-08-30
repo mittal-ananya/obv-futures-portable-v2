@@ -6,6 +6,7 @@ from io import BytesIO
 from dataclasses import replace
 from datetime import date, datetime
 from pathlib import Path
+from types import SimpleNamespace
 
 import obvfut_portable_v2.passive_runner as passive_runner_module
 from obvfut_portable_v2.passive_runner import (
@@ -186,6 +187,65 @@ def test_synthesized_symbols_include_available_september_shadow_keys(tmp_path: P
     assert "NFO:360ONE26SEPFUT" in runner.instruments["360ONE"].target_keys
     assert runner.instruments["DALBHARAT"].shadow_execution_key is None
     assert "NFO:DALBHARAT26SEPFUT" not in runner.targets
+
+
+def test_reject_stale_pending_entries_before_live_materialization(tmp_path: Path) -> None:
+    runner = object.__new__(PassiveV2Runner)
+    runner.config = {
+        "max_live_entry_fill_lag_seconds": 120,
+        "live_reject_retained_late_entry_fills_enabled": True,
+    }
+    runner.market_start = (9, 15, 0)
+    runner.market_end = (15, 30, 0)
+    meta = SimpleNamespace(
+        symbol="BANKNIFTY",
+        signal_source="futures",
+        signal_key="NFO:BANKNIFTY26AUGFUT",
+        execution_key="NFO:BANKNIFTY26AUGFUT",
+        signal_contract_label="BANKNIFTY26AUGFUT",
+        execution_contract_label="BANKNIFTY26AUGFUT",
+        lifecycle_start_date="2026-08-17",
+    )
+    signal_epoch = int(datetime(2026, 8, 17, 9, 20, tzinfo=IST).timestamp())
+    due_epoch = signal_epoch + 60
+    evaluation_epoch = due_epoch + 901
+    state = {
+        "trade_date": "2026-08-17",
+        "last_signal_epoch": 0,
+        "pending_entry": {
+            "signal_id": "test-stale-pending",
+            "side": "short",
+            "module": "primary_obv_short_configured",
+            "signal_epoch": signal_epoch,
+            "signal_time": datetime.fromtimestamp(signal_epoch, IST).isoformat(),
+            "entry_due_epoch": due_epoch,
+        },
+    }
+
+    updated, events = runner.reject_stale_pending_entries_before_fill(
+        meta=meta,
+        model_state=state,
+        trade_date="2026-08-17",
+        evaluation_epoch=evaluation_epoch,
+        entry_delay_seconds=60,
+    )
+
+    assert "pending_entry" not in updated
+    assert updated["last_signal_epoch"] == signal_epoch
+    assert len(events) == 1
+    assert events[0]["event"] == "entry_signal_skipped"
+    assert events[0]["reason"] == "stale_pending_entry_at_evaluation"
+    assert events[0]["entry_staleness_seconds"] == 901
+    assert events[0]["suppress_downstream"] is True
+
+
+def test_memory_pressure_caps_shadow_lifecycle_retention() -> None:
+    runner = object.__new__(PassiveV2Runner)
+    runner.shadow_lifecycle_second_row_retention_seconds = 27000
+    runner.memory_pressure_shadow_lifecycle_second_row_retention_seconds = 900
+
+    assert runner.effective_shadow_lifecycle_retention_seconds({"active": False}) == 27000
+    assert runner.effective_shadow_lifecycle_retention_seconds({"active": True}) == 900
 
 
 def test_normalise_record_uses_exchange_time_and_depth() -> None:

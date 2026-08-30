@@ -331,6 +331,22 @@ def release_unused_process_memory() -> None:
         pass
 
 
+def current_process_rss_mb() -> float | None:
+    status_path = Path("/proc/self/status")
+    if not status_path.exists():
+        return None
+    try:
+        for line in status_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+            if not line.startswith("VmRSS:"):
+                continue
+            parts = line.split()
+            if len(parts) >= 2:
+                return float(parts[1]) / 1024.0
+    except Exception:
+        return None
+    return None
+
+
 def safe_key(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", value)
 
@@ -2420,6 +2436,18 @@ class PassiveV2Runner:
             if self.config.get("transition_second_row_retention_seconds") is not None
             else self.active_second_row_retention_seconds
         )
+        self.memory_retention_soft_limit_mb = as_float(
+            self.config.get("passive_memory_retention_soft_limit_mb")
+            if self.config.get("passive_memory_retention_soft_limit_mb") is not None
+            else self.config.get("memory_retention_soft_limit_mb")
+        )
+        if self.memory_retention_soft_limit_mb is None:
+            self.memory_retention_soft_limit_mb = 8192.0
+        self.memory_pressure_shadow_lifecycle_second_row_retention_seconds = retention_seconds_from_config(
+            self.config.get("memory_pressure_shadow_lifecycle_second_row_retention_seconds")
+            if self.config.get("memory_pressure_shadow_lifecycle_second_row_retention_seconds") is not None
+            else 900
+        )
         self.compute_non_clock_percentiles = bool(self.config.get("compute_non_clock_percentiles", True))
         self.clock_start = str(self.config.get("clock_start_ist") or "09:20")
         self.clock_end = str(self.config.get("clock_end_ist") or "15:20")
@@ -2467,6 +2495,7 @@ class PassiveV2Runner:
         self.latest_transition_signal_report: dict[str, Any] = {}
         self.latest_rollover_report: dict[str, Any] = {}
         self.latest_retention_report: dict[str, Any] = {}
+        self.latest_memory_pressure_report: dict[str, Any] = {}
         self.latest_due_clock_event_symbols: list[str] = []
         self.latest_feed_epoch: float | None = None
         self.partial_live_start = False
@@ -3017,6 +3046,29 @@ class PassiveV2Runner:
             return None
         return max(int(current), int(candidate))
 
+    def memory_pressure_retention_report(self) -> dict[str, Any]:
+        rss_mb = current_process_rss_mb()
+        soft_limit = self.memory_retention_soft_limit_mb
+        active = rss_mb is not None and soft_limit is not None and float(rss_mb) >= float(soft_limit)
+        return {
+            "rss_mb": rss_mb,
+            "soft_limit_mb": soft_limit,
+            "active": bool(active),
+            "shadow_lifecycle_configured_seconds": self.shadow_lifecycle_second_row_retention_seconds,
+            "shadow_lifecycle_pressure_cap_seconds": self.memory_pressure_shadow_lifecycle_second_row_retention_seconds,
+        }
+
+    def effective_shadow_lifecycle_retention_seconds(self, memory_pressure: dict[str, Any]) -> int | None:
+        configured = self.shadow_lifecycle_second_row_retention_seconds
+        if not bool(memory_pressure.get("active")):
+            return configured
+        cap = self.memory_pressure_shadow_lifecycle_second_row_retention_seconds
+        if cap is None:
+            return configured
+        if configured is None:
+            return cap
+        return min(int(configured), int(cap))
+
     def position_is_stale_rejected(self, position: dict[str, Any]) -> bool:
         if not isinstance(position, dict):
             return False
@@ -3036,6 +3088,8 @@ class PassiveV2Runner:
         return True
 
     def desired_retention_by_key(self) -> dict[str, int | None]:
+        memory_pressure = self.memory_pressure_retention_report()
+        shadow_lifecycle_retention = self.effective_shadow_lifecycle_retention_seconds(memory_pressure)
         retention = {key: self.flat_second_row_retention_seconds for key in self.targets}
         for symbol, meta in self.instruments.items():
             state = self.model_states.get(symbol)
@@ -3080,31 +3134,42 @@ class PassiveV2Runner:
                         if key and key in retention:
                             retention[key] = self._wider_retention(
                                 retention[key],
-                                self.shadow_lifecycle_second_row_retention_seconds,
+                                shadow_lifecycle_retention,
                             )
         return retention
 
     def refresh_dynamic_retention(self) -> dict[str, Any]:
+        memory_pressure = self.memory_pressure_retention_report()
         desired = self.desired_retention_by_key()
         changed = 0
         unlimited = 0
+        trimmed = 0
         for key, state in self.states.items():
             next_retention = desired.get(key, self.flat_second_row_retention_seconds)
             if state.second_row_retention_seconds != next_retention:
                 state.set_second_row_retention(next_retention)
                 changed += 1
             elif next_retention is not None:
+                before_rows = len(state.second_rows)
                 state.trim_second_rows()
+                if len(state.second_rows) < before_rows:
+                    trimmed += before_rows - len(state.second_rows)
             if next_retention is None:
                 unlimited += 1
+        if changed or trimmed:
+            release_unused_process_memory()
+        self.latest_memory_pressure_report = memory_pressure
         return {
             "changed": changed,
+            "trimmed_second_rows": trimmed,
             "unlimited_targets": unlimited,
             "flat_retention_seconds": self.flat_second_row_retention_seconds,
             "pending_retention_seconds": self.pending_second_row_retention_seconds,
             "active_retention_seconds": self.active_second_row_retention_seconds,
             "shadow_lifecycle_retention_seconds": self.shadow_lifecycle_second_row_retention_seconds,
+            "effective_shadow_lifecycle_retention_seconds": self.effective_shadow_lifecycle_retention_seconds(memory_pressure),
             "transition_retention_seconds": self.transition_second_row_retention_seconds,
+            "memory_pressure": memory_pressure,
         }
 
     def append_trade_state_events(self, trade_date: str, symbol: str, events: list[dict[str, Any]]) -> None:
@@ -3513,6 +3578,102 @@ class PassiveV2Runner:
         updated["entry_edges_today"] = kept
         return updated, filtered
 
+    def reject_stale_pending_entries_before_fill(
+        self,
+        *,
+        meta: InstrumentMeta,
+        model_state: dict[str, Any],
+        trade_date: str,
+        evaluation_epoch: int,
+        entry_delay_seconds: int,
+    ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+        max_lag = self.live_entry_fill_acceptance_seconds()
+        if max_lag is None or not self.is_market_hours_epoch(evaluation_epoch):
+            return model_state, []
+        if not any(key in model_state for key in ("pending_entry", "pending_entry_signal", "pending_entry_signals")):
+            return model_state, []
+
+        updated = dict(model_state or {})
+        rejected: list[dict[str, Any]] = []
+
+        def should_reject(entry: dict[str, Any]) -> tuple[bool, int | None, int]:
+            due_epoch = self._entry_due_epoch(entry, entry_delay_seconds)
+            if due_epoch is None:
+                return False, None, 0
+            staleness = int(evaluation_epoch) - int(due_epoch)
+            return staleness > int(max_lag), int(due_epoch), staleness
+
+        def rejection_event(entry: dict[str, Any], due_epoch: int | None, staleness: int) -> dict[str, Any]:
+            signal_epoch = int(as_float(entry.get("signal_epoch")) or 0)
+            return {
+                "event": "entry_signal_skipped",
+                "reason": "stale_pending_entry_at_evaluation",
+                "decision_only": True,
+                "suppress_downstream": True,
+                "entry_stale": True,
+                "entry_stale_reason": "stale_pending_entry_at_evaluation",
+                "entry_staleness_seconds": int(staleness),
+                "symbol": meta.symbol,
+                "signal_id": entry.get("signal_id"),
+                "position_id": entry.get("position_id"),
+                "side": entry.get("side"),
+                "source": entry.get("source"),
+                "module": entry.get("module"),
+                "signal_source": meta.signal_source,
+                "signal_instrument_key": meta.signal_key,
+                "execution_instrument_key": meta.execution_key,
+                "signal_contract_label": meta.signal_contract_label,
+                "execution_contract_label": meta.execution_contract_label,
+                "lifecycle_start_date": meta.lifecycle_start_date,
+                "signal_epoch": signal_epoch,
+                "signal_time": entry.get("signal_time") or epoch_ist_iso(signal_epoch),
+                "entry_due_epoch": due_epoch,
+                "entry_due_time": epoch_ist_iso(int(due_epoch)) if due_epoch is not None else None,
+                "evaluation_epoch": int(evaluation_epoch),
+                "evaluation_time": epoch_ist_iso(int(evaluation_epoch)),
+                "max_live_entry_fill_lag_seconds": int(max_lag),
+                "debug_policy": "stale_pending_entry_rejected_before_live_materialization",
+                "created_at_ist": now_ist().isoformat(),
+            }
+
+        for key in ("pending_entry", "pending_entry_signal"):
+            entry = updated.get(key)
+            if not isinstance(entry, dict):
+                continue
+            stale, due_epoch, staleness = should_reject(entry)
+            if not stale:
+                continue
+            rejected.append(rejection_event(entry, due_epoch, staleness))
+            updated.pop(key, None)
+
+        pending_list = updated.get("pending_entry_signals")
+        if isinstance(pending_list, list) and pending_list:
+            kept: list[Any] = []
+            for entry in pending_list:
+                if not isinstance(entry, dict):
+                    kept.append(entry)
+                    continue
+                stale, due_epoch, staleness = should_reject(entry)
+                if stale:
+                    rejected.append(rejection_event(entry, due_epoch, staleness))
+                else:
+                    kept.append(entry)
+            if kept:
+                updated["pending_entry_signals"] = kept
+            else:
+                updated.pop("pending_entry_signals", None)
+
+        if rejected:
+            latest_signal_epoch = max(
+                [int(as_float(event.get("signal_epoch")) or 0) for event in rejected]
+                + [int(updated.get("last_signal_epoch") or 0)]
+            )
+            updated["last_signal_epoch"] = latest_signal_epoch
+            updated["trade_date"] = trade_date
+            updated["signal_source"] = meta.signal_source
+            updated["updated_at_ist"] = now_ist().isoformat()
+        return updated, rejected
+
     def reject_retained_late_entry_fill(
         self,
         *,
@@ -3592,9 +3753,9 @@ class PassiveV2Runner:
                 "signal_epoch": signal_epoch,
                 "signal_time": position.get("signal_time"),
                 "entry_due_epoch": due_epoch,
-                "entry_due_time": epoch_ist_iso(int(due_epoch)),
-                "candidate_entry_epoch": int(entry_epoch),
-                "candidate_entry_time": epoch_ist_iso(int(entry_epoch)),
+                "entry_due_time": epoch_ist_iso(int(due_epoch)) if due_epoch is not None else None,
+                "candidate_entry_epoch": int(entry_epoch) if entry_epoch is not None else None,
+                "candidate_entry_time": epoch_ist_iso(int(entry_epoch)) if entry_epoch is not None else None,
                 "fill_delay_seconds": fill_delay_seconds,
                 "max_live_entry_fill_lag_seconds": int(max_lag),
                 "evaluation_epoch": int(evaluation_epoch),
@@ -5204,6 +5365,13 @@ class PassiveV2Runner:
                     meta.execution_point_config,
                     position if isinstance(position, dict) else None,
                 )
+                current_model_state, stale_pending_events = self.reject_stale_pending_entries_before_fill(
+                    meta=meta,
+                    model_state=current_model_state,
+                    trade_date=trade_date,
+                    evaluation_epoch=effective_evaluation_epoch,
+                    entry_delay_seconds=entry_delay_seconds,
+                )
                 signal_contract_state = self.v1_contract_state_from_online(
                     state=signal_state,
                     today=trade_date,
@@ -5222,7 +5390,7 @@ class PassiveV2Runner:
                     through_epoch=effective_evaluation_epoch,
                 )
                 model_state, events = v1_portfolio.update_position_state_with_execution(
-                    model_state=dict(self.model_states.get(meta.symbol) or {}),
+                    model_state=dict(current_model_state or {}),
                     signal_contract_state=signal_contract_state,
                     execution_contract_state=execution_contract_state,
                     today=trade_date,
@@ -5243,6 +5411,8 @@ class PassiveV2Runner:
                     max_entry_lag_seconds=self.live_entry_lag_guard_seconds(),
                     evaluation_epoch=effective_evaluation_epoch,
                 )
+                if stale_pending_events:
+                    events = [*stale_pending_events, *events]
                 model_state, events = self.calibrate_open_position_state(meta, model_state, events)
                 model_state, events = self.reject_retained_late_entry_fill(
                     meta=meta,
@@ -6560,6 +6730,7 @@ class PassiveV2Runner:
             "latest_rollover_report": self.latest_rollover_report,
             "latest_trade_state_report": self.latest_trade_state_report,
             "latest_retention_report": self.latest_retention_report,
+            "latest_memory_pressure_report": self.latest_memory_pressure_report,
             "load_guard": self.load_guard_snapshot(),
             "clock_metric_coverage": self.clock_metric_coverage_snapshot(),
             "state": {

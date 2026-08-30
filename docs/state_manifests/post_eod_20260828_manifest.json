@@ -1,0 +1,52 @@
+{
+  "baseline_state": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260828",
+  "checksums": {
+    "archive_replay_report.json": {
+      "bytes": 39936,
+      "sha256": "98ad7dacf7abe73684f2a13f083c862afa8afecc95e005b50d77d9725d583203"
+    },
+    "bootstrap_status.json": {
+      "bytes": 403,
+      "sha256": "b018b54c2cc8b969152d3bd4c109367adb53e4bdea00a45b021e83f37f60cbbf"
+    },
+    "decision_events/decision_events_2026-08-28.jsonl": {
+      "bytes": 1505340,
+      "sha256": "a751b7195466f5edf54a4631983d60ddb0922848f79f982624aaf157aad802f4"
+    },
+    "status.json": {
+      "bytes": 20874,
+      "sha256": "f7905c6eadc0f93610e0fc66194fd4b33c9cd4a44f81fc354f8328415fbc3346"
+    }
+  },
+  "created_epoch": 1787923023.7908022,
+  "mode": "incremental_append_from_verified_post_eod_baseline",
+  "notes": [
+    "DALBHARAT preserved from Aug27 verified baseline; current universe source had 211 entries and no Aug28 DALBHARAT target rows."
+  ],
+  "ok": true,
+  "previous_baseline": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/eod_baselines/post_eod_20260827",
+  "run_root": "/tmp/obvfutport_v2_aug28_eod_incremental_20260828_123621",
+  "schema": "obvfutport_v2.post_eod_baseline_manifest.v1",
+  "source_chain": [
+    "selected_materialized_20260823_plus_incremental_2026-08-24_2026-08-25_2026-08-26",
+    {
+      "mode": "single_day_incremental_append",
+      "run_root": "/tmp/obvfutport_v2_aug27_eod_incremental_20260827_123710",
+      "source_state": "/tmp/obvfutport_v2_aug27_eod_incremental_20260827_123710/merged_2026-08-27",
+      "symbol_count": 212,
+      "trade_date": "2026-08-27"
+    },
+    {
+      "mode": "single_day_incremental_append",
+      "run_root": "/tmp/obvfutport_v2_aug28_eod_incremental_20260828_123621",
+      "source_state": "/tmp/obvfutport_v2_aug28_eod_incremental_20260828_123621/merged_2026-08-28",
+      "trade_date": "2026-08-28",
+      "universe_preservation": [
+        "DALBHARAT"
+      ]
+    }
+  ],
+  "source_state": "/tmp/obvfutport_v2_aug28_eod_incremental_20260828_123621/merged_2026-08-28",
+  "symbol_count": 212,
+  "trade_date": "2026-08-28"
+}

@@ -1254,21 +1254,50 @@ def entry_row_for_due(
     *,
     due_epoch: int,
     max_carry_age_seconds: float,
+    receive_grace_seconds: float = 2.0,
 ) -> tuple[int, dict[str, Any] | None]:
     next_idx = bisect.bisect_left(rows.epochs, float(due_epoch))
-    if next_idx < len(rows) and int(rows.epochs[next_idx]) == int(due_epoch):
-        row = rows.row(next_idx)
-        return next_idx, canonical_same_second_fill_row(
-            rows,
-            epoch_second=int(due_epoch),
-            fallback=row,
-            preferred_price=as_float(row.get("price")),
-        )
+    receive_cutoff = float(due_epoch) + max(0.0, float(receive_grace_seconds))
+    candidates: list[int] = []
     prev_idx = next_idx - 1
     if prev_idx >= 0:
         age = int(due_epoch) - int(rows.epochs[prev_idx])
         if 0 <= age <= float(max_carry_age_seconds):
-            return next_idx, rows.carried_row(prev_idx, epoch_second=int(due_epoch))
+            candidates.append(prev_idx)
+    hi = bisect.bisect_right(rows.epochs, float(due_epoch))
+    candidates.extend(range(next_idx, hi))
+    available = [
+        idx
+        for idx in candidates
+        if _path_row_received_epoch(rows, idx) <= receive_cutoff
+    ]
+    if available:
+        available_by_due = [
+            idx
+            for idx in available
+            if _path_row_received_epoch(rows, idx) <= float(due_epoch)
+        ]
+        if available_by_due:
+            selected_idx = max(
+                available_by_due,
+                key=lambda idx: (float(rows.epochs[idx]), _path_row_received_epoch(rows, idx)),
+            )
+        else:
+            selected_idx = min(
+                available,
+                key=lambda idx: (_path_row_received_epoch(rows, idx), -float(rows.epochs[idx])),
+            )
+        selected_epoch = int(rows.epochs[selected_idx])
+        selected = rows.row(selected_idx)
+        if selected_epoch == int(due_epoch):
+            return selected_idx, canonical_same_second_fill_row(
+                rows,
+                epoch_second=int(due_epoch),
+                fallback=selected,
+                preferred_price=as_float(selected.get("price")),
+                max_received_epoch=_path_row_received_epoch(rows, selected_idx),
+            )
+        return next_idx, rows.carried_row(selected_idx, epoch_second=int(due_epoch))
     if next_idx < len(rows):
         row = rows.row(next_idx)
         return next_idx, canonical_same_second_fill_row(
@@ -1311,12 +1340,22 @@ def _without_stale_quote(row: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def _path_row_received_epoch(rows: PathArrays, idx: int) -> float:
+    if idx < 0 or idx >= len(rows):
+        return math.inf
+    received = float(rows.received_epochs[idx])
+    if math.isfinite(received):
+        return received
+    return float(rows.epochs[idx])
+
+
 def canonical_same_second_fill_row(
     rows: PathArrays,
     *,
     epoch_second: int,
     fallback: dict[str, Any],
     preferred_price: float | None,
+    max_received_epoch: float | None = None,
 ) -> dict[str, Any]:
     """Prefer a valid same-second quote without changing the selected LTP path."""
     lo = bisect.bisect_left(rows.epochs, float(epoch_second))
@@ -1326,6 +1365,8 @@ def canonical_same_second_fill_row(
     same_price_rows: list[dict[str, Any]] = []
     inside_quote_rows: list[dict[str, Any]] = []
     for idx in range(lo, hi):
+        if max_received_epoch is not None and _path_row_received_epoch(rows, idx) > float(max_received_epoch):
+            continue
         row = rows.row(idx)
         price = as_float(row.get("price"))
         if _ltp_inside_valid_quote(row):
@@ -1695,10 +1736,14 @@ def simulate_candidate(
     max_carry_age = as_float(runner.config.get("entry_quote_carry_max_age_seconds"))
     if max_carry_age is None:
         max_carry_age = as_float(runner.config.get("signal_quote_max_age_seconds")) or 45.0
+    receive_grace = as_float(runner.config.get("entry_due_receive_grace_seconds"))
+    if receive_grace is None:
+        receive_grace = 2.0
     entry_idx, entry_row = entry_row_for_due(
         exec_rows,
         due_epoch=due_epoch,
         max_carry_age_seconds=float(max_carry_age),
+        receive_grace_seconds=float(receive_grace),
     )
     if entry_row is None:
         return {**candidate, "status": "entry_unavailable", "entry_due_epoch": due_epoch}
