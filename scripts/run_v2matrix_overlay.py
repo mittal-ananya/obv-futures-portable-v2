@@ -900,6 +900,7 @@ def portfolio_summary(portfolio: dict[str, Any], index: QuoteRingIndex, v1_portf
     exits = [row for row in transactions if row.get("event") == "exit"]
     wins = [row for row in exits if float(row.get("net_rupees") or 0.0) > 0]
     peak_margin = max(float(portfolio.get("peak_margin_rupees") or 0.0), sum(h.margin_locked for h in holdings.values()))
+    portfolio_success = (len(wins) / len(exits) * 100.0) if exits else None
     return {
         "portfolio_id": portfolio.get("portfolio_id"),
         "variant": portfolio.get("variant"),
@@ -910,7 +911,14 @@ def portfolio_summary(portfolio: dict[str, Any], index: QuoteRingIndex, v1_portf
         "closed_trades": len(exits),
         "wins": len(wins),
         "losses": len(exits) - len(wins),
-        "success_rate_pct": (len(wins) / len(exits) * 100.0) if exits else None,
+        "success_rate_pct": portfolio_success,
+        "portfolio_closed_success_rate_pct": portfolio_success,
+        "portfolio_closed_trade_count": len(exits),
+        "portfolio_closed_win_count": len(wins),
+        "all_qualified_signal_success_rate_pct": portfolio.get("all_qualified_signal_success_rate_pct"),
+        "all_qualified_signal_trade_count": portfolio.get("all_qualified_signal_trade_count"),
+        "all_qualified_signal_win_count": portfolio.get("all_qualified_signal_win_count"),
+        "all_qualified_signal_reference": portfolio.get("all_qualified_signal_reference"),
         "realized_net_rupees": realized,
         "unrealized_net_rupees": unrealized,
         "total_net_rupees": realized + unrealized,

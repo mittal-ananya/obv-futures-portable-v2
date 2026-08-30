@@ -90,6 +90,8 @@ def test_portfolio_page_renders_sortable_tables(tmp_path: Path, monkeypatch) -> 
                         "open_positions": 1,
                         "closed_trades": 2,
                         "total_net_rupees": 1000,
+                        "portfolio_closed_success_rate_pct": 50,
+                        "all_qualified_signal_success_rate_pct": 75,
                     }
                 ],
                 "portfolios": {
@@ -132,3 +134,6 @@ def test_portfolio_page_renders_sortable_tables(tmp_path: Path, monkeypatch) -> 
     assert "aria-sort" in html
     assert 'data-sort-value="1787795400"' in html
     assert "fixed&lt;capital&gt;" in html
+    assert "Portfolio Closed Success" in html
+    assert "All Qualified Signal Success" in html
+    assert "75.00%" in html

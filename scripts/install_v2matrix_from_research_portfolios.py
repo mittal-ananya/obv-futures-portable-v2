@@ -213,6 +213,29 @@ def portfolio_state_from_research_result(
     return portfolio
 
 
+def all_qualified_signal_summary(
+    *,
+    variant: str,
+    candidates: list[portfolio_research.Candidate],
+    v1_portfolio: Any,
+    reference: str,
+) -> dict[str, Any]:
+    net_values: list[float] = []
+    for candidate in candidates:
+        account = portfolio_research.candidate_account(v1_portfolio, candidate, candidate.exit_fill_price, 1)
+        net_values.append(float(account.get("net_rupees") or 0.0))
+    wins = [value for value in net_values if value > 0]
+    return {
+        "variant": variant,
+        "all_qualified_signal_trade_count": len(net_values),
+        "all_qualified_signal_win_count": len(wins),
+        "all_qualified_signal_loss_count": len(net_values) - len(wins),
+        "all_qualified_signal_success_rate_pct": (len(wins) / len(net_values) * 100.0) if net_values else None,
+        "all_qualified_signal_net_rupees_per_lot": sum(net_values),
+        "all_qualified_signal_reference": reference,
+    }
+
+
 def matrix_payload_from_candidate(
     *,
     candidate: portfolio_research.Candidate,
@@ -412,6 +435,7 @@ def summarize_installed_portfolio(portfolio: dict[str, Any]) -> dict[str, Any]:
     wins = [row for row in exits if float(row.get("net_rupees") or 0.0) > 0]
     realized = sum(float(row.get("net_rupees") or 0.0) for row in exits)
     peak_margin = float(portfolio.get("peak_margin_rupees") or 0.0)
+    portfolio_success = (len(wins) / len(exits) * 100.0) if exits else None
     return {
         "portfolio_id": portfolio.get("portfolio_id"),
         "variant": portfolio.get("variant"),
@@ -422,7 +446,14 @@ def summarize_installed_portfolio(portfolio: dict[str, Any]) -> dict[str, Any]:
         "closed_trades": len(exits),
         "wins": len(wins),
         "losses": len(exits) - len(wins),
-        "success_rate_pct": (len(wins) / len(exits) * 100.0) if exits else None,
+        "success_rate_pct": portfolio_success,
+        "portfolio_closed_success_rate_pct": portfolio_success,
+        "portfolio_closed_trade_count": len(exits),
+        "portfolio_closed_win_count": len(wins),
+        "all_qualified_signal_success_rate_pct": portfolio.get("all_qualified_signal_success_rate_pct"),
+        "all_qualified_signal_trade_count": portfolio.get("all_qualified_signal_trade_count"),
+        "all_qualified_signal_win_count": portfolio.get("all_qualified_signal_win_count"),
+        "all_qualified_signal_reference": portfolio.get("all_qualified_signal_reference"),
         "realized_net_rupees": realized,
         "unrealized_net_rupees": 0.0,
         "total_net_rupees": realized,
@@ -531,11 +562,19 @@ def main() -> int:
             initial_capital=float(args.initial_capital),
             max_positions=int(args.max_positions),
         )
+        signal_summary = all_qualified_signal_summary(
+            variant=variant,
+            candidates=candidates_by_variant.get(variant, []),
+            v1_portfolio=v1_portfolio,
+            reference=str(args.opportunity_frame),
+        )
+        portfolio.update(signal_summary)
         portfolios[portfolio_key(variant)] = portfolio
         summary = {
             **summarize_installed_portfolio(portfolio),
             "source_research_portfolio_id": result["summary"].get("portfolio_id"),
             "research_summary": result["summary"],
+            "all_qualified_signal_summary": signal_summary,
         }
         portfolio_summaries.append(summary)
 

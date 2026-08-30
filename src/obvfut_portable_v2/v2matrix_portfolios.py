@@ -121,7 +121,8 @@ def render_summary_cards(summaries: list[dict[str, Any]]) -> str:
                 <span>Realized <strong>{money(summary.get('realized_net_rupees'))}</strong></span>
                 <span>Peak Margin <strong>{money(summary.get('peak_margin_rupees'))}</strong></span>
                 <span>Return / Peak Margin <strong>{pct(summary.get('return_on_peak_margin_pct'))}</strong></span>
-                <span>Success <strong>{pct(summary.get('success_rate_pct'))}</strong></span>
+                <span>Portfolio Closed Success <strong>{pct(summary.get('portfolio_closed_success_rate_pct') or summary.get('success_rate_pct'))}</strong></span>
+                <span>All Qualified Signal Success <strong>{pct(summary.get('all_qualified_signal_success_rate_pct'))}</strong></span>
               </div>
             </section>
             """
@@ -265,7 +266,7 @@ def page() -> HTMLResponse:
     }}
     .metrics {{
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 8px;
       margin-top: 12px;
     }}
