@@ -639,21 +639,38 @@ def normalize_row(
         or parent.get("latest_epoch")
         or parent.get("exit_epoch")
     )
-    net = safe_float(
-        source.get("net_rupees")
-        if source.get("net_rupees") is not None
-        else source.get("net_rupees_if_closed")
-    )
-    gross = safe_float(
-        source.get("gross_rupees")
-        if source.get("gross_rupees") is not None
-        else source.get("gross_rupees_if_closed")
-    )
-    charges = safe_float(
-        source.get("charges_rupees")
-        if source.get("charges_rupees") is not None
-        else source.get("charges_rupees_if_closed")
-    )
+    if status == "open":
+        net = safe_float(
+            source.get("net_rupees_if_closed")
+            if source.get("net_rupees_if_closed") is not None
+            else source.get("net_rupees")
+        )
+        gross = safe_float(
+            source.get("gross_rupees_if_closed")
+            if source.get("gross_rupees_if_closed") is not None
+            else source.get("gross_rupees")
+        )
+        charges = safe_float(
+            source.get("charges_rupees_if_closed")
+            if source.get("charges_rupees_if_closed") is not None
+            else source.get("charges_rupees")
+        )
+    else:
+        net = safe_float(
+            source.get("net_rupees")
+            if source.get("net_rupees") is not None
+            else source.get("net_rupees_if_closed")
+        )
+        gross = safe_float(
+            source.get("gross_rupees")
+            if source.get("gross_rupees") is not None
+            else source.get("gross_rupees_if_closed")
+        )
+        charges = safe_float(
+            source.get("charges_rupees")
+            if source.get("charges_rupees") is not None
+            else source.get("charges_rupees_if_closed")
+        )
     margin = margin_for_row(source, symbol, side, margins, parent)
     return {
         "symbol": symbol,

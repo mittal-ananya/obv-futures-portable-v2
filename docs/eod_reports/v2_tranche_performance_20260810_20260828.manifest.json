@@ -10,12 +10,12 @@
   "open_positions": 153,
   "rows_by_tranche_counts": {
     "T1": 1120,
-    "T2": 1131,
+    "T2": 1120,
     "T3": 260
   },
   "schema": "obvfutport_v2.tranche_performance_manifest.v1",
-  "sha256": "2733cd7db4ff6b4ea28e2b622420f0faf226ad1571613954d781f87c6ac63798",
-  "size_bytes": 1727663,
+  "sha256": "66dbe3d4a709d56c7f643308e7d507d2ab183ec8d0a600be5623ea98b571f96b",
+  "size_bytes": 1720211,
   "state_dir": "state",
   "summary": {
     "T1": {
@@ -38,23 +38,23 @@
       "total_net_rupees": -1754413.2097799215
     },
     "T2": {
-      "avg_closed_net_pct_margin": -0.6735320410084017,
-      "avg_net_pct_margin": -0.7161712952108312,
-      "charges_rupees": 168394.19015343444,
-      "closed": 1061,
-      "closed_losses": 693,
-      "closed_net_rupees": -1069681.153401284,
-      "closed_success_rate_pct": 34.68426013195099,
-      "closed_wins": 368,
-      "gross_rupees": -14573.622811250483,
+      "avg_closed_net_pct_margin": -0.7009093593602919,
+      "avg_net_pct_margin": -0.7422539977412494,
+      "charges_rupees": 162716.59557892938,
+      "closed": 1050,
+      "closed_losses": 688,
+      "closed_net_rupees": -1094065.8651392793,
+      "closed_success_rate_pct": 34.476190476190474,
+      "closed_wins": 362,
+      "gross_rupees": -44635.929123750415,
       "max_net_pct_margin": 59.17102389861158,
-      "median_closed_net_pct_margin": -1.748177233228117,
-      "median_net_pct_margin": -1.7408945026216163,
+      "median_closed_net_pct_margin": -1.7724081363600077,
+      "median_net_pct_margin": -1.7571564759192702,
       "min_net_pct_margin": -31.317628358235787,
       "open_mark": 70,
       "open_net_rupees": -181027.01628698016,
-      "rows": 1131,
-      "total_net_rupees": -1250708.1696882644
+      "rows": 1120,
+      "total_net_rupees": -1275092.8814262592
     },
     "T3": {
       "avg_closed_net_pct_margin": -0.5212488322289963,

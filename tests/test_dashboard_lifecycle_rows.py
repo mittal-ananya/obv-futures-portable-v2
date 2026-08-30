@@ -119,3 +119,30 @@ def test_closed_t2_ledger_row_supersedes_model_state_open_row(tmp_path, monkeypa
     assert len(t2_rows) == 1
     assert t2_rows[0]["status"] == "closed"
     assert t2_rows[0]["exit_epoch"] == 1787803375
+
+
+def test_open_dashboard_row_prefers_mark_to_market_fields():
+    row = dashboard.normalize_row(
+        symbol="DMART",
+        tranche="T1",
+        status="open",
+        margins={},
+        source={
+            "position_id": "p1",
+            "side": "long",
+            "entry_epoch": 1787908800,
+            "latest_epoch": 1787911200,
+            "net_rupees": 100.0,
+            "net_rupees_if_closed": 250.0,
+            "gross_rupees": 125.0,
+            "gross_rupees_if_closed": 300.0,
+            "charges_rupees": 25.0,
+            "charges_rupees_if_closed": 50.0,
+            "entry_margin_used_rupees": 1000.0,
+        },
+    )
+
+    assert row["net_rupees"] == 250.0
+    assert row["gross_rupees"] == 300.0
+    assert row["charges_rupees"] == 50.0
+    assert row["net_pct_margin"] == 25.0

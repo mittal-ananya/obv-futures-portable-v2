@@ -181,6 +181,27 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def row_key(row: dict[str, Any]) -> tuple[Any, ...]:
+    return (
+        row.get("tranche"),
+        row.get("symbol"),
+        row.get("position_id"),
+        parse_epoch(row.get("entry_epoch")),
+        parse_epoch(row.get("exit_epoch")),
+        row.get("status"),
+    )
+
+
+def lifecycle_row_key(row: dict[str, Any]) -> tuple[Any, ...] | None:
+    position_id = str(row.get("position_id") or "")
+    entry_epoch = parse_epoch(row.get("entry_epoch"))
+    tranche = str(row.get("tranche") or "")
+    symbol = str(row.get("symbol") or "")
+    if not position_id or entry_epoch is None or not tranche or not symbol:
+        return None
+    return (tranche, symbol, position_id, entry_epoch)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-dir", default="/opt/cloud-deploy-candidates/obv-futures-portable-v2/state")
@@ -200,6 +221,33 @@ def main() -> int:
     rows_by_tranche: dict[str, list[dict[str, Any]]] = {"T1": [], "T2": [], "T3": []}
     t2_seen: set[tuple[Any, ...]] = set()
     t3_seen: set[tuple[Any, ...]] = set()
+    seen: set[tuple[Any, ...]] = set()
+    lifecycle_rows: dict[tuple[Any, ...], dict[str, Any]] = {}
+
+    def add(row: dict[str, Any]) -> None:
+        key = row_key(row)
+        if key in seen:
+            return
+        lifecycle_key = lifecycle_row_key(row)
+        status = str(row.get("status") or "")
+        if lifecycle_key is not None:
+            existing = lifecycle_rows.get(lifecycle_key)
+            existing_status = str(existing.get("status") or "") if existing else ""
+            if existing is not None:
+                if existing_status != "closed" and status == "closed":
+                    existing_tranche = str(existing.get("tranche") or "")
+                    try:
+                        rows_by_tranche.setdefault(existing_tranche, []).remove(existing)
+                    except ValueError:
+                        pass
+                    seen.add(key)
+                    lifecycle_rows[lifecycle_key] = row
+                    rows_by_tranche.setdefault(str(row.get("tranche")), []).append(row)
+                return
+        seen.add(key)
+        if lifecycle_key is not None:
+            lifecycle_rows[lifecycle_key] = row
+        rows_by_tranche.setdefault(str(row.get("tranche")), []).append(row)
 
     for instrument_dir in sorted((state_dir / "instruments").glob("*")):
         if not instrument_dir.is_dir():
@@ -218,7 +266,7 @@ def main() -> int:
                 if entry_epoch is None or entry_epoch < start_epoch:
                     continue
                 if event.get("event") == "paper_exit":
-                    rows_by_tranche["T1"].append(row_from_event(symbol, event, "T1", margins))
+                    add(row_from_event(symbol, event, "T1", margins))
                     ttsl = event.get("two_lot_ttsl") if isinstance(event.get("two_lot_ttsl"), dict) else {}
                     tr2 = ttsl.get("tranche2") if isinstance(ttsl.get("tranche2"), dict) else {}
                     if tr2:
@@ -230,7 +278,7 @@ def main() -> int:
                         )
                         if key not in t2_seen:
                             t2_seen.add(key)
-                            rows_by_tranche["T2"].append(
+                            add(
                                 row_from_nested(
                                     symbol=symbol,
                                     parent=event,
@@ -260,45 +308,44 @@ def main() -> int:
                     key = (symbol, event.get("position_id"), entry_epoch, parse_epoch(event.get("exit_epoch")))
                     if key not in t2_seen:
                         t2_seen.add(key)
-                        rows_by_tranche["T2"].append(row_from_event(symbol, event, "T2", margins))
+                        add(row_from_event(symbol, event, "T2", margins))
                 elif event.get("event") == "tranche3_exit":
                     key = (symbol, event.get("position_id"), entry_epoch, event.get("exit_epoch"))
                     if key not in t3_seen:
                         t3_seen.add(key)
-                        rows_by_tranche["T3"].append(row_from_event(symbol, event, "T3", margins))
+                        add(row_from_event(symbol, event, "T3", margins))
 
         model = read_json(instrument_dir / "model_state.json", {})
         position = model.get("position") if isinstance(model, dict) else None
         if isinstance(position, dict):
             entry_epoch = parse_epoch(position.get("entry_epoch"))
             if entry_epoch is not None and entry_epoch >= start_epoch:
-                rows_by_tranche["T1"].append(
-                    {
-                        "tranche": "T1",
-                        "symbol": symbol,
-                        "status": "open_mark",
-                        "side": position.get("side"),
-                        "signal_source": position.get("signal_source"),
-                        "position_id": position.get("position_id"),
-                        "entry_time": position.get("entry_time"),
-                        "exit_time": position.get("latest_time"),
-                        "exit_reason": "open_mark_to_market_if_closed_now",
-                        "entry_epoch": entry_epoch,
-                        "exit_epoch": parse_epoch(position.get("latest_epoch")),
-                        "gross_rupees": safe_float(position.get("gross_rupees_if_closed")),
-                        "charges_rupees": safe_float(position.get("charges_rupees_if_closed")),
-                        "net_rupees": safe_float(position.get("net_rupees_if_closed")),
-                        "margin_rupees": safe_float(position.get("entry_margin_used_rupees")),
-                        "net_pct_margin": pct(
-                            safe_float(position.get("net_rupees_if_closed")),
-                            safe_float(position.get("entry_margin_used_rupees"))
-                            or lookup_margin(margins, symbol, position.get("side")),
-                        ),
-                    }
-                )
-                rows_by_tranche["T1"][-1]["margin_rupees"] = rows_by_tranche["T1"][-1]["margin_rupees"] or lookup_margin(
+                t1_row = {
+                    "tranche": "T1",
+                    "symbol": symbol,
+                    "status": "open_mark",
+                    "side": position.get("side"),
+                    "signal_source": position.get("signal_source"),
+                    "position_id": position.get("position_id"),
+                    "entry_time": position.get("entry_time"),
+                    "exit_time": position.get("latest_time"),
+                    "exit_reason": "open_mark_to_market_if_closed_now",
+                    "entry_epoch": entry_epoch,
+                    "exit_epoch": parse_epoch(position.get("latest_epoch")),
+                    "gross_rupees": safe_float(position.get("gross_rupees_if_closed")),
+                    "charges_rupees": safe_float(position.get("charges_rupees_if_closed")),
+                    "net_rupees": safe_float(position.get("net_rupees_if_closed")),
+                    "margin_rupees": safe_float(position.get("entry_margin_used_rupees")),
+                    "net_pct_margin": pct(
+                        safe_float(position.get("net_rupees_if_closed")),
+                        safe_float(position.get("entry_margin_used_rupees"))
+                        or lookup_margin(margins, symbol, position.get("side")),
+                    ),
+                }
+                t1_row["margin_rupees"] = t1_row["margin_rupees"] or lookup_margin(
                     margins, symbol, position.get("side")
                 )
+                add(t1_row)
                 ttsl = position.get("two_lot_ttsl") if isinstance(position.get("two_lot_ttsl"), dict) else {}
                 tr2 = ttsl.get("tranche2") if isinstance(ttsl.get("tranche2"), dict) else {}
                 if tr2:
@@ -310,7 +357,7 @@ def main() -> int:
                     )
                     if key not in t2_seen:
                         t2_seen.add(key)
-                        rows_by_tranche["T2"].append(
+                        add(
                             row_from_nested(
                                 symbol=symbol,
                                 parent=position,
@@ -326,7 +373,7 @@ def main() -> int:
                     key = (symbol, position.get("position_id"), tr3_entry_epoch, tr3.get("exit_epoch"))
                     if key not in t3_seen:
                         t3_seen.add(key)
-                        rows_by_tranche["T3"].append(
+                        add(
                             row_from_nested(
                                 symbol=symbol,
                                 parent=position,
