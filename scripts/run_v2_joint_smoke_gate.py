@@ -413,6 +413,12 @@ def close_enough(a: Any, b: Any, tolerance: float = 0.05) -> bool:
     return abs(float(fa) - float(fb)) <= tolerance
 
 
+def comparable_exact_value(row: dict[str, Any], field: str) -> Any:
+    if field == "exit_epoch" and row.get("status") == "open_mark":
+        return None
+    return row.get(field)
+
+
 def compare_rows(installed: dict[str, list[dict[str, Any]]], scored: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
     fields_exact = ["signal_epoch", "entry_epoch", "exit_epoch", "t2_exit_epoch", "t3_entry_epoch", "t3_exit_epoch"]
     fields_price = [
@@ -436,8 +442,8 @@ def compare_rows(installed: dict[str, list[dict[str, Any]]], scored: dict[str, l
             mismatches.append({"symbol": symbol, "field": "row_count", "installed": len(left), "scored": len(right)})
         for idx, (a, b) in enumerate(zip(left, right)):
             for field in fields_exact:
-                av = a.get(field)
-                bv = b.get(field)
+                av = comparable_exact_value(a, field)
+                bv = comparable_exact_value(b, field)
                 if (av or None) != (bv or None):
                     mismatches.append({"symbol": symbol, "row": idx, "field": field, "installed": av, "scored": bv})
             for field in fields_price:

@@ -197,3 +197,4 @@ def test_armed_position_exits_at_session_close_when_floor_not_hit() -> None:
     assert reason == "armed_session_close"
     assert math.isclose(float(ret), 0.0028, abs_tol=1e-12)
     assert math.isclose(float(exit_fill), 100.28, abs_tol=1e-12)
+

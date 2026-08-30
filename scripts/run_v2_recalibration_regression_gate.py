@@ -76,7 +76,8 @@ def static_source_checks(root: Path) -> list[dict[str, Any]]:
             "scorer_retains_selected_second_rows_for_compact_update",
         ),
         check(
-            "_compact_model_clock_position_update" in scorer_text,
+            "_compact_update_tranche3_for_candidate" in scorer_text
+            and "_compact_model_clock_position_update" in runner_text,
             "scorer_uses_compact_open_position_update",
         ),
         check(
