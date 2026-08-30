@@ -25,13 +25,14 @@ if str(SCRIPT_DIR) not in sys.path:
 import backtest_tranche_portfolio_overlay as base  # noqa: E402
 import research_t2_continuation_filters as continuation  # noqa: E402
 import research_t2_mfe_first_profit_capture as overlay_research  # noqa: E402
+import research_t2_overlay_variant_compare as overlay_compare  # noqa: E402
 import research_t2_overlay_portfolios as portfolio_research  # noqa: E402
 import run_v2matrix_overlay as live_overlay  # noqa: E402
 from backfill_v2matrix_history import enriched_matrix_events, load_matrix_module, now_ist_iso, write_json, write_jsonl  # noqa: E402
 
 
 SCHEMA = "obvfutport_v2.v2matrix_research_portfolio_install.v1"
-DEFAULT_VARIANTS = ("smooth_survivor_armed20_floor80", "smooth_survivor_profit25")
+DEFAULT_VARIANTS = live_overlay.PORTFOLIO_VARIANTS
 
 
 def json_clean(value: Any) -> Any:
@@ -73,7 +74,7 @@ def variant_overlay_name(variant: str) -> str:
     return str(live_overlay.variant_config(variant).get("name") or variant)
 
 
-def expected_summary_from_csv(path: Path, *, variants: set[str], max_positions: int) -> dict[str, dict[str, Any]]:
+def expected_summary_from_csv(path: Path, *, variants: set[str], max_positions: int | None) -> dict[str, dict[str, Any]]:
     if not path.exists():
         return {}
     out: dict[str, dict[str, Any]] = {}
@@ -82,7 +83,7 @@ def expected_summary_from_csv(path: Path, *, variants: set[str], max_positions: 
             variant = str(row.get("variant") or "")
             if variant not in variants:
                 continue
-            if str(row.get("max_positions") or "") != str(max_positions):
+            if max_positions is not None and str(row.get("max_positions") or "") != str(max_positions):
                 continue
             repl = str(row.get("replacement_policy") or "none")
             if repl != "none":
@@ -146,14 +147,25 @@ def portfolio_state_from_research_result(
     variant: str,
     result: dict[str, Any],
     initial_capital: float,
-    max_positions: int,
 ) -> dict[str, Any]:
+    definition = live_overlay.portfolio_def(variant)
     key = portfolio_key(variant)
     portfolio = {
         "portfolio_id": key,
         "source_research_portfolio_id": result["summary"].get("portfolio_id"),
         "variant": variant,
-        "rule": f"fixed Rs 5L per entry / no replacement / max {max_positions}",
+        "label": definition.label,
+        "rule": (
+            f"fixed Rs 5L per entry / no replacement / max {definition.max_positions}"
+            f" / requalify={definition.requalify}"
+            f" / cooldown={definition.cooldown_minutes}m"
+            f" / max_entries_per_t2_leg={definition.max_entries_per_t2_leg}"
+        ),
+        "max_positions": definition.max_positions,
+        "fixed_entry_margin_rupees": definition.fixed_entry_margin,
+        "requalify": definition.requalify,
+        "cooldown_minutes": definition.cooldown_minutes,
+        "max_entries_per_t2_leg": definition.max_entries_per_t2_leg,
         "cash_rupees": float(initial_capital),
         "peak_margin_rupees": 0.0,
         "holdings": {},
@@ -168,7 +180,7 @@ def portfolio_state_from_research_result(
         symbol = str(row.get("symbol") or "").upper()
         entry_epoch = base.as_int(row.get("entry_epoch")) or 0
         mapped_row_id = live_row_id(research_row_id, symbol=symbol, entry_epoch=entry_epoch)
-        overlay_key_value = live_overlay.overlay_key(variant, mapped_row_id)
+        overlay_key_value = live_overlay.overlay_key(variant, mapped_row_id, entry_epoch)
         row["portfolio_id"] = key
         row["source_research_portfolio_id"] = result["summary"].get("portfolio_id")
         row["research_row_id"] = research_row_id
@@ -288,6 +300,146 @@ def matrix_payload_from_candidate(
     }
 
 
+def numeric_series(frame: pd.DataFrame, column: str) -> pd.Series:
+    if column not in frame.columns:
+        return pd.Series([math.nan] * len(frame), index=frame.index, dtype="float64")
+    return pd.to_numeric(frame[column], errors="coerce")
+
+
+def passing_rows(frame: pd.DataFrame, policy: live_overlay.portfolio_rules.Policy) -> pd.DataFrame:
+    if frame.empty:
+        return frame
+    score_column = f"score_{policy.formula}"
+    score = numeric_series(frame, score_column)
+    mask = score >= policy.min_score
+    mask &= numeric_series(frame, "age_minutes") >= policy.min_age_minutes
+    if policy.max_age_minutes is not None:
+        mask &= numeric_series(frame, "age_minutes") <= float(policy.max_age_minutes)
+    if policy.min_current_ret is not None:
+        mask &= numeric_series(frame, "current_ret") >= float(policy.min_current_ret)
+    if policy.min_mfe is not None:
+        mask &= numeric_series(frame, "mfe") >= float(policy.min_mfe)
+    if policy.max_mae_abs is not None:
+        mask &= numeric_series(frame, "mae_abs") <= float(policy.max_mae_abs)
+    if policy.max_drawdown_to_mfe is not None:
+        mask &= numeric_series(frame, "drawdown_to_mfe") <= float(policy.max_drawdown_to_mfe)
+    if policy.min_positive_ram_count:
+        mask &= numeric_series(frame, "positive_ram_count") >= int(policy.min_positive_ram_count)
+    if policy.max_spread_bps is not None:
+        mask &= numeric_series(frame, "spread_bps") <= float(policy.max_spread_bps)
+    if policy.min_edge_cost_multiple is not None:
+        mask &= numeric_series(frame, "edge_to_cost_multiple") >= float(policy.min_edge_cost_multiple)
+    if policy.min_minutes_to_session_end is not None:
+        mask &= numeric_series(frame, "minutes_to_session_end") >= float(policy.min_minutes_to_session_end)
+    passed = frame.loc[mask].copy()
+    if passed.empty:
+        return passed
+    passed["portfolio_score"] = score.loc[passed.index]
+    return passed.sort_values(["row_id", "clock_epoch"], kind="mergesort")
+
+
+def candidate_from_metrics(
+    *,
+    variant: str,
+    policy: live_overlay.portfolio_rules.Policy,
+    config: dict[str, Any],
+    row: dict[str, Any],
+) -> portfolio_research.Candidate | None:
+    score_column = f"score_{policy.formula}"
+    score = base.as_float(row["window"].iloc[0].get(score_column))
+    if score is None:
+        return None
+    exit_row = overlay_compare.choose_exit(row, config, score_column, policy.min_score)
+    entry_epoch = int(row["qualification_epoch"])
+    exit_epoch = int(exit_row["exit_epoch"])
+    if exit_epoch <= entry_epoch:
+        return None
+    return portfolio_research.Candidate(
+        variant=variant,
+        policy_name=policy.name,
+        overlay=str(config["name"]),
+        row_id=str(row["row_id"]),
+        symbol=str(row["symbol"]),
+        side=str(row["side"]),
+        entry_epoch=entry_epoch,
+        exit_epoch=exit_epoch,
+        exit_reason=str(exit_row["exit_reason"]),
+        entry_fill_price=float(row["entry_fill_price"]),
+        exit_fill_price=float(exit_row["exit_price"]),
+        margin_per_lot=float(row["margin_per_lot"]),
+        lot_size=int(row.get("lot_size") or 1),
+        score=float(score),
+        score_column=score_column,
+        window=row["window"],
+    )
+
+
+def build_candidates_for_definition(
+    *,
+    frame: pd.DataFrame,
+    path_lookup: dict[str, pd.DataFrame],
+    definition: live_overlay.PortfolioVariantDefinition,
+    mae_floor: float,
+) -> list[portfolio_research.Candidate]:
+    passed = passing_rows(frame, definition.policy)
+    if passed.empty:
+        return []
+    config = dict(definition.overlay)
+    candidates: list[portfolio_research.Candidate] = []
+    if not definition.requalify:
+        first = passed.drop_duplicates("row_id", keep="first")
+        for raw in first.itertuples(index=False):
+            metrics = overlay_research.path_metrics(raw, path_lookup, mae_floor, include_window=True)
+            if not metrics.get("ok"):
+                continue
+            candidate = candidate_from_metrics(variant=definition.name, policy=definition.policy, config=config, row=metrics)
+            if candidate is not None:
+                candidates.append(candidate)
+        return portfolio_research.dedupe_candidates(candidates)
+
+    cooldown_seconds = int(definition.cooldown_minutes) * 60
+    for _row_id, group in passed.groupby("row_id", sort=False):
+        next_allowed_epoch = -1
+        entry_count = 0
+        for raw in group.itertuples(index=False):
+            clock_epoch = base.as_int(getattr(raw, "clock_epoch", None))
+            if clock_epoch is None:
+                continue
+            if clock_epoch < next_allowed_epoch:
+                continue
+            if entry_count >= int(definition.max_entries_per_t2_leg):
+                break
+            metrics = overlay_research.path_metrics(raw, path_lookup, mae_floor, include_window=True)
+            if not metrics.get("ok"):
+                continue
+            candidate = candidate_from_metrics(variant=definition.name, policy=definition.policy, config=config, row=metrics)
+            if candidate is None:
+                continue
+            candidates.append(candidate)
+            entry_count += 1
+            next_allowed_epoch = int(candidate.exit_epoch) + cooldown_seconds
+    return portfolio_research.dedupe_candidates(candidates)
+
+
+def build_live_variant_candidates(
+    *,
+    frame: pd.DataFrame,
+    path_lookup: dict[str, pd.DataFrame],
+    variants: tuple[str, ...],
+    mae_floor: float,
+) -> dict[str, list[portfolio_research.Candidate]]:
+    out: dict[str, list[portfolio_research.Candidate]] = {}
+    for variant in variants:
+        definition = live_overlay.portfolio_def(variant)
+        out[variant] = build_candidates_for_definition(
+            frame=frame,
+            path_lookup=path_lookup,
+            definition=definition,
+            mae_floor=mae_floor,
+        )
+    return out
+
+
 def overlay_state_from_candidates(
     *,
     candidates_by_variant: dict[str, list[portfolio_research.Candidate]],
@@ -302,6 +454,7 @@ def overlay_state_from_candidates(
         "portfolio_variants": list(variants),
         "active_overlay": {},
         "completed_overlay_keys": [],
+        "completed_overlay_history": {},
         "posted_event_ids": [],
         "installed_from_research": True,
     }
@@ -312,7 +465,7 @@ def overlay_state_from_candidates(
     for variant in variants:
         for candidate in candidates_by_variant.get(variant, []):
             row_id = live_row_id(candidate.row_id, symbol=candidate.symbol, entry_epoch=candidate.entry_epoch)
-            key = live_overlay.overlay_key(variant, row_id)
+            key = live_overlay.overlay_key(variant, row_id, int(candidate.entry_epoch))
             position_id = source_position_id(candidate.row_id)
             position = live_overlay.OverlayPosition(
                 variant=variant,
@@ -365,6 +518,14 @@ def overlay_state_from_candidates(
                 )
             if int(candidate.exit_epoch) <= int(final_epoch):
                 completed.add(key)
+                live_overlay.record_completed_overlay(
+                    state,
+                    variant=variant,
+                    row_id=row_id,
+                    key=key,
+                    exit_epoch=int(candidate.exit_epoch),
+                    exit_reason=candidate.exit_reason,
+                )
                 exit_event = {
                     "schema": live_overlay.SCHEMA,
                     "event": "overlay_exit",
@@ -404,8 +565,9 @@ def overlay_state_from_candidates(
                 returns = pd.to_numeric(candidate.window.get("forward_return"), errors="coerce").dropna()
                 peak = float(returns.max()) if not returns.empty else 0.0
                 position.peak_return = max(0.0, peak)
-                if variant == "smooth_survivor_armed20_floor80":
-                    position.armed = position.peak_return >= 0.0020
+                config = live_overlay.variant_config(variant)
+                if str(config.get("kind")) == "armed_peak_floor":
+                    position.armed = position.peak_return >= float(config.get("arm_target") or 0.0)
                 active[key] = asdict(position)
     state["completed_overlay_keys"] = sorted(completed)
     state["posted_event_ids"] = sorted(str(row.get("event_id") or "") for row in matrix_payloads if row.get("event_id"))
@@ -436,12 +598,18 @@ def summarize_installed_portfolio(portfolio: dict[str, Any]) -> dict[str, Any]:
     realized = sum(float(row.get("net_rupees") or 0.0) for row in exits)
     peak_margin = float(portfolio.get("peak_margin_rupees") or 0.0)
     portfolio_success = (len(wins) / len(exits) * 100.0) if exits else None
+    variant = str(portfolio.get("variant") or "")
+    definition = live_overlay.portfolio_def(variant) if variant in live_overlay.PORTFOLIO_DEFINITIONS else None
     return {
         "portfolio_id": portfolio.get("portfolio_id"),
-        "variant": portfolio.get("variant"),
+        "variant": variant,
+        "label": definition.label if definition is not None else portfolio.get("label"),
         "rule": portfolio.get("rule"),
-        "max_positions": live_overlay.MAX_PORTFOLIO_POSITIONS,
-        "fixed_entry_margin_rupees": live_overlay.FIXED_ENTRY_MARGIN,
+        "max_positions": definition.max_positions if definition is not None else portfolio.get("max_positions"),
+        "fixed_entry_margin_rupees": definition.fixed_entry_margin if definition is not None else portfolio.get("fixed_entry_margin_rupees"),
+        "requalify": definition.requalify if definition is not None else portfolio.get("requalify"),
+        "cooldown_minutes": definition.cooldown_minutes if definition is not None else portfolio.get("cooldown_minutes"),
+        "max_entries_per_t2_leg": definition.max_entries_per_t2_leg if definition is not None else portfolio.get("max_entries_per_t2_leg"),
         "open_positions": len(portfolio.get("holdings") or {}),
         "closed_trades": len(exits),
         "wins": len(wins),
@@ -531,28 +699,26 @@ def main() -> int:
 
     frame = pd.read_parquet(args.opportunity_frame)
     path_lookup = overlay_research.build_path_lookup(frame)
-    policies = {policy.name: policy for policy in continuation.continuation_policy_grid()}
-    candidates_by_variant = portfolio_research.build_candidates(
+    candidates_by_variant = build_live_variant_candidates(
         frame=frame,
         path_lookup=path_lookup,
-        policies=policies,
-        v1_portfolio=v1_portfolio,
+        variants=variants,
         mae_floor=float(args.mae_floor),
     )
-    candidates_by_variant = {variant: candidates_by_variant.get(variant, []) for variant in variants}
     replacement = portfolio_research.ReplacementPolicy(name="none", enabled=False)
     portfolio_results: dict[str, dict[str, Any]] = {}
     portfolio_summaries: list[dict[str, Any]] = []
     portfolios: dict[str, dict[str, Any]] = {}
     for variant in variants:
+        definition = live_overlay.portfolio_def(variant)
         result = portfolio_research.run_portfolio(
             variant=variant,
             candidates=candidates_by_variant.get(variant, []),
-            max_positions=int(args.max_positions),
+            max_positions=int(definition.max_positions),
             initial_capital=float(args.initial_capital),
             v1_portfolio=v1_portfolio,
             sizing_mode="fixed_entry_margin_unconstrained",
-            fixed_entry_margin=float(args.fixed_entry_margin),
+            fixed_entry_margin=float(definition.fixed_entry_margin),
             replacement_policy=replacement,
         )
         portfolio_results[variant] = result
@@ -560,7 +726,6 @@ def main() -> int:
             variant=variant,
             result=result,
             initial_capital=float(args.initial_capital),
-            max_positions=int(args.max_positions),
         )
         signal_summary = all_qualified_signal_summary(
             variant=variant,
@@ -609,7 +774,7 @@ def main() -> int:
     expected = expected_summary_from_csv(
         args.expected_summary_csv,
         variants=set(variants),
-        max_positions=int(args.max_positions),
+        max_positions=None,
     ) if args.expected_summary_csv else {}
     summary_mismatches: list[dict[str, Any]] = []
     for variant, expected_row in expected.items():
@@ -642,10 +807,11 @@ def main() -> int:
         "primary_variant": args.primary_variant,
         "portfolio_definition": {
             "initial_capital_rupees": float(args.initial_capital),
-            "fixed_entry_margin_rupees": float(args.fixed_entry_margin),
-            "max_positions": int(args.max_positions),
+            "fixed_entry_margin_rupees": "per_portfolio_variant",
+            "max_positions": "per_portfolio_variant",
             "cash_constraint": False,
             "replacement": "none",
+            "portfolio_variants": [asdict(live_overlay.portfolio_def(variant)) for variant in variants],
         },
         "candidate_counts": {variant: len(candidates_by_variant.get(variant, [])) for variant in variants},
         "portfolio_summaries": portfolio_summaries,

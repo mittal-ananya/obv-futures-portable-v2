@@ -29,31 +29,150 @@ import research_t2_portfolio_rules as portfolio_rules  # noqa: E402
 IST = ZoneInfo("Asia/Kolkata")
 SCHEMA = "obvfutport_v2.v2matrix_overlay_state.v1"
 PRIMARY_VARIANT = "smooth_survivor_armed20_floor80"
-PORTFOLIO_VARIANTS = ("smooth_survivor_armed20_floor80", "smooth_survivor_profit25")
 FIXED_ENTRY_MARGIN = 500_000.0
 MAX_PORTFOLIO_POSITIONS = 3
-POLICY = portfolio_rules.Policy(
-    name="smooth_survivor_tight_risk_score0p80_age60to240_runway0",
-    formula="smooth_survivor",
-    min_score=0.80,
-    min_age_minutes=60.0,
-    max_age_minutes=240.0,
-    min_current_ret=0.0005,
-    min_mfe=0.0015,
-    max_mae_abs=0.0030,
-    max_drawdown_from_mfe=None,
-    max_drawdown_to_mfe=0.50,
-    min_positive_ram_count=2,
-    max_spread_bps=12.0,
-    min_edge_cost_multiple=5.0,
-    min_minutes_to_session_end=0.0,
-    allow_replacement=False,
-    min_hold_minutes=0,
-    replacement_gap=0.0,
-    replace_only_if_held_score_below=None,
-    replace_only_if_held_ret_below=None,
-    max_replacements_per_day=None,
-)
+
+
+@dataclass(frozen=True)
+class PortfolioVariantDefinition:
+    name: str
+    label: str
+    policy: portfolio_rules.Policy
+    overlay: dict[str, Any]
+    max_positions: int = MAX_PORTFOLIO_POSITIONS
+    fixed_entry_margin: float = FIXED_ENTRY_MARGIN
+    requalify: bool = False
+    cooldown_minutes: int = 0
+    max_entries_per_t2_leg: int = 1
+
+
+def smooth_survivor_policy(*, min_age_minutes: float) -> portfolio_rules.Policy:
+    return portfolio_rules.Policy(
+        name=f"smooth_survivor_tight_risk_score0p80_age{int(min_age_minutes)}to240_runway0",
+        formula="smooth_survivor",
+        min_score=0.80,
+        min_age_minutes=float(min_age_minutes),
+        max_age_minutes=240.0,
+        min_current_ret=0.0005,
+        min_mfe=0.0015,
+        max_mae_abs=0.0030,
+        max_drawdown_from_mfe=None,
+        max_drawdown_to_mfe=0.50,
+        min_positive_ram_count=2,
+        max_spread_bps=12.0,
+        min_edge_cost_multiple=5.0,
+        min_minutes_to_session_end=0.0,
+        allow_replacement=False,
+        min_hold_minutes=0,
+        replacement_gap=0.0,
+        replace_only_if_held_score_below=None,
+        replace_only_if_held_ret_below=None,
+        max_replacements_per_day=None,
+    )
+
+
+POLICY = smooth_survivor_policy(min_age_minutes=60.0)
+POLICY_AGE0 = smooth_survivor_policy(min_age_minutes=0.0)
+
+
+def armed20_floor80_overlay(*, hard_stop: float | None = None) -> dict[str, Any]:
+    config: dict[str, Any] = {
+        "name": "armed20bps_floor80pct_peak" if hard_stop is None else "armed20bps_floor80pct_peak_stop100bps",
+        "kind": "armed_peak_floor",
+        "arm_target": 0.0020,
+        "floor_fraction": 0.80,
+    }
+    if hard_stop is not None:
+        config["hard_stop"] = float(hard_stop)
+    return config
+
+
+def profit25_overlay(*, hard_stop: float | None = None) -> dict[str, Any]:
+    if hard_stop is None:
+        return {"name": "profit_25bps", "kind": "profit", "target": 0.0025}
+    return {
+        "name": "profit_25bps_stop100bps",
+        "kind": "profit_stop_or_failure",
+        "target": 0.0025,
+        "hard_stop": float(hard_stop),
+        "max_wait_minutes": 0,
+        "failure_floor": 0.0,
+    }
+
+
+PORTFOLIO_DEFINITIONS: dict[str, PortfolioVariantDefinition] = {
+    "smooth_survivor_armed20_floor80": PortfolioVariantDefinition(
+        name="smooth_survivor_armed20_floor80",
+        label="Armed20 Floor80 / age60 / max3 / no stop / first only",
+        policy=POLICY,
+        overlay=armed20_floor80_overlay(),
+    ),
+    "smooth_survivor_profit25": PortfolioVariantDefinition(
+        name="smooth_survivor_profit25",
+        label="Profit25 / age60 / max3 / no stop / first only",
+        policy=POLICY,
+        overlay=profit25_overlay(),
+    ),
+    "smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3": PortfolioVariantDefinition(
+        name="smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3",
+        label="Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+        policy=POLICY,
+        overlay=armed20_floor80_overlay(),
+        requalify=True,
+        cooldown_minutes=0,
+        max_entries_per_t2_leg=3,
+    ),
+    "smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3": PortfolioVariantDefinition(
+        name="smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3",
+        label="Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+        policy=POLICY_AGE0,
+        overlay=armed20_floor80_overlay(hard_stop=0.0100),
+        max_positions=5,
+        requalify=True,
+        cooldown_minutes=0,
+        max_entries_per_t2_leg=3,
+    ),
+    "smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2": PortfolioVariantDefinition(
+        name="smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2",
+        label="Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+        policy=POLICY_AGE0,
+        overlay=armed20_floor80_overlay(hard_stop=0.0100),
+        max_positions=5,
+        requalify=True,
+        cooldown_minutes=15,
+        max_entries_per_t2_leg=2,
+    ),
+    "smooth_survivor_profit25_age60_max3_requal_cd0_max3": PortfolioVariantDefinition(
+        name="smooth_survivor_profit25_age60_max3_requal_cd0_max3",
+        label="Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+        policy=POLICY,
+        overlay=profit25_overlay(),
+        requalify=True,
+        cooldown_minutes=0,
+        max_entries_per_t2_leg=3,
+    ),
+    "smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3": PortfolioVariantDefinition(
+        name="smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3",
+        label="Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+        policy=POLICY_AGE0,
+        overlay=profit25_overlay(hard_stop=0.0100),
+        max_positions=5,
+        requalify=True,
+        cooldown_minutes=0,
+        max_entries_per_t2_leg=3,
+    ),
+    "smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2": PortfolioVariantDefinition(
+        name="smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2",
+        label="Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+        policy=POLICY_AGE0,
+        overlay=profit25_overlay(hard_stop=0.0100),
+        max_positions=5,
+        requalify=True,
+        cooldown_minutes=15,
+        max_entries_per_t2_leg=2,
+    ),
+}
+PORTFOLIO_VARIANTS = tuple(PORTFOLIO_DEFINITIONS)
 
 
 @dataclass
@@ -709,20 +828,104 @@ def build_features(
     return out, stats
 
 
-def candidate_passes(feature: dict[str, Any]) -> bool:
-    return portfolio_rules.candidate_passes_policy(feature, POLICY)
+def portfolio_def(variant: str) -> PortfolioVariantDefinition:
+    try:
+        return PORTFOLIO_DEFINITIONS[variant]
+    except KeyError as exc:
+        raise ValueError(f"unknown overlay variant {variant!r}") from exc
+
+
+def candidate_passes(feature: dict[str, Any], policy: portfolio_rules.Policy | None = None) -> bool:
+    return portfolio_rules.candidate_passes_policy(feature, policy or POLICY)
 
 
 def variant_config(variant: str) -> dict[str, Any]:
-    if variant == "smooth_survivor_armed20_floor80":
-        return {"name": "armed20bps_floor80pct_peak", "kind": "armed_peak_floor", "arm_target": 0.0020, "floor_fraction": 0.80}
-    if variant == "smooth_survivor_profit25":
-        return {"name": "profit_25bps", "kind": "profit", "target": 0.0025}
-    raise ValueError(f"unknown overlay variant {variant!r}")
+    return dict(portfolio_def(variant).overlay)
 
 
-def overlay_key(variant: str, row_id: str) -> str:
+def variant_policy(variant: str) -> portfolio_rules.Policy:
+    return portfolio_def(variant).policy
+
+
+def variant_label(variant: str) -> str:
+    return portfolio_def(variant).label
+
+
+def overlay_scope_key(variant: str, row_id: str) -> str:
     return f"{variant}|{row_id}"
+
+
+def overlay_key(variant: str, row_id: str, entry_epoch: int | None = None) -> str:
+    if portfolio_def(variant).requalify:
+        if entry_epoch is None:
+            raise ValueError(f"entry_epoch is required for requalifying overlay variant {variant!r}")
+        return f"{overlay_scope_key(variant, row_id)}|entry{int(entry_epoch)}"
+    return overlay_scope_key(variant, row_id)
+
+
+def completed_history_for_scope(state: dict[str, Any], variant: str, row_id: str) -> list[dict[str, Any]]:
+    scope = overlay_scope_key(variant, row_id)
+    history = state.setdefault("completed_overlay_history", {})
+    records = history.get(scope)
+    if isinstance(records, list):
+        return [item for item in records if isinstance(item, dict)]
+    completed_keys = state.get("completed_overlay_keys") if isinstance(state.get("completed_overlay_keys"), list) else []
+    fallback = [{"overlay_key": key, "exit_epoch": None} for key in completed_keys if str(key).startswith(f"{scope}|")]
+    if fallback:
+        history[scope] = fallback
+    return fallback
+
+
+def record_completed_overlay(
+    state: dict[str, Any],
+    *,
+    variant: str,
+    row_id: str,
+    key: str,
+    exit_epoch: int,
+    exit_reason: str,
+) -> None:
+    scope = overlay_scope_key(variant, row_id)
+    history = state.setdefault("completed_overlay_history", {})
+    records = history.setdefault(scope, [])
+    if not any(isinstance(item, dict) and item.get("overlay_key") == key for item in records):
+        records.append({"overlay_key": key, "exit_epoch": int(exit_epoch), "exit_reason": exit_reason})
+
+
+def active_scope_exists(active_overlay: dict[str, Any], variant: str, row_id: str) -> bool:
+    for payload in active_overlay.values():
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("variant") == variant and payload.get("row_id") == row_id:
+            return True
+    return False
+
+
+def can_open_overlay(
+    state: dict[str, Any],
+    *,
+    variant: str,
+    row_id: str,
+    clock_epoch: int,
+    active_overlay: dict[str, Any],
+    completed_overlay: set[str],
+) -> tuple[bool, str]:
+    definition = portfolio_def(variant)
+    if active_scope_exists(active_overlay, variant, row_id):
+        return False, "already_active_for_t2_leg"
+    if not definition.requalify:
+        key = overlay_key(variant, row_id)
+        if key in active_overlay or key in completed_overlay:
+            return False, "already_completed_for_t2_leg"
+        return True, "ok"
+    records = completed_history_for_scope(state, variant, row_id)
+    if len(records) >= int(definition.max_entries_per_t2_leg):
+        return False, "max_entries_per_t2_leg_reached"
+    exit_epochs = [parse_epoch(row.get("exit_epoch")) for row in records if isinstance(row, dict)]
+    last_exit_epoch = max([value for value in exit_epochs if value is not None], default=None)
+    if last_exit_epoch is not None and int(clock_epoch) < last_exit_epoch + int(definition.cooldown_minutes) * 60:
+        return False, "requalify_cooldown_active"
+    return True, "ok"
 
 
 def dict_to_overlay_position(payload: dict[str, Any]) -> OverlayPosition:
@@ -776,9 +979,20 @@ def should_exit_overlay(
 ) -> tuple[bool, str, float | None, float | None, dict[str, Any] | None]:
     ret, exit_fill, fill = overlay_return(index, v1_portfolio, leg, position, clock_epoch)
     config = variant_config(variant)
+    hard_stop = config.get("hard_stop")
+    hard_stop_value = float(hard_stop) if hard_stop is not None else None
+    if ret is not None and hard_stop_value is not None and ret <= -hard_stop_value:
+        return True, "adverse_stop", ret, exit_fill, fill
     if ret is not None and config["kind"] == "profit":
         if ret >= float(config["target"]):
             return True, "profit_capture", ret, exit_fill, fill
+    elif ret is not None and config["kind"] == "profit_stop_or_failure":
+        if ret >= float(config["target"]):
+            return True, "profit_capture", ret, exit_fill, fill
+        max_wait_seconds = int(config.get("max_wait_minutes") or 0) * 60
+        failure_floor = float(config.get("failure_floor") or 0.0)
+        if max_wait_seconds > 0 and clock_epoch - position.entry_epoch >= max_wait_seconds and ret <= failure_floor:
+            return True, "target_timeout_failure", ret, exit_fill, fill
     elif ret is not None and config["kind"] == "armed_peak_floor":
         position.peak_return = max(position.peak_return, ret)
         if not position.armed and ret >= float(config["arm_target"]):
@@ -842,7 +1056,7 @@ def matrix_payload(
         "matrix_selected_leg": "T2_smooth_survivor_overlay",
         "matrix_selection_rule": variant,
         "overlay_variant": variant,
-        "overlay_policy": POLICY.name,
+        "overlay_policy": variant_policy(variant).name,
         "overlay_score": position.entry_score if features is None else features.get("portfolio_score"),
         "overlay_row_id": leg.row_id,
         "position_id": f"{variant}:{leg.position_id}",
@@ -876,7 +1090,9 @@ def post_matrix_events(url: str, payloads: list[dict[str, Any]], dry_run: bool) 
 
 
 def portfolio_key(variant: str) -> str:
-    return f"fixed5L_no_replacement_max3_{variant}"
+    definition = portfolio_def(variant)
+    margin_lakhs = int(round(float(definition.fixed_entry_margin) / 100_000.0))
+    return f"fixed{margin_lakhs}L_no_replacement_max{definition.max_positions}_{variant}"
 
 
 def portfolio_summary(portfolio: dict[str, Any], index: QuoteRingIndex, v1_portfolio: Any, legs: dict[str, base.TrancheLeg], clock_epoch: int) -> dict[str, Any]:
@@ -901,12 +1117,18 @@ def portfolio_summary(portfolio: dict[str, Any], index: QuoteRingIndex, v1_portf
     wins = [row for row in exits if float(row.get("net_rupees") or 0.0) > 0]
     peak_margin = max(float(portfolio.get("peak_margin_rupees") or 0.0), sum(h.margin_locked for h in holdings.values()))
     portfolio_success = (len(wins) / len(exits) * 100.0) if exits else None
+    variant = str(portfolio.get("variant") or "")
+    definition = portfolio_def(variant) if variant in PORTFOLIO_DEFINITIONS else None
     return {
         "portfolio_id": portfolio.get("portfolio_id"),
-        "variant": portfolio.get("variant"),
+        "variant": variant,
+        "label": definition.label if definition is not None else portfolio.get("label"),
         "rule": portfolio.get("rule"),
-        "max_positions": MAX_PORTFOLIO_POSITIONS,
-        "fixed_entry_margin_rupees": FIXED_ENTRY_MARGIN,
+        "max_positions": definition.max_positions if definition is not None else portfolio.get("max_positions"),
+        "fixed_entry_margin_rupees": definition.fixed_entry_margin if definition is not None else portfolio.get("fixed_entry_margin_rupees"),
+        "requalify": definition.requalify if definition is not None else portfolio.get("requalify"),
+        "cooldown_minutes": definition.cooldown_minutes if definition is not None else portfolio.get("cooldown_minutes"),
+        "max_entries_per_t2_leg": definition.max_entries_per_t2_leg if definition is not None else portfolio.get("max_entries_per_t2_leg"),
         "open_positions": len(holdings),
         "closed_trades": len(exits),
         "wins": len(wins),
@@ -974,9 +1196,10 @@ def close_portfolio_holding(
     portfolio["last_event_at_ist"] = epoch_ist_iso(exit_epoch)
 
 
-def open_portfolio_holding(*, portfolio: dict[str, Any], variant: str, position: OverlayPosition, leg: base.TrancheLeg) -> bool:
+def open_portfolio_holding(*, portfolio: dict[str, Any], variant: str, overlay_key_value: str, position: OverlayPosition, leg: base.TrancheLeg) -> bool:
+    definition = portfolio_def(variant)
     holdings = portfolio.setdefault("holdings", {})
-    if len(holdings) >= MAX_PORTFOLIO_POSITIONS:
+    if len(holdings) >= definition.max_positions:
         portfolio.setdefault("diagnostics", {}).setdefault("skipped_slot_full", 0)
         portfolio["diagnostics"]["skipped_slot_full"] += 1
         return False
@@ -984,16 +1207,15 @@ def open_portfolio_holding(*, portfolio: dict[str, Any], variant: str, position:
         portfolio.setdefault("diagnostics", {}).setdefault("skipped_symbol_already_held", 0)
         portfolio["diagnostics"]["skipped_symbol_already_held"] += 1
         return False
-    lots = int(math.floor(FIXED_ENTRY_MARGIN / float(leg.margin_per_lot))) if leg.margin_per_lot > 0 else 0
+    lots = int(math.floor(float(definition.fixed_entry_margin) / float(leg.margin_per_lot))) if leg.margin_per_lot > 0 else 0
     if lots <= 0:
         portfolio.setdefault("diagnostics", {}).setdefault("skipped_margin_too_large", 0)
         portfolio["diagnostics"]["skipped_margin_too_large"] += 1
         return False
-    key = overlay_key(variant, leg.row_id)
     margin_locked = float(leg.margin_per_lot) * lots
     portfolio["cash_rupees"] = float(portfolio.get("cash_rupees") or 0.0) - margin_locked
     holding = PortfolioHolding(
-        overlay_key=key,
+        overlay_key=overlay_key_value,
         row_id=leg.row_id,
         position_id=leg.position_id,
         symbol=leg.symbol,
@@ -1007,7 +1229,7 @@ def open_portfolio_holding(*, portfolio: dict[str, Any], variant: str, position:
         entry_ltp_price=position.entry_ltp_price,
         entry_score=position.entry_score,
     )
-    holdings[key] = asdict(holding)
+    holdings[overlay_key_value] = asdict(holding)
     portfolio["peak_margin_rupees"] = max(float(portfolio.get("peak_margin_rupees") or 0.0), sum(float(item.get("margin_locked") or 0.0) for item in holdings.values() if isinstance(item, dict)))
     portfolio.setdefault("transactions", []).append(
         {
@@ -1017,7 +1239,7 @@ def open_portfolio_holding(*, portfolio: dict[str, Any], variant: str, position:
             "symbol": leg.symbol,
             "side": leg.side,
             "source_t2_position_id": leg.position_id,
-            "overlay_key": key,
+            "overlay_key": overlay_key_value,
             "lots": lots,
             "lot_size": int(leg.lot_size or 1),
             "entry_epoch": position.entry_epoch,
@@ -1033,14 +1255,11 @@ def open_portfolio_holding(*, portfolio: dict[str, Any], variant: str, position:
 
 def ensure_portfolios(state: dict[str, Any]) -> dict[str, Any]:
     portfolios = state.setdefault("portfolios", {})
-    for variant in PORTFOLIO_VARIANTS:
+    for variant, definition in PORTFOLIO_DEFINITIONS.items():
         key = portfolio_key(variant)
-        portfolios.setdefault(
+        portfolio = portfolios.setdefault(
             key,
             {
-                "portfolio_id": key,
-                "variant": variant,
-                "rule": f"fixed Rs 5L per entry / no replacement / max {MAX_PORTFOLIO_POSITIONS}",
                 "cash_rupees": 2_000_000.0,
                 "peak_margin_rupees": 0.0,
                 "holdings": {},
@@ -1048,6 +1267,25 @@ def ensure_portfolios(state: dict[str, Any]) -> dict[str, Any]:
                 "diagnostics": {},
             },
         )
+        if isinstance(portfolio, dict):
+            portfolio.update(
+                {
+                    "portfolio_id": key,
+                    "variant": variant,
+                    "label": definition.label,
+                    "rule": (
+                        f"fixed Rs 5L per entry / no replacement / max {definition.max_positions}"
+                        f" / requalify={definition.requalify}"
+                        f" / cooldown={definition.cooldown_minutes}m"
+                        f" / max_entries_per_t2_leg={definition.max_entries_per_t2_leg}"
+                    ),
+                    "max_positions": definition.max_positions,
+                    "fixed_entry_margin_rupees": definition.fixed_entry_margin,
+                    "requalify": definition.requalify,
+                    "cooldown_minutes": definition.cooldown_minutes,
+                    "max_entries_per_t2_leg": definition.max_entries_per_t2_leg,
+                }
+            )
     return portfolios
 
 
@@ -1105,12 +1343,20 @@ def run_clock(
             continue
         active_overlay.pop(key, None)
         completed_overlay.add(key)
+        record_completed_overlay(
+            state,
+            variant=position.variant,
+            row_id=position.row_id,
+            key=key,
+            exit_epoch=clock_epoch,
+            exit_reason=exit_reason,
+        )
         event = {
             "schema": SCHEMA,
             "event": "overlay_exit",
             "overlay_key": key,
             "variant": position.variant,
-            "policy": POLICY.name,
+            "policy": variant_policy(position.variant).name,
             "source_t2_position_id": leg.position_id,
             "row_id": leg.row_id,
             "symbol": leg.symbol,
@@ -1157,17 +1403,30 @@ def run_clock(
                 )
             )
 
-    eligible = [feature for feature in features.values() if candidate_passes(feature)]
-    eligible.sort(key=lambda row: (float(row.get("portfolio_score") or -1.0), str(row.get("symbol") or ""), str(row.get("row_id") or "")), reverse=True)
-    for feature in eligible:
-        row_id = str(feature["row_id"])
-        leg = legs.get(row_id)
-        if leg is None:
-            continue
-        for variant in PORTFOLIO_VARIANTS:
-            key = overlay_key(variant, row_id)
-            if key in active_overlay or key in completed_overlay:
+    eligible_count_by_variant: dict[str, int] = {}
+    skipped_open_gate: dict[str, int] = {}
+    for variant in PORTFOLIO_VARIANTS:
+        definition = portfolio_def(variant)
+        eligible = [feature for feature in features.values() if candidate_passes(feature, definition.policy)]
+        eligible.sort(key=lambda row: (float(row.get("portfolio_score") or -1.0), str(row.get("symbol") or ""), str(row.get("row_id") or "")), reverse=True)
+        eligible_count_by_variant[variant] = len(eligible)
+        for feature in eligible:
+            row_id = str(feature["row_id"])
+            leg = legs.get(row_id)
+            if leg is None:
                 continue
+            can_open, skip_reason = can_open_overlay(
+                state,
+                variant=variant,
+                row_id=row_id,
+                clock_epoch=clock_epoch,
+                active_overlay=active_overlay,
+                completed_overlay=completed_overlay,
+            )
+            if not can_open:
+                skipped_open_gate[skip_reason] = skipped_open_gate.get(skip_reason, 0) + 1
+                continue
+            key = overlay_key(variant, row_id, clock_epoch)
             fill = execution_fill(index, v1_portfolio, leg, clock_epoch, phase="entry")
             if fill is None:
                 continue
@@ -1209,7 +1468,7 @@ def run_clock(
                 "event": "overlay_entry",
                 "overlay_key": key,
                 "variant": variant,
-                "policy": POLICY.name,
+                "policy": definition.policy.name,
                 "source_t2_position_id": leg.position_id,
                 "row_id": row_id,
                 "symbol": leg.symbol,
@@ -1229,7 +1488,7 @@ def run_clock(
             created_events.append(event)
             portfolio = portfolios.get(portfolio_key(variant))
             if isinstance(portfolio, dict):
-                open_portfolio_holding(portfolio=portfolio, variant=variant, position=position, leg=leg)
+                open_portfolio_holding(portfolio=portfolio, variant=variant, overlay_key_value=key, position=position, leg=leg)
             if variant == PRIMARY_VARIANT:
                 posted_payloads.append(
                     matrix_payload(
@@ -1263,7 +1522,9 @@ def run_clock(
         "active_t2_legs": len(active_legs),
         "required_key_count": len(required_keys),
         "feature_stats": feature_stats,
-        "eligible_count": len(eligible),
+        "eligible_count": sum(eligible_count_by_variant.values()),
+        "eligible_count_by_variant": eligible_count_by_variant,
+        "skipped_open_gate": skipped_open_gate,
         "created_events": len(created_events),
         "matrix_posted": posted,
         "matrix_failed": failed,
@@ -1285,8 +1546,9 @@ def write_portfolio_files(overlay_root: Path, state: dict[str, Any]) -> None:
             "definition": {
                 "source": "canonical OBVFUTPORT-v2 T2 ledgers plus quote-valid target stream",
                 "sizing": "fixed Rs 5L max margin per entry, multi-lot, no cash constraint",
-                "max_positions": MAX_PORTFOLIO_POSITIONS,
+                "max_positions": "per_portfolio_variant",
                 "replacement": "none",
+                "portfolio_variants": [asdict(definition) for definition in PORTFOLIO_DEFINITIONS.values()],
             },
             "summaries": state.get("portfolio_summaries") or [],
             "portfolios": portfolios,
@@ -1318,8 +1580,8 @@ def main() -> int:
         state = {}
     state.setdefault("schema", SCHEMA)
     state.setdefault("created_at_ist", now_ist().isoformat())
-    state.setdefault("primary_variant", PRIMARY_VARIANT)
-    state.setdefault("portfolio_variants", list(PORTFOLIO_VARIANTS))
+    state["primary_variant"] = PRIMARY_VARIANT
+    state["portfolio_variants"] = list(PORTFOLIO_VARIANTS)
     index = QuoteRingIndex(args.quote_retention_seconds)
     hydrate_quote_index_from_state(index, state)
     consecutive_failures = 0

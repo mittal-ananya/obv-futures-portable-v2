@@ -102,13 +102,63 @@ def research_exit(config: dict, returns: list[float], *, start_hour: int = 9, st
 def test_live_policy_and_variants_match_research_definitions() -> None:
     selected = {name: (policy_name, config) for name, policy_name, config in research_portfolios.portfolio_variants()}
 
-    assert set(live.PORTFOLIO_VARIANTS) == {"smooth_survivor_armed20_floor80", "smooth_survivor_profit25"}
-    for variant in live.PORTFOLIO_VARIANTS:
+    assert {
+        "smooth_survivor_armed20_floor80",
+        "smooth_survivor_profit25",
+        "smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3",
+        "smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3",
+        "smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2",
+        "smooth_survivor_profit25_age60_max3_requal_cd0_max3",
+        "smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3",
+        "smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2",
+    } == set(live.PORTFOLIO_VARIANTS)
+    for variant in ("smooth_survivor_armed20_floor80", "smooth_survivor_profit25"):
         policy_name, config = selected[variant]
         assert policy_name == live.POLICY.name
         assert live.variant_config(variant) == config
+        assert live.portfolio_def(variant).max_positions == 3
+        assert not live.portfolio_def(variant).requalify
+    assert live.portfolio_def("smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3").max_positions == 5
+    assert live.portfolio_def("smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3").policy.min_age_minutes == 0.0
+    assert live.portfolio_def("smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3").max_entries_per_t2_leg == 3
+    assert live.portfolio_def("smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2").cooldown_minutes == 15
+    assert live.variant_config("smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3")["kind"] == "profit_stop_or_failure"
     assert live.FIXED_ENTRY_MARGIN == 500_000.0
     assert live.MAX_PORTFOLIO_POSITIONS == 3
+
+
+def test_requalifying_overlay_keys_are_unique_but_legacy_keys_are_stable() -> None:
+    row_id = "TEST|T2|pos-1|1"
+    assert live.overlay_key("smooth_survivor_profit25", row_id) == f"smooth_survivor_profit25|{row_id}"
+    first = live.overlay_key("smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3", row_id, epoch_at(9, 35))
+    second = live.overlay_key("smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3", row_id, epoch_at(10, 5))
+    assert first != second
+    assert first.endswith(f"entry{epoch_at(9, 35)}")
+
+
+def test_requalify_gate_respects_cooldown_and_max_entries() -> None:
+    row_id = "TEST|T2|pos-1|1"
+    variant = "smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    state: dict[str, object] = {"completed_overlay_keys": [], "completed_overlay_history": {}}
+    active: dict[str, object] = {}
+    completed: set[str] = set()
+    first_key = live.overlay_key(variant, row_id, epoch_at(9, 35))
+    live.record_completed_overlay(state, variant=variant, row_id=row_id, key=first_key, exit_epoch=epoch_at(10, 0), exit_reason="profit_capture")
+
+    assert live.can_open_overlay(state, variant=variant, row_id=row_id, clock_epoch=epoch_at(10, 10), active_overlay=active, completed_overlay=completed) == (
+        False,
+        "requalify_cooldown_active",
+    )
+    assert live.can_open_overlay(state, variant=variant, row_id=row_id, clock_epoch=epoch_at(10, 15), active_overlay=active, completed_overlay=completed) == (
+        True,
+        "ok",
+    )
+    second_key = live.overlay_key(variant, row_id, epoch_at(10, 15))
+    live.record_completed_overlay(state, variant=variant, row_id=row_id, key=second_key, exit_epoch=epoch_at(10, 30), exit_reason="adverse_stop")
+    assert live.can_open_overlay(state, variant=variant, row_id=row_id, clock_epoch=epoch_at(10, 45), active_overlay=active, completed_overlay=completed) == (
+        False,
+        "max_entries_per_t2_leg_reached",
+    )
 
 
 def test_armed_floor_live_exit_matches_research_floor_price_and_reason() -> None:
@@ -170,6 +220,50 @@ def test_profit_exit_takes_priority_over_same_clock_underlying_t2_exit() -> None
     assert math.isclose(float(exit_fill), float(expected["exit_price"]), abs_tol=1e-12)
 
 
+def test_profit_stop_variant_exits_on_adverse_stop() -> None:
+    clock = epoch_at(10, 5)
+    variant = "smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    leg = make_leg()
+    position = make_position(variant)
+    index = make_index({clock: 98.80})
+
+    should_exit, reason, ret, exit_fill, _fill = live.should_exit_overlay(
+        variant=variant,
+        leg=leg,
+        position=position,
+        index=index,
+        v1_portfolio=DummyV1Portfolio(),
+        clock_epoch=clock,
+    )
+
+    assert should_exit
+    assert reason == "adverse_stop"
+    assert math.isclose(float(ret), -0.012, abs_tol=1e-12)
+    assert math.isclose(float(exit_fill), 98.80, abs_tol=1e-12)
+
+
+def test_armed_stop_variant_exits_on_adverse_stop_before_arming() -> None:
+    clock = epoch_at(10, 5)
+    variant = "smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    leg = make_leg()
+    position = make_position(variant)
+    index = make_index({clock: 98.80})
+
+    should_exit, reason, ret, exit_fill, _fill = live.should_exit_overlay(
+        variant=variant,
+        leg=leg,
+        position=position,
+        index=index,
+        v1_portfolio=DummyV1Portfolio(),
+        clock_epoch=clock,
+    )
+
+    assert should_exit
+    assert reason == "adverse_stop"
+    assert math.isclose(float(ret), -0.012, abs_tol=1e-12)
+    assert math.isclose(float(exit_fill), 98.80, abs_tol=1e-12)
+
+
 def test_armed_position_exits_at_session_close_when_floor_not_hit() -> None:
     armed_clock = epoch_at(14, 0)
     close_clock = epoch_at(15, 30)
@@ -197,4 +291,3 @@ def test_armed_position_exits_at_session_close_when_floor_not_hit() -> None:
     assert reason == "armed_session_close"
     assert math.isclose(float(ret), 0.0028, abs_tol=1e-12)
     assert math.isclose(float(exit_fill), 100.28, abs_tol=1e-12)
-

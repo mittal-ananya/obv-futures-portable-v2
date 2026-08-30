@@ -75,6 +75,30 @@ def head(label: str) -> str:
     return f'<th scope="col"><button type="button" class="sort-button">{escape(label)}<span class="sort-mark" aria-hidden="true"></span></button></th>'
 
 
+def portfolio_display_name(portfolio_id: str, portfolio: dict[str, Any] | None = None, summary: dict[str, Any] | None = None) -> str:
+    source = summary if isinstance(summary, dict) and summary else portfolio if isinstance(portfolio, dict) else {}
+    label = source.get("label") or source.get("rule") or source.get("variant")
+    return f"{portfolio_id} - {label}" if label else portfolio_id
+
+
+def render_portfolio_filter(portfolios: dict[str, Any], summaries: list[dict[str, Any]]) -> str:
+    summary_by_id = {str(row.get("portfolio_id") or ""): row for row in summaries if isinstance(row, dict)}
+    portfolio_ids = sorted({str(key) for key in portfolios} | {key for key in summary_by_id if key})
+    options = ['<option value="">All Portfolios</option>']
+    for portfolio_id in portfolio_ids:
+        portfolio = portfolios.get(portfolio_id) if isinstance(portfolios.get(portfolio_id), dict) else {}
+        label = portfolio_display_name(portfolio_id, portfolio, summary_by_id.get(portfolio_id))
+        options.append(f'<option value="{sort_attr(portfolio_id)}">{escape(label)}</option>')
+    return f"""
+      <div class="filters">
+        <label for="portfolioFilter">Portfolio</label>
+        <select id="portfolioFilter">
+          {''.join(options)}
+        </select>
+      </div>
+    """
+
+
 def payload() -> dict[str, Any]:
     state = read_json(STATE_PATH, {})
     status = read_json(STATUS_PATH, {})
@@ -140,7 +164,7 @@ def render_holdings(portfolios: dict[str, Any]) -> str:
                 continue
             rows.append(
                 f"""
-                <tr>
+                <tr data-portfolio-id="{sort_attr(portfolio_id)}" data-portfolio-variant="{sort_attr(portfolio.get('variant'))}">
                   {cell(portfolio_id)}
                   {cell(holding.get('symbol'))}
                   {cell(holding.get('side'))}
@@ -163,7 +187,7 @@ def render_transactions(portfolios: dict[str, Any]) -> str:
         for row in reversed(txs[-120:]):
             rows.append(
                 f"""
-                <tr>
+                <tr data-portfolio-id="{sort_attr(portfolio_id)}" data-portfolio-variant="{sort_attr(portfolio.get('variant'))}">
                   {cell(portfolio_id)}
                   {cell(row.get('event'))}
                   {cell(row.get('symbol'))}
@@ -188,6 +212,7 @@ def page() -> HTMLResponse:
     portfolios = state.get("portfolios") if isinstance(state.get("portfolios"), dict) else {}
     overlay_status = data.get("overlay_status") if isinstance(data.get("overlay_status"), dict) else {}
     clock = overlay_status.get("clock") if isinstance(overlay_status.get("clock"), dict) else {}
+    filter_html = render_portfolio_filter(portfolios, summaries)
     html = f"""
 <!doctype html>
 <html lang="en">
@@ -325,6 +350,31 @@ def page() -> HTMLResponse:
     th[aria-sort="ascending"] .sort-mark::after {{ content: "ASC"; }}
     th[aria-sort="descending"] .sort-mark::after {{ content: "DESC"; }}
     .table-block {{ margin-top: 14px; overflow-x: auto; }}
+    .filters {{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 10px 12px;
+      margin: 8px 0 14px;
+    }}
+    .filters label {{
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }}
+    .filters select {{
+      min-width: min(760px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0c111a;
+      color: var(--text);
+      padding: 8px 10px;
+      font: inherit;
+    }}
     @media (max-width: 900px) {{
       header {{ display: block; }}
       .status {{ justify-content: flex-start; margin-top: 12px; }}
@@ -348,6 +398,7 @@ def page() -> HTMLResponse:
       </div>
     </header>
     <div class="grid">{render_summary_cards(summaries)}</div>
+    {filter_html}
     <section class="table-block">
       <h2>Open Positions</h2>
       <table class="sortable-table">
@@ -414,6 +465,18 @@ def page() -> HTMLResponse:
         }});
       }});
     }});
+    const portfolioFilter = document.getElementById("portfolioFilter");
+    const applyPortfolioFilter = () => {{
+      const selected = portfolioFilter ? portfolioFilter.value : "";
+      document.querySelectorAll("tbody tr[data-portfolio-id]").forEach((row) => {{
+        const visible = !selected || row.dataset.portfolioId === selected;
+        row.style.display = visible ? "" : "none";
+      }});
+    }};
+    if (portfolioFilter) {{
+      portfolioFilter.addEventListener("change", applyPortfolioFilter);
+      applyPortfolioFilter();
+    }}
   </script>
 </body>
 </html>

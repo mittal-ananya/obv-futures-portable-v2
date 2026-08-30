@@ -70,6 +70,7 @@ def test_portfolio_tables_escape_cells_and_keep_sort_values(monkeypatch) -> None
     )
 
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
+    assert 'data-portfolio-id="p&lt;1&gt;"' in html
     assert "<script>" not in html
     assert 'data-sort-value="1787795400"' in html
     assert "Rs 5.00L" in html
@@ -130,6 +131,9 @@ def test_portfolio_page_renders_sortable_tables(tmp_path: Path, monkeypatch) -> 
     html = v2matrix_portfolios.page().body.decode("utf-8")
 
     assert 'table class="sortable-table"' in html
+    assert 'id="portfolioFilter"' in html
+    assert "applyPortfolioFilter" in html
+    assert 'data-portfolio-id="fixed"' in html
     assert "parseSortValue" in html
     assert "aria-sort" in html
     assert 'data-sort-value="1787795400"' in html
