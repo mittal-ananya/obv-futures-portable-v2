@@ -14,6 +14,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 import backtest_tranche_portfolio_overlay as base  # noqa: E402
+import install_v2matrix_from_research_portfolios as installer  # noqa: E402
 import research_t2_overlay_portfolios as research_portfolios  # noqa: E402
 import research_t2_overlay_variant_compare as research_compare  # noqa: E402
 import run_v2matrix_overlay as live  # noqa: E402
@@ -26,6 +27,11 @@ class DummyV1Portfolio:
     def execution_fill_from_row(self, row, *, side, phase, point_config=None):  # noqa: ANN001
         price = float(row["price"])
         return {"fill_price": price, "ltp_price": price, "side": side, "phase": phase}
+
+    def futures_trade_accounting(self, *, side, entry_fill_price, exit_fill_price, lot_size, lots, point_config=None):  # noqa: ANN001
+        direction = 1.0 if str(side).lower() == "long" else -1.0
+        gross = direction * (float(exit_fill_price) - float(entry_fill_price)) * int(lot_size) * int(lots)
+        return {"gross_rupees": gross, "charges_rupees": 0.0, "net_rupees": gross}
 
 
 def epoch_at(hour: int, minute: int) -> int:
@@ -291,3 +297,69 @@ def test_armed_position_exits_at_session_close_when_floor_not_hit() -> None:
     assert reason == "armed_session_close"
     assert math.isclose(float(ret), 0.0028, abs_tol=1e-12)
     assert math.isclose(float(exit_fill), 100.28, abs_tol=1e-12)
+
+
+def make_research_candidate(*, exit_reason: str = "open_at_period_end") -> research_portfolios.Candidate:
+    entry = epoch_at(14, 0)
+    mark = epoch_at(15, 30)
+    window = pd.DataFrame(
+        {
+            "clock_epoch": [entry, entry + 60, mark],
+            "clock_time": [live.epoch_ist_iso(entry), live.epoch_ist_iso(entry + 60), live.epoch_ist_iso(mark)],
+            "forward_return": [0.0, 0.001, 0.002],
+            "score_smooth_survivor": [0.91, 0.91, 0.91],
+        }
+    )
+    return research_portfolios.Candidate(
+        variant="smooth_survivor_armed20_floor80",
+        policy_name="smooth_survivor_tight_risk_score0p80_age60to240_runway0",
+        overlay="armed20bps_floor80pct_peak",
+        row_id="TEST|T2|pos-1|1",
+        symbol="TEST",
+        side="long",
+        entry_epoch=entry,
+        exit_epoch=mark,
+        exit_reason=exit_reason,
+        entry_fill_price=100.0,
+        exit_fill_price=100.20,
+        margin_per_lot=100000.0,
+        lot_size=100,
+        score=0.91,
+        score_column="score_smooth_survivor",
+        window=window,
+    )
+
+
+def test_open_at_period_end_candidate_remains_open_in_portfolio_simulation() -> None:
+    candidate = make_research_candidate()
+
+    result = research_portfolios.run_portfolio(
+        variant=candidate.variant,
+        candidates=[candidate],
+        max_positions=3,
+        initial_capital=2_000_000.0,
+        v1_portfolio=DummyV1Portfolio(),
+        sizing_mode="fixed_entry_margin_unconstrained",
+        fixed_entry_margin=500_000.0,
+        replacement_policy=research_portfolios.ReplacementPolicy(name="none", enabled=False),
+    )
+
+    assert result["summary"]["current_open_positions"] == 1
+    assert result["summary"]["closed_trades"] == 0
+    assert [row["event"] for row in result["transactions"]] == ["entry"]
+
+
+def test_open_at_period_end_candidate_remains_active_in_installed_state() -> None:
+    candidate = make_research_candidate()
+    state, overlay_events, matrix_payloads, report = installer.overlay_state_from_candidates(
+        candidates_by_variant={candidate.variant: [candidate]},
+        variants=(candidate.variant,),
+        primary_variant=candidate.variant,
+        final_epoch=candidate.exit_epoch,
+    )
+
+    assert report["active_overlay_count"] == 1
+    assert report["completed_overlay_count"] == 0
+    assert len(state["active_overlay"]) == 1
+    assert [row["event"] for row in overlay_events] == ["overlay_entry"]
+    assert [row["event_type"] for row in matrix_payloads] == ["paper_entry"]

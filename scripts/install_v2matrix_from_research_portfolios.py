@@ -47,6 +47,21 @@ def finite_float(value: Any) -> float | None:
     return out if math.isfinite(out) else None
 
 
+def truthy_flag(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    try:
+        if pd.isna(value):
+            return False
+    except (TypeError, ValueError):
+        pass
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y"}
+    return bool(value)
+
+
 def source_position_id(row_id: str) -> str:
     parts = str(row_id or "").split("|")
     if len(parts) >= 3 and parts[1] == "T2":
@@ -237,9 +252,12 @@ def all_qualified_signal_summary(
         account = portfolio_research.candidate_account(v1_portfolio, candidate, candidate.exit_fill_price, 1)
         net_values.append(float(account.get("net_rupees") or 0.0))
     wins = [value for value in net_values if value > 0]
+    open_count = sum(1 for candidate in candidates if candidate.exit_reason == "open_at_period_end")
     return {
         "variant": variant,
         "all_qualified_signal_trade_count": len(net_values),
+        "all_qualified_signal_open_count": open_count,
+        "all_qualified_signal_closed_or_exited_count": len(net_values) - open_count,
         "all_qualified_signal_win_count": len(wins),
         "all_qualified_signal_loss_count": len(net_values) - len(wins),
         "all_qualified_signal_success_rate_pct": (len(wins) / len(net_values) * 100.0) if net_values else None,
@@ -354,6 +372,9 @@ def candidate_from_metrics(
     exit_epoch = int(exit_row["exit_epoch"])
     if exit_epoch <= entry_epoch:
         return None
+    exit_reason = str(exit_row["exit_reason"])
+    if truthy_flag(row.get("open_at_period_end")) and exit_reason == "underlying_t2_exit":
+        exit_reason = "open_at_period_end"
     return portfolio_research.Candidate(
         variant=variant,
         policy_name=policy.name,
@@ -363,7 +384,7 @@ def candidate_from_metrics(
         side=str(row["side"]),
         entry_epoch=entry_epoch,
         exit_epoch=exit_epoch,
-        exit_reason=str(exit_row["exit_reason"]),
+        exit_reason=exit_reason,
         entry_fill_price=float(row["entry_fill_price"]),
         exit_fill_price=float(exit_row["exit_price"]),
         margin_per_lot=float(row["margin_per_lot"]),
@@ -516,7 +537,7 @@ def overlay_state_from_candidates(
                         position=position,
                     )
                 )
-            if int(candidate.exit_epoch) <= int(final_epoch):
+            if candidate.exit_reason != "open_at_period_end" and int(candidate.exit_epoch) <= int(final_epoch):
                 completed.add(key)
                 live_overlay.record_completed_overlay(
                     state,
@@ -705,6 +726,9 @@ def main() -> int:
         variants=variants,
         mae_floor=float(args.mae_floor),
     )
+    open_mask = frame["open_at_period_end"].map(truthy_flag) if "open_at_period_end" in frame else pd.Series(False, index=frame.index)
+    input_open_rows = int(open_mask.sum()) if "open_at_period_end" in frame else 0
+    input_open_legs = int(frame.loc[open_mask, "row_id"].nunique()) if "row_id" in frame else 0
     replacement = portfolio_research.ReplacementPolicy(name="none", enabled=False)
     portfolio_results: dict[str, dict[str, Any]] = {}
     portfolio_summaries: list[dict[str, Any]] = []
@@ -740,6 +764,7 @@ def main() -> int:
             "source_research_portfolio_id": result["summary"].get("portfolio_id"),
             "research_summary": result["summary"],
             "all_qualified_signal_summary": signal_summary,
+            "open_candidates": sum(1 for candidate in candidates_by_variant.get(variant, []) if candidate.exit_reason == "open_at_period_end"),
         }
         portfolio_summaries.append(summary)
 
@@ -796,6 +821,20 @@ def main() -> int:
                 "reason": "expected summary CSV did not contain every selected variant",
             }
         )
+    open_carry_mismatches: list[dict[str, Any]] = []
+    for summary in portfolio_summaries:
+        variant = str(summary.get("variant") or "")
+        research_open = int((summary.get("research_summary") or {}).get("current_open_positions") or 0)
+        installed_open = int(summary.get("open_positions") or 0)
+        if research_open != installed_open:
+            open_carry_mismatches.append(
+                {
+                    "variant": variant,
+                    "research_open_positions": research_open,
+                    "installed_open_positions": installed_open,
+                    "reason": "portfolio_state holdings do not match canonical portfolio simulation open positions",
+                }
+            )
     report = {
         "schema": SCHEMA,
         "created_at_ist": now_ist_iso(),
@@ -815,6 +854,14 @@ def main() -> int:
         },
         "candidate_counts": {variant: len(candidates_by_variant.get(variant, [])) for variant in variants},
         "portfolio_summaries": portfolio_summaries,
+        "input_open_after_period": {
+            "rows": input_open_rows,
+            "unique_legs": input_open_legs,
+        },
+        "open_carry_gate": {
+            "ok": not open_carry_mismatches,
+            "mismatches": open_carry_mismatches,
+        },
         "summary_gate": {
             "ok": not summary_mismatches,
             "mismatches": summary_mismatches,
@@ -823,7 +870,7 @@ def main() -> int:
         "simulation_report": simulation_report,
         "matrix_event_count": len(matrix_events),
         "matrix_symbol_count": len(matrix_state.get("instruments") or {}),
-        "installed": bool(args.install and not summary_mismatches),
+        "installed": bool(args.install and not summary_mismatches and not open_carry_mismatches),
         "elapsed_seconds": round(time.monotonic() - started, 3),
     }
     write_json(args.output_dir / "v2matrix_research_portfolio_install_report.json", report)
@@ -832,7 +879,7 @@ def main() -> int:
     write_json(args.output_dir / "matrix_state.json", matrix_state)
     write_jsonl(args.output_dir / "matrix_events.jsonl", matrix_events)
     write_json(args.output_dir / "portfolio_state.json", portfolio_state)
-    if summary_mismatches:
+    if summary_mismatches or open_carry_mismatches:
         print(json.dumps(report, indent=2, sort_keys=True))
         return 2
     if args.install:

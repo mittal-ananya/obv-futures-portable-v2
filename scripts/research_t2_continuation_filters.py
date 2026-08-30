@@ -301,6 +301,8 @@ def build_outcome_frame(
     index: base.QuoteIndex,
     v1_portfolio: Any,
     period_end_epoch: int,
+    include_open_after_period: bool = False,
+    period_mark_epoch: int | None = None,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
     legs_by_id = {leg.row_id: leg for leg in legs}
     exit_fill_by_id: dict[str, dict[str, Any] | None] = {}
@@ -320,15 +322,20 @@ def build_outcome_frame(
             if leg is None:
                 skip_counts["missing_leg"] += 1
                 continue
-            if leg.exit_epoch is None or leg.exit_epoch > period_end_epoch:
+            open_after_period = leg.exit_epoch is None or leg.exit_epoch > period_end_epoch
+            if open_after_period and not include_open_after_period:
                 skip_counts["open_after_period"] += 1
+                continue
+            effective_exit_epoch = int(period_mark_epoch or period_end_epoch) if open_after_period else int(leg.exit_epoch or 0)
+            if effective_exit_epoch <= int(clock_epoch):
+                skip_counts["open_after_period" if open_after_period else "missing_exit_fill"] += 1
                 continue
             if leg.margin_per_lot <= 0:
                 skip_counts["non_positive_margin"] += 1
                 continue
             exit_fill = exit_fill_by_id.get(row_id)
             if row_id not in exit_fill_by_id:
-                exit_fill = base.execution_fill(index, v1_portfolio, leg, leg.exit_epoch, phase="exit")
+                exit_fill = base.execution_fill(index, v1_portfolio, leg, effective_exit_epoch, phase="exit")
                 exit_fill_by_id[row_id] = exit_fill
             if exit_fill is None:
                 skip_counts["missing_exit_fill"] += 1
@@ -356,8 +363,12 @@ def build_outcome_frame(
                 "clock_time": base.epoch_ist_iso(clock_epoch),
                 "t2_entry_epoch": int(leg.entry_epoch),
                 "t2_entry_time": base.epoch_ist_iso(leg.entry_epoch),
-                "t2_exit_epoch": int(leg.exit_epoch),
-                "t2_exit_time": base.epoch_ist_iso(leg.exit_epoch),
+                "t2_exit_epoch": int(effective_exit_epoch),
+                "t2_exit_time": base.epoch_ist_iso(effective_exit_epoch),
+                "t2_actual_exit_epoch": int(leg.exit_epoch) if leg.exit_epoch is not None else None,
+                "t2_actual_exit_time": base.epoch_ist_iso(leg.exit_epoch) if leg.exit_epoch is not None else None,
+                "t2_status": "open_at_period_end" if open_after_period else "closed",
+                "open_at_period_end": bool(open_after_period),
                 "entry_fill_price": entry_price,
                 "exit_fill_price": exit_price,
                 "gross_return_pct": gross_return_pct,
@@ -365,7 +376,7 @@ def build_outcome_frame(
                 "gross_rupees": gross_rupees,
                 "charges_rupees": charges_rupees,
                 "net_return_on_margin_pct": (net_rupees / float(leg.margin_per_lot)) * 100.0,
-                "hold_minutes_after_clock": (float(leg.exit_epoch) - float(clock_epoch)) / 60.0,
+                "hold_minutes_after_clock": (float(effective_exit_epoch) - float(clock_epoch)) / 60.0,
                 "margin_per_lot": float(leg.margin_per_lot),
                 "lot_size": int(leg.lot_size or 1),
                 "signal_source": leg.signal_source,
@@ -388,6 +399,9 @@ def build_outcome_frame(
         "rows": int(frame.shape[0]),
         "unique_legs_with_forward_rows": int(frame["row_id"].nunique()) if not frame.empty else 0,
         "skip_counts": skip_counts,
+        "include_open_after_period": bool(include_open_after_period),
+        "period_mark_epoch": int(period_mark_epoch) if period_mark_epoch is not None else None,
+        "period_mark_time": base.epoch_ist_iso(period_mark_epoch) if period_mark_epoch is not None else None,
     }
     return frame, report
 
@@ -585,6 +599,11 @@ def main() -> int:
     parser.add_argument("--quote-index-cache-dir", type=Path, default=None)
     parser.add_argument("--allow-raw-scan", action="store_true")
     parser.add_argument(
+        "--include-open-after-period",
+        action="store_true",
+        help="Include T2 legs still open at the period end and mark them to the last available clock.",
+    )
+    parser.add_argument(
         "--leg-scope",
         choices=("entry", "overlap"),
         default="entry",
@@ -649,12 +668,16 @@ def main() -> int:
         v1_portfolio=v1_portfolio,
         risk_floor=float(args.risk_floor),
     )
+    panel_clocks = [int(clock) for clock in panel.keys() if int(clock) <= int(end_epoch)]
+    period_mark_epoch = max(panel_clocks) if panel_clocks else end_epoch
     frame, outcome_report = build_outcome_frame(
         panel=panel,
         legs=period_legs,
         index=index,
         v1_portfolio=v1_portfolio,
         period_end_epoch=end_epoch,
+        include_open_after_period=bool(args.include_open_after_period),
+        period_mark_epoch=period_mark_epoch,
     )
     frame_path = output_dir / "continuation_opportunities.parquet"
     frame_storage = "parquet"
@@ -680,6 +703,9 @@ def main() -> int:
             "open_after_period_t2_leg_count": len(open_after_period_legs),
             "required_key_count": len(required_keys),
             "leg_scope": args.leg_scope,
+            "include_open_after_period": bool(args.include_open_after_period),
+            "period_mark_epoch": int(period_mark_epoch),
+            "period_mark_time": base.epoch_ist_iso(period_mark_epoch),
         },
     )
     policies = continuation_policy_grid()
@@ -739,6 +765,9 @@ def main() -> int:
         "open_after_period_t2_leg_count": len(open_after_period_legs),
         "required_key_count": len(required_keys),
         "leg_scope": args.leg_scope,
+        "include_open_after_period": bool(args.include_open_after_period),
+        "period_mark_epoch": int(period_mark_epoch),
+        "period_mark_time": base.epoch_ist_iso(period_mark_epoch),
         "policy_count": len(policies),
         "quality_pass_count": len(quality_summaries),
         "input_stream": input_report,

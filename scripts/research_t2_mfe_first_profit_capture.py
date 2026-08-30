@@ -51,6 +51,21 @@ def metric_stats(values: list[float] | pd.Series) -> dict[str, Any]:
     }
 
 
+def truthy_flag(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    try:
+        if pd.isna(value):
+            return False
+    except (TypeError, ValueError):
+        pass
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y"}
+    return bool(value)
+
+
 def side_direction(side: str) -> float:
     return 1.0 if str(side).lower() == "long" else -1.0
 
@@ -159,6 +174,9 @@ def path_metrics(
         "side": str(row.side),
         "qualification_epoch": int(row.clock_epoch),
         "t2_exit_epoch": int(row.t2_exit_epoch),
+        "t2_actual_exit_epoch": base.as_int(getattr(row, "t2_actual_exit_epoch", None)),
+        "t2_status": str(getattr(row, "t2_status", "closed") or "closed"),
+        "open_at_period_end": truthy_flag(getattr(row, "open_at_period_end", False)),
         "entry_fill_price": float(row.entry_fill_price),
         "margin_per_lot": float(row.margin_per_lot),
         "lot_size": int(row.lot_size or 1),

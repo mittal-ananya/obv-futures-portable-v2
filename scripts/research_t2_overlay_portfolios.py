@@ -310,6 +310,9 @@ def build_candidates(
             exit_epoch = int(exit_row["exit_epoch"])
             if exit_epoch <= entry_epoch:
                 continue
+            exit_reason = str(exit_row["exit_reason"])
+            if overlay_research.truthy_flag(row.get("open_at_period_end")) and exit_reason == "underlying_t2_exit":
+                exit_reason = "open_at_period_end"
             candidates.append(
                 Candidate(
                     variant=variant_name,
@@ -320,7 +323,7 @@ def build_candidates(
                     side=str(row["side"]),
                     entry_epoch=entry_epoch,
                     exit_epoch=exit_epoch,
-                    exit_reason=str(exit_row["exit_reason"]),
+                    exit_reason=exit_reason,
                     entry_fill_price=float(row["entry_fill_price"]),
                     exit_fill_price=float(exit_row["exit_price"]),
                     margin_per_lot=float(row["margin_per_lot"]),
@@ -374,6 +377,8 @@ def run_portfolio(
     for epoch in sorted(event_epochs):
         for row_id, holding in list(holdings.items()):
             candidate = holding.candidate
+            if candidate.exit_reason == "open_at_period_end":
+                continue
             if candidate.exit_epoch <= epoch:
                 acct = candidate_account(v1_portfolio, candidate, candidate.exit_fill_price, holding.lots)
                 pnl = float(acct.get("net_rupees") or 0.0)
