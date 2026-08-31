@@ -141,6 +141,9 @@ def test_portfolio_page_renders_sortable_tables(tmp_path: Path, monkeypatch) -> 
     assert "Portfolio Closed Success" in html
     assert "All Qualified Signal Success" in html
     assert "75.00%" in html
+    assert "Portfolio Comparison" in html
+    assert "window.setInterval(() =&gt; window.location.reload(), 60000)" not in html
+    assert "window.setInterval(() => window.location.reload(), 60000)" in html
 
 
 def test_portfolio_page_uses_readable_variant_labels_and_max_filters(tmp_path: Path, monkeypatch) -> None:
@@ -211,7 +214,49 @@ def test_portfolio_page_uses_readable_variant_labels_and_max_filters(tmp_path: P
     assert 'id="maxFilter"' in html
     assert ">Max 5<" in html
     assert "Profit25 / age0 / max5 / stop100 / requalify cd15 max2" in html
-    assert "Rs 5.00L/entry" in html
-    assert "Requalify cd15m max2/leg" in html
+    assert "Portfolio Comparison" in html
+    assert "Qualified Signals" in html
     assert 'data-portfolio-max="5"' in html
     assert f'<option value="{max5_id}">Profit25 / age0 / max5 / stop100 / requalify cd15 max2</option>' in html
+
+
+def test_portfolio_page_uses_requested_portfolio_order(tmp_path: Path, monkeypatch) -> None:
+    v2matrix_portfolios = load_portfolios_module(monkeypatch)
+    state_path = tmp_path / "portfolio_state.json"
+    status_path = tmp_path / "overlay_status.json"
+    labels = [
+        "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+        "Armed20 Floor80 / age60 / max3 / no stop / first only",
+        "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+        "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+    ]
+    state_path.write_text(
+        json.dumps(
+            {
+                "updated_at_ist": "2026-08-31T12:00:00+05:30",
+                "summaries": [
+                    {"portfolio_id": f"p{i}", "label": label, "max_positions": 5 if "max5" in label else 3}
+                    for i, label in enumerate(labels)
+                ],
+                "portfolios": {
+                    f"p{i}": {"label": label, "max_positions": 5 if "max5" in label else 3, "holdings": {}, "transactions": []}
+                    for i, label in enumerate(labels)
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    status_path.write_text(json.dumps({"ok": True, "clock": {}}), encoding="utf-8")
+    monkeypatch.setattr(v2matrix_portfolios, "STATE_PATH", state_path)
+    monkeypatch.setattr(v2matrix_portfolios, "STATUS_PATH", status_path)
+
+    html = v2matrix_portfolios.page().body.decode("utf-8")
+
+    ordered_labels = [
+        "Armed20 Floor80 / age60 / max3 / no stop / first only",
+        "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+        "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+        "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+    ]
+    positions = [html.index(label) for label in ordered_labels]
+    assert positions == sorted(positions)

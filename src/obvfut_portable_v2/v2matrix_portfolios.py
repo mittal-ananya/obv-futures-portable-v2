@@ -17,6 +17,17 @@ IST = ZoneInfo("Asia/Kolkata")
 V2MATRIX_ROOT = Path(os.environ.get("V2MATRIX_ROOT", "/opt/cloud-deploy-candidates/v2matrix"))
 STATE_PATH = V2MATRIX_ROOT / "state" / "portfolio_state.json"
 STATUS_PATH = V2MATRIX_ROOT / "state" / "overlay_status.json"
+PREFERRED_PORTFOLIO_LABELS = [
+    "Armed20 Floor80 / age60 / max3 / no stop / first only",
+    "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+    "Profit25 / age60 / max3 / no stop / first only",
+    "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+    "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+    "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+    "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+    "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+]
+PREFERRED_PORTFOLIO_ORDER = {label: index for index, label in enumerate(PREFERRED_PORTFOLIO_LABELS)}
 
 app = FastAPI(title="v2Matrix Portfolios")
 
@@ -138,15 +149,19 @@ def render_badges(badges: list[str]) -> str:
     return "".join(f'<span class="badge">{escape(str(badge))}</span>' for badge in badges)
 
 
+def portfolio_order_key(portfolio_id: str, portfolio: dict[str, Any] | None = None, summary: dict[str, Any] | None = None) -> tuple[int, str, str]:
+    label = portfolio_display_name(portfolio_id, portfolio, summary)
+    preferred_index = PREFERRED_PORTFOLIO_ORDER.get(label)
+    if preferred_index is not None:
+        return (preferred_index, label.lower(), portfolio_id)
+    return (len(PREFERRED_PORTFOLIO_LABELS), label.lower(), portfolio_id)
+
+
 def render_portfolio_filter(portfolios: dict[str, Any], summaries: list[dict[str, Any]]) -> str:
     summary_by_id = {str(row.get("portfolio_id") or ""): row for row in summaries if isinstance(row, dict)}
     portfolio_ids = sorted(
         {str(key) for key in portfolios} | {key for key in summary_by_id if key},
-        key=lambda item: (
-            portfolio_max_positions(item, portfolio_source(portfolios.get(item) if isinstance(portfolios.get(item), dict) else {}, summary_by_id.get(item))),
-            portfolio_display_name(item, portfolios.get(item) if isinstance(portfolios.get(item), dict) else {}, summary_by_id.get(item)).lower(),
-            item,
-        ),
+        key=lambda item: portfolio_order_key(item, portfolios.get(item) if isinstance(portfolios.get(item), dict) else {}, summary_by_id.get(item)),
     )
     max_values = sorted(
         {
@@ -209,44 +224,67 @@ async def api_stream() -> StreamingResponse:
         while True:
             yield "event: status\n"
             yield "data: " + json.dumps(payload(), ensure_ascii=True, sort_keys=True) + "\n\n"
-            await asyncio.sleep(5)
+            await asyncio.sleep(60)
 
     return StreamingResponse(events(), media_type="text/event-stream")
 
 
-def render_summary_cards(summaries: list[dict[str, Any]]) -> str:
-    cards = []
-    for summary in summaries:
+def render_summary_table(summaries: list[dict[str, Any]]) -> str:
+    rows = []
+    for summary in sorted(summaries, key=lambda row: portfolio_order_key(str(row.get("portfolio_id") or ""), summary=row)):
         portfolio_id = str(summary.get("portfolio_id") or "")
         label = portfolio_display_name(portfolio_id, summary=summary)
-        badges = render_badges(portfolio_badges(portfolio_id, summary))
-        cards.append(
+        order_index = portfolio_order_key(portfolio_id, summary=summary)[0]
+        rows.append(
             f"""
-            <section class="summary">
-              <div class="kicker">{text(summary.get('variant'))}</div>
-              <div class="summary-title">
-                <h2>{escape(label)}</h2>
-                <span class="id-chip">{escape(portfolio_id)}</span>
-              </div>
-              <div class="badge-row">{badges}</div>
-              <h2>{text(summary.get('open_positions', 0))} Open / {text(summary.get('closed_trades', 0))} Closed</h2>
-              <div class="metrics">
-                <span>Net <strong>{money(summary.get('total_net_rupees'))}</strong></span>
-                <span>Realized <strong>{money(summary.get('realized_net_rupees'))}</strong></span>
-                <span>Peak Margin <strong>{money(summary.get('peak_margin_rupees'))}</strong></span>
-                <span>Return / Peak Margin <strong>{pct(summary.get('return_on_peak_margin_pct'))}</strong></span>
-                <span>Portfolio Closed Success <strong>{pct(summary.get('portfolio_closed_success_rate_pct') or summary.get('success_rate_pct'))}</strong></span>
-                <span>All Qualified Signal Success <strong>{pct(summary.get('all_qualified_signal_success_rate_pct'))}</strong></span>
-              </div>
-            </section>
+            <tr data-portfolio-id="{sort_attr(portfolio_id)}" data-portfolio-max="{sort_attr(portfolio_max_positions(portfolio_id, summary))}">
+              {cell(label, order_index)}
+              {cell(portfolio_max_positions(portfolio_id, summary), portfolio_max_positions(portfolio_id, summary))}
+              {cell(summary.get('open_positions', 0), summary.get('open_positions', 0))}
+              {cell(summary.get('closed_trades', 0), summary.get('closed_trades', 0))}
+              {cell(money(summary.get('total_net_rupees')), summary.get('total_net_rupees'))}
+              {cell(money(summary.get('realized_net_rupees')), summary.get('realized_net_rupees'))}
+              {cell(money(summary.get('unrealized_net_rupees')), summary.get('unrealized_net_rupees'))}
+              {cell(money(summary.get('current_margin_rupees')), summary.get('current_margin_rupees'))}
+              {cell(money(summary.get('peak_margin_rupees')), summary.get('peak_margin_rupees'))}
+              {cell(pct(summary.get('return_on_peak_margin_pct')), summary.get('return_on_peak_margin_pct'))}
+              {cell(pct(summary.get('portfolio_closed_success_rate_pct') or summary.get('success_rate_pct')), summary.get('portfolio_closed_success_rate_pct') or summary.get('success_rate_pct'))}
+              {cell(summary.get('all_qualified_signal_trade_count'), summary.get('all_qualified_signal_trade_count'))}
+              {cell(pct(summary.get('all_qualified_signal_success_rate_pct')), summary.get('all_qualified_signal_success_rate_pct'))}
+            </tr>
             """
         )
-    return "\n".join(cards) or "<section class='summary'><h2>No portfolio state yet</h2></section>"
+    body = "\n".join(rows) or "<tr><td colspan='13'>No portfolio state yet</td></tr>"
+    return f"""
+    <section class="table-block summary-block">
+      <h2>Portfolio Comparison</h2>
+      <table class="sortable-table summary-table">
+        <thead>
+          <tr>
+            {head('Portfolio')}
+            {head('Max')}
+            {head('Open')}
+            {head('Closed')}
+            {head('Net')}
+            {head('Realized')}
+            {head('Unrealized')}
+            {head('Current Margin')}
+            {head('Peak Margin')}
+            {head('Return / Peak Margin')}
+            {head('Portfolio Closed Success')}
+            {head('Qualified Signals')}
+            {head('All Qualified Signal Success')}
+          </tr>
+        </thead>
+        <tbody>{body}</tbody>
+      </table>
+    </section>
+    """
 
 
 def render_holdings(portfolios: dict[str, Any]) -> str:
     rows = []
-    for portfolio_id, portfolio in sorted(portfolios.items()):
+    for portfolio_id, portfolio in sorted(portfolios.items(), key=lambda item: portfolio_order_key(str(item[0]), item[1] if isinstance(item[1], dict) else {})):
         if not isinstance(portfolio, dict):
             continue
         label = portfolio_display_name(str(portfolio_id), portfolio)
@@ -272,7 +310,7 @@ def render_holdings(portfolios: dict[str, Any]) -> str:
 
 def render_transactions(portfolios: dict[str, Any]) -> str:
     rows = []
-    for portfolio_id, portfolio in sorted(portfolios.items()):
+    for portfolio_id, portfolio in sorted(portfolios.items(), key=lambda item: portfolio_order_key(str(item[0]), item[1] if isinstance(item[1], dict) else {})):
         if not isinstance(portfolio, dict):
             continue
         label = portfolio_display_name(str(portfolio_id), portfolio)
@@ -364,72 +402,13 @@ def page() -> HTMLResponse:
       background: #0c111a;
       white-space: nowrap;
     }}
-    .grid {{
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }}
-    .summary, .table-block {{
+    .table-block {{
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
       padding: 14px;
     }}
-    .kicker {{
-      color: var(--accent);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 6px;
-    }}
-    .summary-title {{
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: start;
-    }}
-    .summary-title h2 {{
-      font-size: 17px;
-      line-height: 1.25;
-    }}
-    .id-chip {{
-      max-width: 320px;
-      color: var(--muted);
-      font-size: 11px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }}
-    .badge-row {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin: 8px 0 10px;
-    }}
-    .badge {{
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: #0c111a;
-      color: var(--muted);
-      font-size: 12px;
-      padding: 4px 8px;
-      white-space: nowrap;
-    }}
-    .metrics {{
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 12px;
-    }}
-    .metrics span {{
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px;
-      color: var(--muted);
-      min-height: 58px;
-    }}
+    .summary-block {{ margin-bottom: 14px; }}
     strong {{ display: block; color: var(--text); font-size: 16px; margin-top: 4px; }}
     table {{
       width: 100%;
@@ -514,7 +493,6 @@ def page() -> HTMLResponse:
     @media (max-width: 900px) {{
       header {{ display: block; }}
       .status {{ justify-content: flex-start; margin-top: 12px; }}
-      .grid, .metrics {{ grid-template-columns: 1fr; }}
       main {{ width: min(100vw - 20px, 1520px); padding-top: 16px; }}
     }}
   </style>
@@ -533,7 +511,7 @@ def page() -> HTMLResponse:
         <span class="pill">Updated: {text(state.get('updated_at_ist'))}</span>
       </div>
     </header>
-    <div class="grid">{render_summary_cards(summaries)}</div>
+    {render_summary_table(summaries)}
     {filter_html}
     <section class="table-block">
       <h2>Open Positions</h2>
@@ -555,6 +533,7 @@ def page() -> HTMLResponse:
     source.addEventListener("status", () => {{
       window.__v2matrixPortfolioLastEvent = Date.now();
     }});
+    window.setInterval(() => window.location.reload(), 60000);
     const parseSortValue = (raw) => {{
       const value = (raw || "").trim();
       if (!value || value === "-") return {{ empty: true, type: "text", value: "" }};
@@ -603,6 +582,21 @@ def page() -> HTMLResponse:
     }});
     const portfolioFilter = document.getElementById("portfolioFilter");
     const maxFilter = document.getElementById("maxFilter");
+    const restoreFilter = (element, key) => {{
+      if (!element) return;
+      try {{
+        const value = window.localStorage.getItem(key);
+        if (value !== null) element.value = value;
+      }} catch (error) {{}}
+    }};
+    const saveFilter = (element, key) => {{
+      if (!element) return;
+      try {{
+        window.localStorage.setItem(key, element.value || "");
+      }} catch (error) {{}}
+    }};
+    restoreFilter(portfolioFilter, "v2matrixPortfolioFilter");
+    restoreFilter(maxFilter, "v2matrixPortfolioMaxFilter");
     const applyPortfolioFilter = () => {{
       const selected = portfolioFilter ? portfolioFilter.value : "";
       const selectedMax = maxFilter ? maxFilter.value : "";
@@ -614,9 +608,15 @@ def page() -> HTMLResponse:
       }});
     }};
     if (portfolioFilter) {{
-      portfolioFilter.addEventListener("change", applyPortfolioFilter);
+      portfolioFilter.addEventListener("change", () => {{
+        saveFilter(portfolioFilter, "v2matrixPortfolioFilter");
+        applyPortfolioFilter();
+      }});
     }}
-    if (maxFilter) maxFilter.addEventListener("change", applyPortfolioFilter);
+    if (maxFilter) maxFilter.addEventListener("change", () => {{
+      saveFilter(maxFilter, "v2matrixPortfolioMaxFilter");
+      applyPortfolioFilter();
+    }});
     applyPortfolioFilter();
   </script>
 </body>
