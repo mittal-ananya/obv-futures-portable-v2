@@ -529,6 +529,8 @@ def build_feature_panel(
                 edge = estimate_edge(index, v1_portfolio, leg, clock_epoch, {**ram})
                 if not edge.get("ok"):
                     stats["missing_edge"] += 1
+                ram60_available_from = index.ram_available_from_epoch(leg.signal_key, 60)
+                ram60_bounds = index.lookback_window_bounds(leg.signal_key, ref_epoch, 60)
                 feature = {
                     "row_id": leg.row_id,
                     "symbol": leg.symbol,
@@ -550,6 +552,18 @@ def build_feature_panel(
                     "edge_return": edge.get("edge_return"),
                     "edge_to_cost_multiple": edge.get("edge_to_cost_multiple"),
                     "edge_diagnostics": edge,
+                    "quote_history_mode": "research_full_session_quote_index",
+                    "quote_history_key_scope": "all_t2_ledger_keys",
+                    "signal_key_history_earliest_epoch": index.key_earliest_epoch(leg.signal_key),
+                    "signal_key_history_earliest_time": base.epoch_ist_iso(index.key_earliest_epoch(leg.signal_key)),
+                    "signal_key_history_latest_epoch": index.key_latest_epoch(leg.signal_key),
+                    "signal_key_history_latest_time": base.epoch_ist_iso(index.key_latest_epoch(leg.signal_key)),
+                    "ram_60_available_from_epoch": ram60_available_from,
+                    "ram_60_available_from": base.epoch_ist_iso(ram60_available_from),
+                    "ram_60_window_start_epoch": ram60_bounds[0] if ram60_bounds else None,
+                    "ram_60_window_start": base.epoch_ist_iso(ram60_bounds[0]) if ram60_bounds else None,
+                    "ram_60_window_end_epoch": ram60_bounds[1] if ram60_bounds else None,
+                    "ram_60_window_end": base.epoch_ist_iso(ram60_bounds[1]) if ram60_bounds else None,
                     **ram,
                 }
                 features.append(feature)

@@ -85,6 +85,60 @@ def portfolio_key(variant: str) -> str:
     return live_overlay.portfolio_key(variant)
 
 
+def candidate_entry_metadata(candidate: portfolio_research.Candidate) -> dict[str, Any]:
+    fields = [
+        "age_minutes",
+        "current_ret",
+        "mfe",
+        "mae",
+        "mae_abs",
+        "drawdown_from_mfe",
+        "drawdown_to_mfe",
+        "path_quality",
+        "minutes_since_mfe",
+        "spread_bps",
+        "edge_return",
+        "edge_to_cost_multiple",
+        "ram_10",
+        "ram_30",
+        "ram_60",
+        "ret_10",
+        "ret_30",
+        "ret_60",
+        "positive_ram_count",
+        "quote_history_mode",
+        "quote_history_key_scope",
+        "signal_key_history_earliest_epoch",
+        "signal_key_history_earliest_time",
+        "signal_key_history_latest_epoch",
+        "signal_key_history_latest_time",
+        "ram_60_available_from_epoch",
+        "ram_60_available_from",
+        "ram_60_window_start_epoch",
+        "ram_60_window_start",
+        "ram_60_window_end_epoch",
+        "ram_60_window_end",
+    ]
+    out: dict[str, Any] = {}
+    try:
+        if candidate.window.empty:
+            return out
+        row = candidate.window.iloc[0]
+        for field in fields:
+            if field not in row:
+                continue
+            value = row[field]
+            try:
+                if pd.isna(value):
+                    continue
+            except (TypeError, ValueError):
+                pass
+            out[field] = value.item() if hasattr(value, "item") else value
+    except Exception:
+        return out
+    return out
+
+
 def variant_overlay_name(variant: str) -> str:
     return str(live_overlay.variant_config(variant).get("name") or variant)
 
@@ -278,6 +332,7 @@ def matrix_payload_from_candidate(
     row_id = live_row_id(candidate.row_id, symbol=candidate.symbol, entry_epoch=candidate.entry_epoch)
     position_id = source_position_id(candidate.row_id)
     side = "long" if str(candidate.side).lower() == "long" else "short"
+    metadata = candidate_entry_metadata(candidate)
     return {
         "event_id": f"V2MATRIX:{candidate.variant}:{event_type}:{position_id}:{event_epoch}",
         "source_strategy": "OBVFUTPORT_V2_T2_SMOOTH_SURVIVOR",
@@ -306,6 +361,11 @@ def matrix_payload_from_candidate(
         "overlay_policy": candidate.policy_name,
         "overlay_score": candidate.score,
         "overlay_row_id": row_id,
+        "overlay_entry_features": metadata,
+        "quote_history_mode": metadata.get("quote_history_mode"),
+        "quote_history_key_scope": metadata.get("quote_history_key_scope"),
+        "ram_60_available_from": metadata.get("ram_60_available_from"),
+        "ram_60_available_from_epoch": metadata.get("ram_60_available_from_epoch"),
         "research_row_id": candidate.row_id,
         "position_id": f"{candidate.variant}:{position_id}",
         "signal_id": position_id,
@@ -488,6 +548,7 @@ def overlay_state_from_candidates(
             row_id = live_row_id(candidate.row_id, symbol=candidate.symbol, entry_epoch=candidate.entry_epoch)
             key = live_overlay.overlay_key(variant, row_id, int(candidate.entry_epoch))
             position_id = source_position_id(candidate.row_id)
+            metadata = candidate_entry_metadata(candidate)
             position = live_overlay.OverlayPosition(
                 variant=variant,
                 row_id=row_id,
@@ -500,6 +561,7 @@ def overlay_state_from_candidates(
                 entry_ltp_price=float(candidate.entry_fill_price),
                 entry_score=float(candidate.score),
                 entry_features={
+                    **metadata,
                     "portfolio_score": float(candidate.score),
                     "policy_name": candidate.policy_name,
                     "overlay": candidate.overlay,
@@ -520,6 +582,17 @@ def overlay_state_from_candidates(
                 "entry_epoch": int(candidate.entry_epoch),
                 "entry_time": epoch_ist_iso(candidate.entry_epoch),
                 "entry_score": float(candidate.score),
+                "entry_features": {
+                    **metadata,
+                    "portfolio_score": float(candidate.score),
+                    "policy_name": candidate.policy_name,
+                    "overlay": candidate.overlay,
+                    "research_row_id": candidate.row_id,
+                },
+                "quote_history_mode": metadata.get("quote_history_mode"),
+                "quote_history_key_scope": metadata.get("quote_history_key_scope"),
+                "ram_60_available_from": metadata.get("ram_60_available_from"),
+                "ram_60_available_from_epoch": metadata.get("ram_60_available_from_epoch"),
                 "entry_fill_price": float(candidate.entry_fill_price),
                 "entry_ltp_price": float(candidate.entry_fill_price),
                 "history_backfilled": True,

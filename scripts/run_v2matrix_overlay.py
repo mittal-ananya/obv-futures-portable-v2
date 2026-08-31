@@ -3,15 +3,18 @@ from __future__ import annotations
 
 import argparse
 import bisect
+import gzip
+import hashlib
 import json
 import math
 import os
+import pickle
 import sys
 import tempfile
 import time
 import urllib.error
 import urllib.request
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, time as dt_time, timezone
 from pathlib import Path
 from typing import Any
@@ -31,6 +34,13 @@ SCHEMA = "obvfutport_v2.v2matrix_overlay_state.v1"
 PRIMARY_VARIANT = "smooth_survivor_armed20_floor80"
 FIXED_ENTRY_MARGIN = 500_000.0
 MAX_PORTFOLIO_POSITIONS = 3
+QUOTE_HISTORY_MODE = "bounded_prior_session_potential_t2_universe"
+QUOTE_HISTORY_KEY_SCOPE = "potential_t2_universe"
+QUOTE_RING_STATE_ROWS_PER_KEY = 96
+QUOTE_WARMUP_LOOKBACK_MINUTES = 60
+QUOTE_WARMUP_EXTRA_MINUTES = 10
+QUOTE_WARMUP_CURRENT_TAIL_BYTES = 900_000_000
+QUOTE_INDEX_CACHE_SCHEMA = "obvfutport_v2.t2_research.quote_index_day.v1"
 
 
 @dataclass(frozen=True)
@@ -207,6 +217,11 @@ class PortfolioHolding:
     entry_fill_price: float
     entry_ltp_price: float
     entry_score: float
+    entry_features: dict[str, Any] = field(default_factory=dict)
+    quote_history_mode: str | None = None
+    quote_history_key_scope: str | None = None
+    ram_60_available_from_epoch: int | None = None
+    ram_60_available_from: str | None = None
 
 
 class QuoteRingIndex:
@@ -230,12 +245,36 @@ class QuoteRingIndex:
         self.earliest_epoch = minute if self.earliest_epoch is None else min(self.earliest_epoch, minute)
         self.latest_epoch = minute if self.latest_epoch is None else max(self.latest_epoch, minute)
 
-    def prune(self, now_epoch: int) -> None:
+    def clear(self) -> None:
+        self._raw.clear()
+        self._keys.clear()
+        self._values.clear()
+        self.earliest_epoch = None
+        self.latest_epoch = None
+
+    def prune(self, now_epoch: int, *, preserve_since_epoch: int | None = None) -> None:
         cutoff = base.minute_floor(now_epoch - self.retention_seconds)
+        if preserve_since_epoch is not None:
+            cutoff = min(cutoff, base.minute_floor(preserve_since_epoch))
         for key in list(self._raw):
             rows = self._raw[key]
             for minute in list(rows):
                 if minute < cutoff:
+                    rows.pop(minute, None)
+            if not rows:
+                self._raw.pop(key, None)
+        self.finalize()
+
+    def trim_to_recent_per_key(self, max_rows_per_key: int) -> None:
+        if max_rows_per_key <= 0:
+            return
+        for key in list(self._raw):
+            rows = self._raw[key]
+            if len(rows) <= max_rows_per_key:
+                continue
+            keep = set(sorted(rows)[-max_rows_per_key:])
+            for minute in list(rows):
+                if minute not in keep:
                     rows.pop(minute, None)
             if not rows:
                 self._raw.pop(key, None)
@@ -290,6 +329,32 @@ class QuoteRingIndex:
         if idx < 0 or start < 0:
             return []
         return [quote.price for quote in values[start : idx + 1]]
+
+    def key_earliest_epoch(self, key: str) -> int | None:
+        minutes = self._keys.get(key)
+        return minutes[0] if minutes else None
+
+    def key_latest_epoch(self, key: str) -> int | None:
+        minutes = self._keys.get(key)
+        return minutes[-1] if minutes else None
+
+    def ram_available_from_epoch(self, key: str, lookback_minutes: int) -> int | None:
+        values = self._values.get(key)
+        if not values or len(values) <= int(lookback_minutes):
+            return None
+        return int(values[int(lookback_minutes)].minute_epoch + 60)
+
+    def lookback_window_bounds(self, key: str, epoch: int | float, lookback_minutes: int) -> tuple[int, int] | None:
+        minutes = self._keys.get(key)
+        values = self._values.get(key)
+        if not minutes or not values:
+            return None
+        target = base.minute_floor(epoch)
+        idx = bisect.bisect_right(minutes, target) - 1
+        start = idx - int(lookback_minutes)
+        if idx < 0 or start < 0:
+            return None
+        return int(values[start].minute_epoch), int(values[idx].minute_epoch)
 
     def key_count(self) -> int:
         return len(self._keys)
@@ -557,6 +622,296 @@ def target_stream_path(root: Path, trade_date: date) -> Path:
     return root / "state" / "target_stream" / day / f"target_quotes_{day}.jsonl"
 
 
+def key_set_hash(keys: set[str]) -> str:
+    payload = "\n".join(sorted(keys)).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()[:16]
+
+
+def potential_t2_required_keys(root: Path, legs: dict[str, base.TrancheLeg]) -> set[str]:
+    manifest = base.load_contract_manifest(root)
+    keys: set[str] = set()
+    symbols = manifest.get("symbols") if isinstance(manifest, dict) else {}
+    if isinstance(symbols, dict):
+        for payload in symbols.values():
+            if not isinstance(payload, dict):
+                continue
+            for key in (payload.get("cash_key"), payload.get("base_fut_key")):
+                if key:
+                    keys.add(str(key))
+            for contract in payload.get("contracts") or []:
+                if isinstance(contract, dict) and contract.get("instrument_key"):
+                    keys.add(str(contract["instrument_key"]))
+    for leg in legs.values():
+        for key in (leg.signal_key, leg.execution_key):
+            if key:
+                keys.add(str(key))
+    return keys
+
+
+def available_target_stream_dates(root: Path, *, before: date | None = None) -> list[date]:
+    base_dir = root / "state" / "target_stream"
+    if not base_dir.exists():
+        return []
+    out: list[date] = []
+    for day_dir in base_dir.glob("20??-??-??"):
+        try:
+            day = date.fromisoformat(day_dir.name)
+        except ValueError:
+            continue
+        if before is not None and day >= before:
+            continue
+        if (day_dir / f"target_quotes_{day_dir.name}.jsonl").exists():
+            out.append(day)
+    return sorted(out)
+
+
+def load_stream_path_into_index(
+    *,
+    path: Path,
+    trade_date: date,
+    required_keys: set[str],
+    index: QuoteRingIndex,
+    min_epoch: int | None = None,
+    tail_bytes: int | None = None,
+    max_rows_per_key: int | None = None,
+) -> dict[str, Any]:
+    from obvfut_portable_v2.passive_runner import row_from_target_stream_line  # type: ignore
+
+    rows = 0
+    kept = 0
+    seek_offset = 0
+    if not path.exists():
+        return {"trade_date": trade_date.isoformat(), "path": str(path), "exists": False, "rows": 0, "kept": 0, "size": 0}
+    size = path.stat().st_size
+    with path.open("rb") as handle:
+        if tail_bytes is not None and tail_bytes > 0 and size > tail_bytes:
+            seek_offset = max(0, size - int(tail_bytes))
+            handle.seek(seek_offset)
+            handle.readline()
+        for raw_line in handle:
+            if not raw_line.strip():
+                continue
+            rows += 1
+            row = row_from_target_stream_line(raw_line, trade_date.isoformat(), required_keys)
+            if row is None:
+                continue
+            price = safe_float(row.get("price"))
+            epoch = safe_float(row.get("epoch"))
+            key = str(row.get("target") or "")
+            if price is None or epoch is None or not key:
+                continue
+            if min_epoch is not None and int(epoch) < int(min_epoch):
+                continue
+            index.add(key, epoch, price, safe_float(row.get("bid")), safe_float(row.get("ask")))
+            kept += 1
+    if max_rows_per_key is not None:
+        index.trim_to_recent_per_key(int(max_rows_per_key))
+    return {
+        "trade_date": trade_date.isoformat(),
+        "path": str(path),
+        "exists": True,
+        "rows": rows,
+        "kept": kept,
+        "size": size,
+        "seek_offset": seek_offset,
+        "tail_bytes": tail_bytes,
+        "min_epoch": min_epoch,
+        "min_time_ist": epoch_ist_iso(min_epoch),
+    }
+
+
+def quote_index_cache_dir(root: Path) -> Path:
+    return root / "state" / "research_cache" / "t2_quote_index"
+
+
+def cached_quote_index_candidates(root: Path, trade_date: date) -> list[tuple[Path, Path]]:
+    cache_dir = quote_index_cache_dir(root)
+    if not cache_dir.exists():
+        return []
+    out: list[tuple[Path, Path]] = []
+    for meta in sorted(cache_dir.glob(f"{trade_date.isoformat()}_*.quote_index_meta.json")):
+        cache_file = meta.with_name(meta.name.replace(".quote_index_meta.json", ".quote_index.pkl.gz"))
+        if cache_file.exists():
+            out.append((cache_file, meta))
+    return out
+
+
+def load_cached_quote_index_into_ring(
+    *,
+    root: Path,
+    trade_date: date,
+    required_keys: set[str],
+    index: QuoteRingIndex,
+    max_rows_per_key: int,
+) -> dict[str, Any]:
+    best_payload: dict[str, list[tuple[int, float, float, float | None, float | None]]] | None = None
+    best_cache: Path | None = None
+    best_meta_path: Path | None = None
+    best_meta: dict[str, Any] = {}
+    best_overlap = -1
+    best_key_count = 0
+    for cache_file, meta_file in cached_quote_index_candidates(root, trade_date):
+        meta = read_json(meta_file, {})
+        if isinstance(meta, dict) and meta.get("schema") not in {None, QUOTE_INDEX_CACHE_SCHEMA}:
+            continue
+        try:
+            with gzip.open(cache_file, "rb") as handle:
+                payload = pickle.load(handle)
+        except Exception:
+            continue
+        if not isinstance(payload, dict):
+            continue
+        keys = {str(key) for key in payload}
+        overlap = len(keys & required_keys)
+        if overlap > best_overlap:
+            best_overlap = overlap
+            best_key_count = len(keys)
+            best_payload = payload
+            best_cache = cache_file
+            best_meta_path = meta_file
+            best_meta = meta if isinstance(meta, dict) else {}
+    if best_payload is None or best_cache is None:
+        return {
+            "trade_date": trade_date.isoformat(),
+            "cache_status": "missing",
+            "required_key_count": len(required_keys),
+            "warmed_key_count": 0,
+            "missing_required_key_count": len(required_keys),
+        }
+    loaded_rows = 0
+    loaded_keys = 0
+    for key, rows in best_payload.items():
+        key_str = str(key)
+        if key_str not in required_keys or not isinstance(rows, list):
+            continue
+        selected = rows[-max_rows_per_key:]
+        if selected:
+            loaded_keys += 1
+        for row in selected:
+            if not isinstance(row, (list, tuple)) or len(row) < 5:
+                continue
+            minute, event_epoch, price, bid, ask = row[:5]
+            index.add(key_str, float(event_epoch), float(price), safe_float(bid), safe_float(ask))
+            loaded_rows += 1
+    index.trim_to_recent_per_key(max_rows_per_key)
+    return {
+        "trade_date": trade_date.isoformat(),
+        "cache_status": "hit",
+        "cache_file": str(best_cache),
+        "cache_meta_file": str(best_meta_path) if best_meta_path else None,
+        "cache_source": best_meta.get("source") if isinstance(best_meta, dict) else None,
+        "cache_key_count": best_key_count,
+        "required_key_count": len(required_keys),
+        "warmed_key_count": loaded_keys,
+        "warmed_row_count": loaded_rows,
+        "missing_required_key_count": max(0, len(required_keys) - loaded_keys),
+        "required_overlap": max(0, best_overlap),
+    }
+
+
+def ensure_quote_history_warmup(
+    *,
+    root: Path,
+    state: dict[str, Any],
+    index: QuoteRingIndex,
+    required_keys: set[str],
+    today: date,
+    prior_sessions: int,
+    clock_epoch: int,
+    lookback_minutes: int,
+    current_tail_bytes: int,
+) -> dict[str, Any]:
+    stream_offsets = state.setdefault("stream_offsets", {})
+    required_hash = key_set_hash(required_keys)
+    prior_dates = available_target_stream_dates(root, before=today)[-max(0, int(prior_sessions)) :]
+    today_path = target_stream_path(root, today)
+    current_size = today_path.stat().st_size if today_path.exists() else 0
+    rows_per_key = max(QUOTE_RING_STATE_ROWS_PER_KEY, int(lookback_minutes) + QUOTE_WARMUP_EXTRA_MINUTES + 1)
+    current_min_epoch = max(
+        int(datetime.combine(today, dt_time(9, 15), tzinfo=IST).timestamp()),
+        base.minute_floor(clock_epoch - (int(lookback_minutes) + QUOTE_WARMUP_EXTRA_MINUTES) * 60),
+    )
+    signature = {
+        "mode": QUOTE_HISTORY_MODE,
+        "key_scope": QUOTE_HISTORY_KEY_SCOPE,
+        "trade_date": today.isoformat(),
+        "prior_trade_dates": [day.isoformat() for day in prior_dates],
+        "required_key_hash": required_hash,
+        "required_key_count": len(required_keys),
+        "today_path": str(today_path),
+        "lookback_minutes": int(lookback_minutes),
+        "extra_minutes": QUOTE_WARMUP_EXTRA_MINUTES,
+        "current_tail_bytes": int(current_tail_bytes),
+        "rows_per_key_cap": int(rows_per_key),
+    }
+    existing = state.get("quote_history_contract") if isinstance(state.get("quote_history_contract"), dict) else {}
+    signature_fields = (
+        "mode",
+        "key_scope",
+        "trade_date",
+        "prior_trade_dates",
+        "required_key_hash",
+        "today_path",
+        "lookback_minutes",
+        "current_tail_bytes",
+        "rows_per_key_cap",
+    )
+    if index.row_count() > 0 and all(existing.get(field) == signature.get(field) for field in signature_fields):
+        return {**existing, "skipped": True, "reason": "already_warmed"}
+
+    index.clear()
+    loaded: list[dict[str, Any]] = []
+    for day in prior_dates:
+        loaded.append(
+            load_cached_quote_index_into_ring(
+                root=root,
+                trade_date=day,
+                required_keys=required_keys,
+                index=index,
+                max_rows_per_key=rows_per_key,
+            )
+        )
+    if today_path.exists():
+        loaded.append(
+            load_stream_path_into_index(
+                path=today_path,
+                trade_date=today,
+                required_keys=required_keys,
+                index=index,
+                min_epoch=current_min_epoch,
+                tail_bytes=int(current_tail_bytes),
+                max_rows_per_key=rows_per_key,
+            )
+        )
+        stream_offsets[str(today_path)] = current_size
+    index.trim_to_recent_per_key(rows_per_key)
+    preserve_since = index.earliest_epoch
+    missing_current_ram60 = 0
+    for key in required_keys:
+        if index.ram_available_from_epoch(key, int(lookback_minutes)) is None:
+            missing_current_ram60 += 1
+    contract = {
+        **signature,
+        "skipped": False,
+        "loaded_streams": loaded,
+        "warmed_row_count": index.row_count(),
+        "warmed_key_count": index.key_count(),
+        "missing_ram60_key_count": missing_current_ram60,
+        "earliest_epoch": index.earliest_epoch,
+        "earliest_time_ist": epoch_ist_iso(index.earliest_epoch),
+        "latest_epoch": index.latest_epoch,
+        "latest_time_ist": epoch_ist_iso(index.latest_epoch),
+        "preserve_since_epoch": preserve_since,
+        "preserve_since_time_ist": epoch_ist_iso(preserve_since),
+        "current_min_epoch": current_min_epoch,
+        "current_min_time_ist": epoch_ist_iso(current_min_epoch),
+        "today_size_at_warmup": current_size,
+        "warmed_at_ist": now_ist().isoformat(),
+    }
+    state["quote_history_contract"] = contract
+    return contract
+
+
 def update_quote_index(
     *,
     root: Path,
@@ -564,6 +919,7 @@ def update_quote_index(
     index: QuoteRingIndex,
     required_keys: set[str],
     initial_stream_mode: str,
+    preserve_since_epoch: int | None = None,
 ) -> dict[str, Any]:
     from obvfut_portable_v2.passive_runner import row_from_target_stream_line  # type: ignore
 
@@ -603,7 +959,8 @@ def update_quote_index(
             kept += 1
         offset = handle.tell()
     stream_offsets[path_key] = offset
-    index.prune(session_clock())
+    index.prune(session_clock(), preserve_since_epoch=preserve_since_epoch)
+    index.trim_to_recent_per_key(QUOTE_RING_STATE_ROWS_PER_KEY)
     return {"path": path_key, "exists": True, "rows": rows, "kept": kept, "size": size, "offset": offset}
 
 
@@ -627,7 +984,7 @@ def hydrate_quote_index_from_state(index: QuoteRingIndex, state: dict[str, Any])
 def quote_index_to_state(index: QuoteRingIndex) -> dict[str, list[list[Any]]]:
     out: dict[str, list[list[Any]]] = {}
     for key, values in index._values.items():
-        out[key] = [[q.minute_epoch, q.event_epoch, q.price, q.bid, q.ask] for q in values[-520:]]
+        out[key] = [[q.minute_epoch, q.event_epoch, q.price, q.bid, q.ask] for q in values[-QUOTE_RING_STATE_ROWS_PER_KEY:]]
     return out
 
 
@@ -792,6 +1149,9 @@ def build_features(
         edge = estimate_edge(index, v1_portfolio, leg, clock_epoch, {**ram})
         if not edge.get("ok"):
             stats["missing_edge"] += 1
+        ram60_available_from = index.ram_available_from_epoch(leg.signal_key, 60)
+        ram60_bounds = index.lookback_window_bounds(leg.signal_key, ref_epoch, 60)
+        quote_contract = state.get("quote_history_contract") if isinstance(state.get("quote_history_contract"), dict) else {}
         features.append(
             {
                 "row_id": leg.row_id,
@@ -814,6 +1174,19 @@ def build_features(
                 "edge_return": edge.get("edge_return"),
                 "edge_to_cost_multiple": edge.get("edge_to_cost_multiple"),
                 "edge_diagnostics": edge,
+                "quote_history_mode": quote_contract.get("mode") or "live_active_t2_only_legacy",
+                "quote_history_key_scope": quote_contract.get("key_scope") or "active_t2_only_legacy",
+                "quote_history_required_key_count": quote_contract.get("required_key_count"),
+                "signal_key_history_earliest_epoch": index.key_earliest_epoch(leg.signal_key),
+                "signal_key_history_earliest_time": epoch_ist_iso(index.key_earliest_epoch(leg.signal_key)),
+                "signal_key_history_latest_epoch": index.key_latest_epoch(leg.signal_key),
+                "signal_key_history_latest_time": epoch_ist_iso(index.key_latest_epoch(leg.signal_key)),
+                "ram_60_available_from_epoch": ram60_available_from,
+                "ram_60_available_from": epoch_ist_iso(ram60_available_from),
+                "ram_60_window_start_epoch": ram60_bounds[0] if ram60_bounds else None,
+                "ram_60_window_start": epoch_ist_iso(ram60_bounds[0]) if ram60_bounds else None,
+                "ram_60_window_end_epoch": ram60_bounds[1] if ram60_bounds else None,
+                "ram_60_window_end": epoch_ist_iso(ram60_bounds[1]) if ram60_bounds else None,
                 **ram,
             }
         )
@@ -915,7 +1288,7 @@ def can_open_overlay(
         return False, "already_active_for_t2_leg"
     if not definition.requalify:
         key = overlay_key(variant, row_id)
-        if key in active_overlay or key in completed_overlay:
+        if key in active_overlay or key in completed_overlay or completed_history_for_scope(state, variant, row_id):
             return False, "already_completed_for_t2_leg"
         return True, "ok"
     records = completed_history_for_scope(state, variant, row_id)
@@ -934,6 +1307,68 @@ def dict_to_overlay_position(payload: dict[str, Any]) -> OverlayPosition:
 
 def dict_to_portfolio_holding(payload: dict[str, Any]) -> PortfolioHolding:
     return PortfolioHolding(**{field: payload[field] for field in PortfolioHolding.__dataclass_fields__ if field in payload})
+
+
+def legs_by_position_id(legs: dict[str, base.TrancheLeg]) -> dict[str, base.TrancheLeg]:
+    out: dict[str, base.TrancheLeg] = {}
+    for leg in legs.values():
+        if leg.position_id:
+            out[str(leg.position_id)] = leg
+    return out
+
+
+def resolve_leg_for_position(
+    legs: dict[str, base.TrancheLeg],
+    by_position_id: dict[str, base.TrancheLeg],
+    *,
+    row_id: str | None,
+    position_id: str | None,
+) -> base.TrancheLeg | None:
+    if row_id and row_id in legs:
+        return legs[row_id]
+    if position_id:
+        return by_position_id.get(str(position_id))
+    return None
+
+
+def canonicalize_live_overlay_rows(state: dict[str, Any], legs: dict[str, base.TrancheLeg]) -> int:
+    by_position_id = legs_by_position_id(legs)
+    changed = 0
+    for payload in (state.get("active_overlay") or {}).values():
+        if not isinstance(payload, dict):
+            continue
+        current_row_id = str(payload.get("row_id") or "")
+        leg = resolve_leg_for_position(
+            legs,
+            by_position_id,
+            row_id=current_row_id,
+            position_id=str(payload.get("position_id") or ""),
+        )
+        if leg is not None and current_row_id != leg.row_id:
+            payload.setdefault("legacy_row_id", current_row_id)
+            payload["row_id"] = leg.row_id
+            changed += 1
+    for portfolio in (state.get("portfolios") or {}).values():
+        if not isinstance(portfolio, dict):
+            continue
+        for payload in (portfolio.get("holdings") or {}).values():
+            if not isinstance(payload, dict):
+                continue
+            current_row_id = str(payload.get("row_id") or "")
+            leg = resolve_leg_for_position(
+                legs,
+                by_position_id,
+                row_id=current_row_id,
+                position_id=str(payload.get("position_id") or ""),
+            )
+            if leg is not None and current_row_id != leg.row_id:
+                payload.setdefault("legacy_row_id", current_row_id)
+                payload["row_id"] = leg.row_id
+                changed += 1
+    if changed:
+        state.setdefault("diagnostics", {})["canonicalized_live_overlay_row_ids"] = changed
+        state.setdefault("diagnostics", {})["canonicalized_live_overlay_row_ids_at_ist"] = now_ist().isoformat()
+    return changed
 
 
 def entry_display_reference(position: OverlayPosition) -> tuple[float, str, str | None]:
@@ -1058,6 +1493,11 @@ def matrix_payload(
         "overlay_variant": variant,
         "overlay_policy": variant_policy(variant).name,
         "overlay_score": position.entry_score if features is None else features.get("portfolio_score"),
+        "overlay_entry_features": features,
+        "quote_history_mode": (features or {}).get("quote_history_mode"),
+        "quote_history_key_scope": (features or {}).get("quote_history_key_scope"),
+        "ram_60_available_from_epoch": parse_epoch((features or {}).get("ram_60_available_from_epoch")),
+        "ram_60_available_from": (features or {}).get("ram_60_available_from"),
         "overlay_row_id": leg.row_id,
         "position_id": f"{variant}:{leg.position_id}",
         "signal_id": leg.position_id,
@@ -1104,8 +1544,14 @@ def portfolio_summary(portfolio: dict[str, Any], index: QuoteRingIndex, v1_portf
     transactions = [row for row in (portfolio.get("transactions") or []) if isinstance(row, dict)]
     realized = sum(float(row.get("net_rupees") or 0.0) for row in transactions if row.get("event") == "exit")
     unrealized = 0.0
+    by_position_id = legs_by_position_id(legs)
     for holding in holdings.values():
-        leg = legs.get(holding.row_id)
+        leg = resolve_leg_for_position(
+            legs,
+            by_position_id,
+            row_id=holding.row_id,
+            position_id=holding.position_id,
+        )
         if leg is None:
             continue
         fill = execution_fill(index, v1_portfolio, leg, clock_epoch, phase="exit")
@@ -1228,6 +1674,11 @@ def open_portfolio_holding(*, portfolio: dict[str, Any], variant: str, overlay_k
         entry_fill_price=position.entry_fill_price,
         entry_ltp_price=position.entry_ltp_price,
         entry_score=position.entry_score,
+        entry_features=position.entry_features,
+        quote_history_mode=position.entry_features.get("quote_history_mode"),
+        quote_history_key_scope=position.entry_features.get("quote_history_key_scope"),
+        ram_60_available_from_epoch=parse_epoch(position.entry_features.get("ram_60_available_from_epoch")),
+        ram_60_available_from=position.entry_features.get("ram_60_available_from"),
     )
     holdings[overlay_key_value] = asdict(holding)
     portfolio["peak_margin_rupees"] = max(float(portfolio.get("peak_margin_rupees") or 0.0), sum(float(item.get("margin_locked") or 0.0) for item in holdings.values() if isinstance(item, dict)))
@@ -1247,6 +1698,11 @@ def open_portfolio_holding(*, portfolio: dict[str, Any], variant: str, overlay_k
             "entry_score": position.entry_score,
             "entry_fill_price": position.entry_fill_price,
             "margin_locked": margin_locked,
+            "entry_features": position.entry_features,
+            "quote_history_mode": position.entry_features.get("quote_history_mode"),
+            "quote_history_key_scope": position.entry_features.get("quote_history_key_scope"),
+            "ram_60_available_from_epoch": parse_epoch(position.entry_features.get("ram_60_available_from_epoch")),
+            "ram_60_available_from": position.entry_features.get("ram_60_available_from"),
         }
     )
     portfolio["last_event_at_ist"] = position.entry_time
@@ -1300,9 +1756,13 @@ def run_clock(
     dry_run: bool,
     risk_floor: float,
     max_entry_staleness_seconds: float,
+    legs: dict[str, base.TrancheLeg] | None = None,
 ) -> dict[str, Any]:
     clock_epoch = session_clock()
-    legs = load_t2_legs(root, max_entry_staleness_seconds)
+    if legs is None:
+        legs = load_t2_legs(root, max_entry_staleness_seconds)
+    row_id_reconciliations = canonicalize_live_overlay_rows(state, legs)
+    by_position_id = legs_by_position_id(legs)
     active_legs = [leg for leg in legs.values() if leg.entry_epoch <= clock_epoch and (leg.exit_epoch is None or leg.exit_epoch > clock_epoch)]
     required_keys = {leg.signal_key for leg in active_legs} | {leg.execution_key for leg in active_legs}
     features, feature_stats = build_features(
@@ -1327,7 +1787,12 @@ def run_clock(
             active_overlay.pop(key, None)
             continue
         position = dict_to_overlay_position(payload)
-        leg = legs.get(position.row_id)
+        leg = resolve_leg_for_position(
+            legs,
+            by_position_id,
+            row_id=position.row_id,
+            position_id=position.position_id,
+        )
         if leg is None:
             continue
         should_exit, exit_reason, ret, exit_fill, fill = should_exit_overlay(
@@ -1477,6 +1942,10 @@ def run_clock(
                 "entry_time": position.entry_time,
                 "entry_score": position.entry_score,
                 "entry_features": entry_features,
+                "quote_history_mode": entry_features.get("quote_history_mode"),
+                "quote_history_key_scope": entry_features.get("quote_history_key_scope"),
+                "ram_60_available_from_epoch": parse_epoch(entry_features.get("ram_60_available_from_epoch")),
+                "ram_60_available_from": entry_features.get("ram_60_available_from"),
                 "entry_fill_price": entry_fill,
                 "entry_ltp_price": entry_ltp,
                 "entry_display_price_underlying": entry_display_price,
@@ -1531,6 +2000,7 @@ def run_clock(
         "active_overlay_count": len(active_overlay),
         "quote_keys": index.key_count(),
         "quote_rows": index.row_count(),
+        "row_id_reconciliations": row_id_reconciliations,
     }
     return state["last_clock"]
 
@@ -1564,7 +2034,10 @@ def main() -> int:
     parser.add_argument("--interval-seconds", type=float, default=5.0)
     parser.add_argument("--risk-floor", type=float, default=0.0005)
     parser.add_argument("--max-entry-staleness-seconds", type=float, default=5.0)
-    parser.add_argument("--quote-retention-seconds", type=int, default=28_800)
+    parser.add_argument("--quote-retention-seconds", type=int, default=100_000)
+    parser.add_argument("--quote-warmup-prior-sessions", type=int, default=1)
+    parser.add_argument("--quote-warmup-lookback-minutes", type=int, default=QUOTE_WARMUP_LOOKBACK_MINUTES)
+    parser.add_argument("--quote-warmup-current-tail-bytes", type=int, default=QUOTE_WARMUP_CURRENT_TAIL_BYTES)
     parser.add_argument("--initial-stream-mode", choices=["tail", "beginning"], default="tail")
     parser.add_argument("--once", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
@@ -1593,18 +2066,32 @@ def main() -> int:
             clock_epoch = session_clock()
             session_active = in_session(clock_epoch)
             if session_active or args.once:
+                legs = load_t2_legs(args.root, args.max_entry_staleness_seconds)
+                canonicalize_live_overlay_rows(state, legs)
+                required_keys = potential_t2_required_keys(args.root, legs)
+                quote_history_contract = ensure_quote_history_warmup(
+                    root=args.root,
+                    state=state,
+                    index=index,
+                    required_keys=required_keys,
+                    today=now_ist().date(),
+                    prior_sessions=int(args.quote_warmup_prior_sessions),
+                    clock_epoch=clock_epoch,
+                    lookback_minutes=int(args.quote_warmup_lookback_minutes),
+                    current_tail_bytes=int(args.quote_warmup_current_tail_bytes),
+                )
                 active_legs_for_keys = [
                     leg
-                    for leg in load_t2_legs(args.root, args.max_entry_staleness_seconds).values()
+                    for leg in legs.values()
                     if leg.entry_epoch <= clock_epoch and (leg.exit_epoch is None or leg.exit_epoch > clock_epoch)
                 ]
-                required_keys = {leg.signal_key for leg in active_legs_for_keys} | {leg.execution_key for leg in active_legs_for_keys}
                 stream_status = update_quote_index(
                     root=args.root,
                     state=state,
                     index=index,
                     required_keys=required_keys,
                     initial_stream_mode=args.initial_stream_mode,
+                    preserve_since_epoch=parse_epoch(quote_history_contract.get("preserve_since_epoch")),
                 )
                 clock_status = run_clock(
                     root=args.root,
@@ -1616,7 +2103,13 @@ def main() -> int:
                     dry_run=args.dry_run,
                     risk_floor=args.risk_floor,
                     max_entry_staleness_seconds=args.max_entry_staleness_seconds,
+                    legs=legs,
                 )
+                clock_status["potential_t2_required_key_count"] = len(required_keys)
+                clock_status["active_t2_required_key_count_legacy"] = len(
+                    {leg.signal_key for leg in active_legs_for_keys} | {leg.execution_key for leg in active_legs_for_keys}
+                )
+                clock_status["quote_history_contract"] = quote_history_contract
             else:
                 stream_status = {"skipped": True, "reason": "outside_market_session_idle"}
                 clock_status = {"clock_epoch": clock_epoch, "clock_time_ist": epoch_ist_iso(clock_epoch), "in_session": False}

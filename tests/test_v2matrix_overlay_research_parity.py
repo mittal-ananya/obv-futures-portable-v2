@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
 import math
+import gzip
+import pickle
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -80,6 +83,163 @@ def make_index(prices_by_epoch: dict[int, float]) -> live.QuoteRingIndex:
         index.add("NFO:TEST_FUT", epoch, price, price - 0.01, price + 0.01)
     index.finalize()
     return index
+
+
+def test_potential_t2_required_keys_include_manifest_universe_before_leg_is_active(tmp_path: Path) -> None:
+    root = tmp_path
+    config_dir = root / "config"
+    config_dir.mkdir()
+    (config_dir / "obvfutport_v2_contract_chain_manifest.json").write_text(
+        json.dumps(
+            {
+                "symbols": {
+                    "TEST": {
+                        "cash_key": "NSE:TEST",
+                        "base_fut_key": "NFO:TEST26SEPFUT",
+                        "contracts": [{"instrument_key": "NFO:TEST26SEPFUT"}],
+                    },
+                    "FRESH": {
+                        "cash_key": "NSE:FRESH",
+                        "base_fut_key": "NFO:FRESH26SEPFUT",
+                        "contracts": [{"instrument_key": "NFO:FRESH26SEPFUT"}],
+                    },
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    keys = live.potential_t2_required_keys(root, {})
+
+    assert "NSE:FRESH" in keys
+    assert "NFO:FRESH26SEPFUT" in keys
+    assert "NSE:TEST" in keys
+
+
+def test_live_features_record_ram60_history_contract() -> None:
+    clock = epoch_at(9, 21)
+    start = clock - (61 * 60)
+    index = live.QuoteRingIndex(retention_seconds=100_000)
+    for i in range(61):
+        epoch = start + (i * 60)
+        price = 100.0 + (i * 0.01)
+        index.add("NSE:TEST", epoch, price, price - 0.01, price + 0.01)
+        index.add("NFO:TEST_FUT", epoch, price, price - 0.01, price + 0.01)
+    index.finalize()
+    state = {
+        "quote_history_contract": {
+            "mode": live.QUOTE_HISTORY_MODE,
+            "key_scope": live.QUOTE_HISTORY_KEY_SCOPE,
+            "required_key_count": 2,
+        }
+    }
+
+    features, stats = live.build_features(
+        active_legs=[make_leg()],
+        index=index,
+        v1_portfolio=DummyV1Portfolio(),
+        clock_epoch=clock,
+        state=state,
+        risk_floor=0.0005,
+    )
+
+    assert stats["missing_ram"] == 0
+    feature = features["TEST|T2|pos-1|1"]
+    assert feature["quote_history_mode"] == live.QUOTE_HISTORY_MODE
+    assert feature["quote_history_key_scope"] == live.QUOTE_HISTORY_KEY_SCOPE
+    assert feature["ram_60_available_from_epoch"] == clock
+    assert feature["ram_60_available_from"] == live.epoch_ist_iso(clock)
+    assert feature["ram_60_window_end_epoch"] == clock - 60
+
+
+def test_cached_prior_session_warmup_reports_partial_key_coverage(tmp_path: Path) -> None:
+    root = tmp_path
+    cache_dir = root / "state" / "research_cache" / "t2_quote_index"
+    cache_dir.mkdir(parents=True)
+    trade_date = "2026-08-27"
+    cache_file = cache_dir / f"{trade_date}_abc.quote_index.pkl.gz"
+    meta_file = cache_dir / f"{trade_date}_abc.quote_index_meta.json"
+    with gzip.open(cache_file, "wb") as handle:
+        pickle.dump(
+            {
+                "NSE:TEST": [
+                    (epoch_at(14, 58), float(epoch_at(14, 58)), 100.0, 99.9, 100.1),
+                    (epoch_at(14, 59), float(epoch_at(14, 59)), 101.0, 100.9, 101.1),
+                ]
+            },
+            handle,
+        )
+    meta_file.write_text(json.dumps({"schema": live.QUOTE_INDEX_CACHE_SCHEMA}), encoding="utf-8")
+    index = live.QuoteRingIndex()
+
+    report = live.load_cached_quote_index_into_ring(
+        root=root,
+        trade_date=datetime.fromisoformat(trade_date).date(),
+        required_keys={"NSE:TEST", "NSE:MISSING"},
+        index=index,
+        max_rows_per_key=96,
+    )
+
+    assert report["cache_status"] == "hit"
+    assert report["warmed_key_count"] == 1
+    assert report["missing_required_key_count"] == 1
+    assert index.key_count() == 1
+    assert index.row_count() == 2
+
+
+def test_live_entry_contract_is_stored_on_payload_and_portfolio_holding() -> None:
+    clock = epoch_at(10, 30)
+    leg = make_leg()
+    features = {
+        "portfolio_score": 0.91,
+        "quote_history_mode": live.QUOTE_HISTORY_MODE,
+        "quote_history_key_scope": live.QUOTE_HISTORY_KEY_SCOPE,
+        "ram_60_available_from_epoch": epoch_at(10, 20),
+        "ram_60_available_from": live.epoch_ist_iso(epoch_at(10, 20)),
+    }
+    position = make_position()
+    position.entry_epoch = clock
+    position.entry_time = live.epoch_ist_iso(clock)
+    position.entry_features = dict(features)
+
+    payload = live.matrix_payload(
+        event_type="paper_entry",
+        variant=position.variant,
+        leg=leg,
+        position=position,
+        event_epoch_value=clock,
+        trigger_price=100.0,
+        trigger_source="unit_test",
+        features=features,
+    )
+
+    assert payload["quote_history_mode"] == live.QUOTE_HISTORY_MODE
+    assert payload["quote_history_key_scope"] == live.QUOTE_HISTORY_KEY_SCOPE
+    assert payload["ram_60_available_from_epoch"] == epoch_at(10, 20)
+    assert payload["ram_60_available_from"] == live.epoch_ist_iso(epoch_at(10, 20))
+    assert payload["overlay_entry_features"]["quote_history_mode"] == live.QUOTE_HISTORY_MODE
+
+    portfolio = {
+        "portfolio_id": "unit-portfolio",
+        "cash_rupees": 2_000_000.0,
+        "peak_margin_rupees": 0.0,
+        "holdings": {},
+        "transactions": [],
+        "diagnostics": {},
+    }
+    assert live.open_portfolio_holding(
+        portfolio=portfolio,
+        variant=position.variant,
+        overlay_key_value="overlay-key-1",
+        position=position,
+        leg=leg,
+    )
+    holding = portfolio["holdings"]["overlay-key-1"]
+    tx = portfolio["transactions"][-1]
+    assert holding["quote_history_mode"] == live.QUOTE_HISTORY_MODE
+    assert holding["quote_history_key_scope"] == live.QUOTE_HISTORY_KEY_SCOPE
+    assert holding["ram_60_available_from_epoch"] == epoch_at(10, 20)
+    assert tx["quote_history_mode"] == live.QUOTE_HISTORY_MODE
+    assert tx["ram_60_available_from"] == live.epoch_ist_iso(epoch_at(10, 20))
 
 
 def research_exit(config: dict, returns: list[float], *, start_hour: int = 9, start_minute: int = 30) -> dict:
@@ -165,6 +325,111 @@ def test_requalify_gate_respects_cooldown_and_max_entries() -> None:
         False,
         "max_entries_per_t2_leg_reached",
     )
+
+
+def test_live_row_id_reconciliation_uses_position_id_for_research_rows() -> None:
+    leg = make_leg()
+    old_row_id = "TEST|T2|pos-1|999"
+    state = {
+        "active_overlay": {
+            "smooth_survivor_profit25|TEST|T2|pos-1|999": {
+                **live.asdict(make_position("smooth_survivor_profit25")),
+                "row_id": old_row_id,
+            }
+        },
+        "portfolios": {
+            "fixed5L": {
+                "holdings": {
+                    "smooth_survivor_profit25|TEST|T2|pos-1|999": {
+                        "overlay_key": "smooth_survivor_profit25|TEST|T2|pos-1|999",
+                        "row_id": old_row_id,
+                        "position_id": "pos-1",
+                        "symbol": "TEST",
+                        "side": "long",
+                        "lots": 1,
+                        "lot_size": 100,
+                        "margin_locked": 100000.0,
+                        "entry_epoch": epoch_at(9, 30),
+                        "entry_time": live.epoch_ist_iso(epoch_at(9, 30)),
+                        "entry_fill_price": 100.0,
+                        "entry_ltp_price": 100.0,
+                        "entry_score": 0.92,
+                    }
+                }
+            }
+        },
+    }
+
+    changed = live.canonicalize_live_overlay_rows(state, {leg.row_id: leg})
+
+    assert changed == 2
+    active = next(iter(state["active_overlay"].values()))
+    holding = next(iter(state["portfolios"]["fixed5L"]["holdings"].values()))
+    assert active["row_id"] == leg.row_id
+    assert active["legacy_row_id"] == old_row_id
+    assert holding["row_id"] == leg.row_id
+    assert holding["legacy_row_id"] == old_row_id
+
+
+def test_non_requalifying_overlay_does_not_reopen_after_row_id_reconciliation() -> None:
+    state: dict[str, object] = {"completed_overlay_keys": [], "completed_overlay_history": {}}
+    row_id = "TEST|T2|pos-1|1"
+    legacy_key = "smooth_survivor_profit25|TEST|T2|pos-1|999"
+    live.record_completed_overlay(
+        state,
+        variant="smooth_survivor_profit25",
+        row_id=row_id,
+        key=legacy_key,
+        exit_epoch=epoch_at(10, 0),
+        exit_reason="underlying_t2_exit",
+    )
+
+    assert live.can_open_overlay(
+        state,
+        variant="smooth_survivor_profit25",
+        row_id=row_id,
+        clock_epoch=epoch_at(10, 5),
+        active_overlay={},
+        completed_overlay=set(),
+    ) == (False, "already_completed_for_t2_leg")
+
+
+def test_portfolio_summary_marks_unrealized_using_position_id_reconciled_leg() -> None:
+    leg = make_leg()
+    portfolio = {
+        "variant": "smooth_survivor_profit25",
+        "portfolio_id": "fixed5L",
+        "peak_margin_rupees": 100000.0,
+        "holdings": {
+            "smooth_survivor_profit25|TEST|T2|pos-1|999": {
+                "overlay_key": "smooth_survivor_profit25|TEST|T2|pos-1|999",
+                "row_id": "TEST|T2|pos-1|999",
+                "position_id": "pos-1",
+                "symbol": "TEST",
+                "side": "long",
+                "lots": 1,
+                "lot_size": 100,
+                "margin_locked": 100000.0,
+                "entry_epoch": epoch_at(9, 30),
+                "entry_time": live.epoch_ist_iso(epoch_at(9, 30)),
+                "entry_fill_price": 100.0,
+                "entry_ltp_price": 100.0,
+                "entry_score": 0.92,
+            }
+        },
+        "transactions": [],
+    }
+
+    summary = live.portfolio_summary(
+        portfolio,
+        make_index({epoch_at(9, 35): 101.0}),
+        DummyV1Portfolio(),
+        {leg.row_id: leg},
+        epoch_at(9, 35),
+    )
+
+    assert summary["open_positions"] == 1
+    assert summary["unrealized_net_rupees"] == 100.0
 
 
 def test_armed_floor_live_exit_matches_research_floor_price_and_reason() -> None:

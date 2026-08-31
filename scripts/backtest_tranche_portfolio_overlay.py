@@ -169,6 +169,32 @@ class QuoteIndex:
             return []
         return [quote.price for quote in values[start : idx + 1]]
 
+    def key_earliest_epoch(self, key: str) -> int | None:
+        minutes = self._keys.get(key)
+        return minutes[0] if minutes else None
+
+    def key_latest_epoch(self, key: str) -> int | None:
+        minutes = self._keys.get(key)
+        return minutes[-1] if minutes else None
+
+    def ram_available_from_epoch(self, key: str, lookback_minutes: int) -> int | None:
+        values = self._values.get(key)
+        if not values or len(values) <= int(lookback_minutes):
+            return None
+        return int(values[int(lookback_minutes)].minute_epoch + 60)
+
+    def lookback_window_bounds(self, key: str, epoch: int | float, lookback_minutes: int) -> tuple[int, int] | None:
+        minutes = self._keys.get(key)
+        values = self._values.get(key)
+        if not minutes or not values:
+            return None
+        target = minute_floor(epoch)
+        idx = bisect.bisect_right(minutes, target) - 1
+        start = idx - int(lookback_minutes)
+        if idx < 0 or start < 0:
+            return None
+        return int(values[start].minute_epoch), int(values[idx].minute_epoch)
+
     def last_epoch(self) -> int | None:
         latest: int | None = None
         for minutes in self._keys.values():
