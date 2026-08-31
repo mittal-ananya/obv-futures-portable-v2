@@ -3,8 +3,8 @@
 Overall OK: False
 Summary OK: False | Transactions OK: False | Open holdings OK: False | Canonical metadata OK: True
 
-Live state: 
-Canonical dry-run: 
+Live state: `/opt/cloud-deploy-candidates/v2matrix/state/portfolio_state.json`
+Canonical dry-run: `/tmp/v2matrix_aug31_parity_install_metadata_path_fixed_20260831_180500/portfolio_state.json`
 
 ## Summary Differences
 
