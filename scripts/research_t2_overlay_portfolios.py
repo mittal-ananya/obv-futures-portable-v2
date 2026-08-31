@@ -66,6 +66,52 @@ class ReplacementPolicy:
     min_hold_minutes: int = 0
 
 
+ENTRY_METADATA_FIELDS = (
+    "quote_history_mode",
+    "quote_history_key_scope",
+    "signal_key_history_earliest_epoch",
+    "signal_key_history_earliest_time",
+    "signal_key_history_latest_epoch",
+    "signal_key_history_latest_time",
+    "ram_60_available_from_epoch",
+    "ram_60_available_from",
+    "ram_60_window_start_epoch",
+    "ram_60_window_start",
+    "ram_60_window_end_epoch",
+    "ram_60_window_end",
+)
+
+
+def candidate_entry_metadata(candidate: Candidate) -> dict[str, Any]:
+    if candidate.window.empty:
+        return {}
+    row = candidate.window.iloc[0]
+    metadata: dict[str, Any] = {}
+    for field in ENTRY_METADATA_FIELDS:
+        if field not in row:
+            continue
+        value = row[field]
+        try:
+            if pd.isna(value):
+                continue
+        except (TypeError, ValueError):
+            pass
+        metadata[field] = value.item() if hasattr(value, "item") else value
+    if metadata.get("ram_60_available_from_epoch") is not None:
+        metadata.setdefault("quote_history_mode", "research_full_session_quote_index")
+        metadata.setdefault("quote_history_key_scope", "all_t2_ledger_keys")
+        for epoch_field, time_field in (
+            ("ram_60_available_from_epoch", "ram_60_available_from"),
+            ("ram_60_window_start_epoch", "ram_60_window_start"),
+            ("ram_60_window_end_epoch", "ram_60_window_end"),
+            ("signal_key_history_earliest_epoch", "signal_key_history_earliest_time"),
+            ("signal_key_history_latest_epoch", "signal_key_history_latest_time"),
+        ):
+            if metadata.get(epoch_field) is not None and not metadata.get(time_field):
+                metadata[time_field] = base.epoch_ist_iso(int(metadata[epoch_field]))
+    return metadata
+
+
 def write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(f"{path.name}.{time.time_ns()}.tmp")
@@ -383,6 +429,7 @@ def run_portfolio(
                 acct = candidate_account(v1_portfolio, candidate, candidate.exit_fill_price, holding.lots)
                 pnl = float(acct.get("net_rupees") or 0.0)
                 cash += holding.margin_locked + pnl
+                metadata = candidate_entry_metadata(candidate)
                 transactions.append(
                     {
                         "event": "exit",
@@ -406,6 +453,7 @@ def run_portfolio(
                         "charges_rupees": acct.get("charges_rupees"),
                         "net_rupees": pnl,
                         "net_pct_margin": (pnl / holding.margin_locked * 100.0) if holding.margin_locked else None,
+                        **metadata,
                     }
                 )
                 holdings.pop(row_id, None)
@@ -467,6 +515,7 @@ def run_portfolio(
                     continue
                 cash = cash_after_close
                 holdings.pop(weakest_row_id, None)
+                metadata = candidate_entry_metadata(weakest.candidate)
                 replaced_row = {
                     "event": "exit",
                     "exit_reason": "portfolio_replacement",
@@ -494,6 +543,7 @@ def run_portfolio(
                     "charges_rupees": acct.get("charges_rupees"),
                     "net_rupees": pnl,
                     "net_pct_margin": (pnl / weakest.margin_locked * 100.0) if weakest.margin_locked else None,
+                    **metadata,
                 }
                 transactions.append(replaced_row)
                 diagnostics["replacement_exits"] += 1
@@ -514,6 +564,7 @@ def run_portfolio(
             cash -= margin_locked
             holdings[candidate.row_id] = PortfolioHolding(candidate=candidate, lots=lots, margin_locked=margin_locked)
             diagnostics["entered"] += 1
+            metadata = candidate_entry_metadata(candidate)
             transactions.append(
                 {
                     "event": "entry",
@@ -536,6 +587,7 @@ def run_portfolio(
                     "planned_exit_epoch": candidate.exit_epoch,
                     "planned_exit_time": base.epoch_ist_iso(candidate.exit_epoch),
                     "planned_exit_reason": candidate.exit_reason,
+                    **metadata,
                 }
             )
         equity = portfolio_equity(cash, holdings, v1_portfolio, epoch)

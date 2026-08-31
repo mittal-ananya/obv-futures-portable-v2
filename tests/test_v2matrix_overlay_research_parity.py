@@ -20,6 +20,7 @@ if str(SCRIPTS_DIR) not in sys.path:
 import backtest_tranche_portfolio_overlay as base  # noqa: E402
 import backfill_v2matrix_history as history_backfill  # noqa: E402
 import install_v2matrix_from_research_portfolios as installer  # noqa: E402
+import research_t2_mfe_first_profit_capture as mfe_research  # noqa: E402
 import research_t2_overlay_portfolios as research_portfolios  # noqa: E402
 import research_t2_overlay_variant_compare as research_compare  # noqa: E402
 import run_v2matrix_overlay as live  # noqa: E402
@@ -627,6 +628,10 @@ def make_research_candidate(*, exit_reason: str = "open_at_period_end") -> resea
             "clock_time": [live.epoch_ist_iso(entry), live.epoch_ist_iso(entry + 60), live.epoch_ist_iso(mark)],
             "forward_return": [0.0, 0.001, 0.002],
             "score_smooth_survivor": [0.91, 0.91, 0.91],
+            "quote_history_mode": ["research_full_session_quote_index"] * 3,
+            "quote_history_key_scope": ["all_candidate_keys"] * 3,
+            "ram_60_available_from_epoch": [entry] * 3,
+            "ram_60_available_from": [live.epoch_ist_iso(entry)] * 3,
         }
     )
     return research_portfolios.Candidate(
@@ -666,6 +671,70 @@ def test_open_at_period_end_candidate_remains_open_in_portfolio_simulation() -> 
     assert result["summary"]["current_open_positions"] == 1
     assert result["summary"]["closed_trades"] == 0
     assert [row["event"] for row in result["transactions"]] == ["entry"]
+
+
+def test_research_portfolio_transactions_and_installed_holdings_keep_quote_history_metadata() -> None:
+    candidate = make_research_candidate()
+    result = research_portfolios.run_portfolio(
+        variant=candidate.variant,
+        candidates=[candidate],
+        max_positions=3,
+        initial_capital=2_000_000.0,
+        v1_portfolio=DummyV1Portfolio(),
+        sizing_mode="fixed_entry_margin_unconstrained",
+        fixed_entry_margin=500_000.0,
+        replacement_policy=research_portfolios.ReplacementPolicy(name="none", enabled=False),
+    )
+
+    entry = result["transactions"][0]
+    assert entry["quote_history_mode"] == "research_full_session_quote_index"
+    assert entry["quote_history_key_scope"] == "all_candidate_keys"
+    assert entry["ram_60_available_from_epoch"] == candidate.entry_epoch
+
+    portfolio = installer.portfolio_state_from_research_result(
+        variant=candidate.variant,
+        result=result,
+        initial_capital=2_000_000.0,
+    )
+    holding = next(iter(portfolio["holdings"].values()))
+    tx = portfolio["transactions"][0]
+    assert tx["quote_history_mode"] == "research_full_session_quote_index"
+    assert tx["ram_60_available_from_epoch"] == candidate.entry_epoch
+    assert holding["quote_history_mode"] == "research_full_session_quote_index"
+    assert holding["ram_60_available_from"] == live.epoch_ist_iso(candidate.entry_epoch)
+
+
+def test_research_path_lookup_keeps_quote_history_metadata_for_candidates() -> None:
+    entry = epoch_at(10, 0)
+    exit_epoch = epoch_at(10, 2)
+    frame = pd.DataFrame(
+        {
+            "row_id": ["TEST|T2|pos-1|1"] * 3,
+            "symbol": ["TEST"] * 3,
+            "side": ["long"] * 3,
+            "clock_epoch": [entry, entry + 60, exit_epoch],
+            "clock_time": [live.epoch_ist_iso(entry), live.epoch_ist_iso(entry + 60), live.epoch_ist_iso(exit_epoch)],
+            "current_ret": [0.0010, 0.0020, 0.0030],
+            "t2_exit_epoch": [exit_epoch] * 3,
+            "entry_fill_price": [100.0] * 3,
+            "margin_per_lot": [100000.0] * 3,
+            "lot_size": [100] * 3,
+            "score_smooth_survivor": [0.91] * 3,
+            "quote_history_mode": ["research_full_session_quote_index"] * 3,
+            "quote_history_key_scope": ["all_t2_ledger_keys"] * 3,
+            "ram_60_available_from_epoch": [entry] * 3,
+            "ram_60_available_from": [live.epoch_ist_iso(entry)] * 3,
+        }
+    )
+    lookup = mfe_research.build_path_lookup(frame)
+    row = frame.iloc[0]
+    metrics = mfe_research.path_metrics(row, lookup, 0.0005, include_window=True)
+
+    assert metrics["ok"]
+    window = metrics["window"]
+    assert window.iloc[0]["quote_history_mode"] == "research_full_session_quote_index"
+    assert window.iloc[0]["quote_history_key_scope"] == "all_t2_ledger_keys"
+    assert window.iloc[0]["ram_60_available_from_epoch"] == entry
 
 
 def test_open_at_period_end_candidate_remains_active_in_installed_state() -> None:

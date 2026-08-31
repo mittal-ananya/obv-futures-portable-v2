@@ -294,6 +294,17 @@ def load_quote_index(
     )
 
 
+FEATURE_METADATA_FIELDS = {
+    "quote_history_mode",
+    "quote_history_key_scope",
+    "signal_key_history_earliest_time",
+    "signal_key_history_latest_time",
+    "ram_60_available_from",
+    "ram_60_window_start",
+    "ram_60_window_end",
+}
+
+
 def build_outcome_frame(
     *,
     panel: dict[int, dict[str, dict[str, Any]]],
@@ -383,6 +394,14 @@ def build_outcome_frame(
             }
             for key, value in feature.items():
                 if key in {"row_id", "symbol", "side"}:
+                    continue
+                if key in FEATURE_METADATA_FIELDS:
+                    try:
+                        if pd.isna(value):
+                            continue
+                    except (TypeError, ValueError):
+                        pass
+                    record[key] = value.item() if hasattr(value, "item") else value
                     continue
                 number = finite_float(value)
                 if number is not None:

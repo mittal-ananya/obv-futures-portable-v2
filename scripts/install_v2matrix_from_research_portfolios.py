@@ -136,7 +136,39 @@ def candidate_entry_metadata(candidate: portfolio_research.Candidate) -> dict[st
             out[field] = value.item() if hasattr(value, "item") else value
     except Exception:
         return out
+    if out.get("ram_60_available_from_epoch") is not None:
+        out.setdefault("quote_history_mode", "research_full_session_quote_index")
+        out.setdefault("quote_history_key_scope", "all_t2_ledger_keys")
+        for epoch_field, time_field in (
+            ("ram_60_available_from_epoch", "ram_60_available_from"),
+            ("ram_60_window_start_epoch", "ram_60_window_start"),
+            ("ram_60_window_end_epoch", "ram_60_window_end"),
+            ("signal_key_history_earliest_epoch", "signal_key_history_earliest_time"),
+            ("signal_key_history_latest_epoch", "signal_key_history_latest_time"),
+        ):
+            if out.get(epoch_field) is not None and not out.get(time_field):
+                out[time_field] = epoch_ist_iso(int(out[epoch_field]))
     return out
+
+
+PORTFOLIO_ENTRY_METADATA_FIELDS = (
+    "quote_history_mode",
+    "quote_history_key_scope",
+    "signal_key_history_earliest_epoch",
+    "signal_key_history_earliest_time",
+    "signal_key_history_latest_epoch",
+    "signal_key_history_latest_time",
+    "ram_60_available_from_epoch",
+    "ram_60_available_from",
+    "ram_60_window_start_epoch",
+    "ram_60_window_start",
+    "ram_60_window_end_epoch",
+    "ram_60_window_end",
+)
+
+
+def portfolio_entry_metadata(row: dict[str, Any]) -> dict[str, Any]:
+    return {field: row.get(field) for field in PORTFOLIO_ENTRY_METADATA_FIELDS if row.get(field) is not None}
 
 
 def variant_overlay_name(variant: str) -> str:
@@ -276,6 +308,7 @@ def portfolio_state_from_research_result(
                 "entry_fill_price": float(row.get("entry_fill_price") or 0.0),
                 "entry_ltp_price": float(row.get("entry_fill_price") or 0.0),
                 "entry_score": float(row.get("entry_score") or 0.0),
+                **portfolio_entry_metadata(row),
             }
             portfolio["last_event_at_ist"] = row.get("entry_time")
         elif row.get("event") == "exit":
@@ -335,7 +368,7 @@ def matrix_payload_from_candidate(
     metadata = candidate_entry_metadata(candidate)
     entry_metadata = position.entry_features if isinstance(position.entry_features, dict) else {}
     if entry_metadata:
-        metadata = {**entry_metadata, **metadata}
+        metadata = {**metadata, **entry_metadata}
     return {
         "event_id": f"V2MATRIX:{candidate.variant}:{event_type}:{position_id}:{event_epoch}",
         "source_strategy": "OBVFUTPORT_V2_T2_SMOOTH_SURVIVOR",

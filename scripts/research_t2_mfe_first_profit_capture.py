@@ -25,6 +25,20 @@ import research_t2_continuation_filters as continuation  # noqa: E402
 
 SCHEMA = "obvfutport_v2.t2_mfe_first_profit_capture_research.v1"
 SCORE_COLUMNS = ("score_risk_first", "score_smooth_survivor", "score_continuation", "score_cost_adjusted")
+PATH_METADATA_COLUMNS = (
+    "quote_history_mode",
+    "quote_history_key_scope",
+    "signal_key_history_earliest_epoch",
+    "signal_key_history_earliest_time",
+    "signal_key_history_latest_epoch",
+    "signal_key_history_latest_time",
+    "ram_60_available_from_epoch",
+    "ram_60_available_from",
+    "ram_60_window_start_epoch",
+    "ram_60_window_start",
+    "ram_60_window_end_epoch",
+    "ram_60_window_end",
+)
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -100,6 +114,7 @@ def build_path_lookup(frame: pd.DataFrame) -> dict[str, pd.DataFrame]:
         "clock_time",
         "current_ret",
         *SCORE_COLUMNS,
+        *PATH_METADATA_COLUMNS,
     ]
     slim = frame.loc[:, [col for col in needed if col in frame.columns]].copy()
     slim["row_id"] = slim["row_id"].astype(str)

@@ -1,0 +1,1032 @@
+{
+  "canonical_metadata_ok": true,
+  "canonical_path": "/tmp/v2matrix_aug31_parity_install_metadata_path_fixed_20260831_180500/portfolio_state.json",
+  "canonical_sha256": "2dcc2df7976ae4899ea6b9266aeab9446c54fc19364d6b27019a210210779940",
+  "created_at_ist": "2026-08-31T22:59:23.667589+05:30",
+  "created_at_utc": "2026-08-31T17:29:23+00:00",
+  "live_path": "/opt/cloud-deploy-candidates/v2matrix/state/portfolio_state.json",
+  "live_sha256": "8d41bffd0ab9b967d3b714909b12e8aa17d8dee57512feb178b4e2956786f3fb",
+  "open_holdings_ok": false,
+  "overall_ok": false,
+  "portfolio_deltas": [
+    {
+      "canonical_metadata": {
+        "entry_count": 57,
+        "entry_missing_quote_contract": 0,
+        "holding_count": 2,
+        "holding_missing_quote_contract": 0
+      },
+      "canonical_open_count": 2,
+      "canonical_tx_count": 112,
+      "extra_live_open_count": 2,
+      "extra_live_tx_count": 60,
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live_metadata": {
+        "entry_count": 47,
+        "entry_missing_quote_contract": 46,
+        "holding_count": 2,
+        "holding_missing_quote_contract": 2
+      },
+      "live_open_count": 2,
+      "live_tx_count": 92,
+      "missing_canonical_open_count": 2,
+      "missing_canonical_tx_count": 80,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical_metadata": {
+        "entry_count": 72,
+        "entry_missing_quote_contract": 0,
+        "holding_count": 2,
+        "holding_missing_quote_contract": 0
+      },
+      "canonical_open_count": 2,
+      "canonical_tx_count": 142,
+      "extra_live_open_count": 3,
+      "extra_live_tx_count": 53,
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live_metadata": {
+        "entry_count": 57,
+        "entry_missing_quote_contract": 57,
+        "holding_count": 3,
+        "holding_missing_quote_contract": 3
+      },
+      "live_open_count": 3,
+      "live_tx_count": 111,
+      "missing_canonical_open_count": 2,
+      "missing_canonical_tx_count": 84,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical_metadata": {
+        "entry_count": 56,
+        "entry_missing_quote_contract": 0,
+        "holding_count": 3,
+        "holding_missing_quote_contract": 0
+      },
+      "canonical_open_count": 3,
+      "canonical_tx_count": 109,
+      "extra_live_open_count": 2,
+      "extra_live_tx_count": 54,
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live_metadata": {
+        "entry_count": 49,
+        "entry_missing_quote_contract": 48,
+        "holding_count": 2,
+        "holding_missing_quote_contract": 2
+      },
+      "live_open_count": 2,
+      "live_tx_count": 96,
+      "missing_canonical_open_count": 3,
+      "missing_canonical_tx_count": 67,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical_metadata": {
+        "entry_count": 62,
+        "entry_missing_quote_contract": 0,
+        "holding_count": 2,
+        "holding_missing_quote_contract": 0
+      },
+      "canonical_open_count": 2,
+      "canonical_tx_count": 122,
+      "extra_live_open_count": 3,
+      "extra_live_tx_count": 57,
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live_metadata": {
+        "entry_count": 53,
+        "entry_missing_quote_contract": 53,
+        "holding_count": 3,
+        "holding_missing_quote_contract": 3
+      },
+      "live_open_count": 3,
+      "live_tx_count": 103,
+      "missing_canonical_open_count": 2,
+      "missing_canonical_tx_count": 76,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical_metadata": {
+        "entry_count": 264,
+        "entry_missing_quote_contract": 0,
+        "holding_count": 2,
+        "holding_missing_quote_contract": 0
+      },
+      "canonical_open_count": 2,
+      "canonical_tx_count": 526,
+      "extra_live_open_count": 0,
+      "extra_live_tx_count": 160,
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live_metadata": {
+        "entry_count": 198,
+        "entry_missing_quote_contract": 196,
+        "holding_count": 0,
+        "holding_missing_quote_contract": 0
+      },
+      "live_open_count": 0,
+      "live_tx_count": 396,
+      "missing_canonical_open_count": 2,
+      "missing_canonical_tx_count": 290,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical_metadata": {
+        "entry_count": 214,
+        "entry_missing_quote_contract": 0,
+        "holding_count": 1,
+        "holding_missing_quote_contract": 0
+      },
+      "canonical_open_count": 1,
+      "canonical_tx_count": 427,
+      "extra_live_open_count": 0,
+      "extra_live_tx_count": 134,
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live_metadata": {
+        "entry_count": 158,
+        "entry_missing_quote_contract": 156,
+        "holding_count": 0,
+        "holding_missing_quote_contract": 0
+      },
+      "live_open_count": 0,
+      "live_tx_count": 316,
+      "missing_canonical_open_count": 1,
+      "missing_canonical_tx_count": 245,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical_metadata": {
+        "entry_count": 241,
+        "entry_missing_quote_contract": 0,
+        "holding_count": 2,
+        "holding_missing_quote_contract": 0
+      },
+      "canonical_open_count": 2,
+      "canonical_tx_count": 480,
+      "extra_live_open_count": 0,
+      "extra_live_tx_count": 160,
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live_metadata": {
+        "entry_count": 192,
+        "entry_missing_quote_contract": 190,
+        "holding_count": 0,
+        "holding_missing_quote_contract": 0
+      },
+      "live_open_count": 0,
+      "live_tx_count": 384,
+      "missing_canonical_open_count": 2,
+      "missing_canonical_tx_count": 256,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical_metadata": {
+        "entry_count": 204,
+        "entry_missing_quote_contract": 0,
+        "holding_count": 1,
+        "holding_missing_quote_contract": 0
+      },
+      "canonical_open_count": 1,
+      "canonical_tx_count": 407,
+      "extra_live_open_count": 0,
+      "extra_live_tx_count": 136,
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live_metadata": {
+        "entry_count": 154,
+        "entry_missing_quote_contract": 153,
+        "holding_count": 0,
+        "holding_missing_quote_contract": 0
+      },
+      "live_open_count": 0,
+      "live_tx_count": 308,
+      "missing_canonical_open_count": 1,
+      "missing_canonical_tx_count": 235,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    }
+  ],
+  "rca": "Current live dashboard state differs from the corrected research-aligned Aug10-Aug31 canonical dry-run output. Metadata propagation is now fixed in canonical output. Remaining differences are economic/history state differences and require choosing the canonical contract before any controlled reseed/install.",
+  "required_fix": "Controlled v2Matrix and v2Matrix Portfolio reseed/install from corrected canonical output if the dashboard history/performance must match replay/backtest. This rewrites portfolio state/history and needs explicit approval.",
+  "schema": "obvfutport_v2.v2matrix_portfolio_live_vs_research_parity.v1",
+  "summary_delta_count": 117,
+  "summary_deltas": [
+    {
+      "canonical": 55,
+      "field": "closed_trades",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 45,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 48,
+      "field": "wins",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 40,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 7,
+      "field": "losses",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 5,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 95475.2201317137,
+      "field": "total_net_rupees",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 58502.223840013045,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 95475.2201317137,
+      "field": "realized_net_rupees",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 114875.69681153612,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 0.0,
+      "field": "unrealized_net_rupees",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": -56373.47297152308,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 515708.25,
+      "field": "current_margin_rupees",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 722279.8999999999,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 87.27272727272727,
+      "field": "success_rate_pct",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 88.88888888888889,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 55,
+      "field": "portfolio_closed_trade_count",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 45,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 48,
+      "field": "portfolio_closed_win_count",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 40,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 87.27272727272727,
+      "field": "portfolio_closed_success_rate_pct",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 88.88888888888889,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 87,
+      "field": "all_qualified_signal_trade_count",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 60,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 66,
+      "field": "all_qualified_signal_win_count",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 47,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 75.86206896551724,
+      "field": "all_qualified_signal_success_rate_pct",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "live": 78.3333,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "canonical": 2,
+      "field": "open_positions",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 3,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 70,
+      "field": "closed_trades",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 54,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 63,
+      "field": "wins",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 46,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 7,
+      "field": "losses",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 8,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 98940.7789932293,
+      "field": "total_net_rupees",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 25624.699058730126,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 98940.7789932293,
+      "field": "realized_net_rupees",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 75215.52522060617,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 0.0,
+      "field": "unrealized_net_rupees",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": -49590.826161876044,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 515708.25,
+      "field": "current_margin_rupees",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 1131525.65,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 90.0,
+      "field": "success_rate_pct",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 85.18518518518519,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 70,
+      "field": "portfolio_closed_trade_count",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 54,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 63,
+      "field": "portfolio_closed_win_count",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 46,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 90.0,
+      "field": "portfolio_closed_success_rate_pct",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 85.18518518518519,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 162,
+      "field": "all_qualified_signal_trade_count",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 122,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 130,
+      "field": "all_qualified_signal_win_count",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 93,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 80.24691358024691,
+      "field": "all_qualified_signal_success_rate_pct",
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 76.22950819672131,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 3,
+      "field": "open_positions",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 2,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 53,
+      "field": "closed_trades",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 47,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 46,
+      "field": "wins",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 40,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 125839.282845536,
+      "field": "total_net_rupees",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 77111.20706100286,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 125839.282845536,
+      "field": "realized_net_rupees",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 133484.68003252594,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 0.0,
+      "field": "unrealized_net_rupees",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": -56373.47297152308,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 936821.85,
+      "field": "current_margin_rupees",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 722279.8999999999,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 86.79245283018868,
+      "field": "success_rate_pct",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 85.1063829787234,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 53,
+      "field": "portfolio_closed_trade_count",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 47,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 46,
+      "field": "portfolio_closed_win_count",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 40,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 86.79245283018868,
+      "field": "portfolio_closed_success_rate_pct",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 85.1063829787234,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 87,
+      "field": "all_qualified_signal_trade_count",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 60,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 65,
+      "field": "all_qualified_signal_win_count",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 46,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 74.71264367816092,
+      "field": "all_qualified_signal_success_rate_pct",
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "live": 76.6667,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "canonical": 2,
+      "field": "open_positions",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 3,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 60,
+      "field": "closed_trades",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 50,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 50,
+      "field": "wins",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 38,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 10,
+      "field": "losses",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 12,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 33086.229456925146,
+      "field": "total_net_rupees",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 266.96657795696956,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 33086.229456925146,
+      "field": "realized_net_rupees",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 45877.50624817692,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 0.0,
+      "field": "unrealized_net_rupees",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": -45610.53967021995,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 515708.25,
+      "field": "current_margin_rupees",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 1131525.65,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 83.33333333333334,
+      "field": "success_rate_pct",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 76.0,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 60,
+      "field": "portfolio_closed_trade_count",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 50,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 50,
+      "field": "portfolio_closed_win_count",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 38,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 83.33333333333334,
+      "field": "portfolio_closed_success_rate_pct",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 76.0,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 162,
+      "field": "all_qualified_signal_trade_count",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 122,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 124,
+      "field": "all_qualified_signal_win_count",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 86,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 76.5432098765432,
+      "field": "all_qualified_signal_success_rate_pct",
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "live": 70.49180327868852,
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "canonical": 2,
+      "field": "open_positions",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 0,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 262,
+      "field": "closed_trades",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 198,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 209,
+      "field": "wins",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 150,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 53,
+      "field": "losses",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 48,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 377159.499357006,
+      "field": "total_net_rupees",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 233954.0799873352,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 377159.499357006,
+      "field": "realized_net_rupees",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 233954.0799873352,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 885076.25,
+      "field": "current_margin_rupees",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 0,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 79.77099236641222,
+      "field": "success_rate_pct",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 75.75757575757575,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 262,
+      "field": "portfolio_closed_trade_count",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 198,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 209,
+      "field": "portfolio_closed_win_count",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 150,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 79.77099236641222,
+      "field": "portfolio_closed_success_rate_pct",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 75.75757575757575,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 396,
+      "field": "all_qualified_signal_trade_count",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 302,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 294,
+      "field": "all_qualified_signal_win_count",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 214,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 74.24242424242425,
+      "field": "all_qualified_signal_success_rate_pct",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 70.86092715231787,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 1,
+      "field": "open_positions",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 0,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 213,
+      "field": "closed_trades",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 158,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 166,
+      "field": "wins",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 116,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 47,
+      "field": "losses",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 42,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 253559.37565579708,
+      "field": "total_net_rupees",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 184102.7203200055,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 253559.37565579708,
+      "field": "realized_net_rupees",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 184102.7203200055,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 483688.45,
+      "field": "current_margin_rupees",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 0,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 2355329.125,
+      "field": "peak_margin_rupees",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 2286662.96875,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 77.93427230046949,
+      "field": "success_rate_pct",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 73.41772151898735,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 213,
+      "field": "portfolio_closed_trade_count",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 158,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 166,
+      "field": "portfolio_closed_win_count",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 116,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 77.93427230046949,
+      "field": "portfolio_closed_success_rate_pct",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 73.41772151898735,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 305,
+      "field": "all_qualified_signal_trade_count",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 239,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 226,
+      "field": "all_qualified_signal_win_count",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 171,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 74.09836065573771,
+      "field": "all_qualified_signal_success_rate_pct",
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 71.54811715481172,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 2,
+      "field": "open_positions",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 0,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 239,
+      "field": "closed_trades",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 192,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 173,
+      "field": "wins",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 134,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 66,
+      "field": "losses",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 58,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": -92792.78764656199,
+      "field": "total_net_rupees",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": -29045.411457708462,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": -92792.78764656199,
+      "field": "realized_net_rupees",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": -29045.411457708462,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 885076.25,
+      "field": "current_margin_rupees",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 0,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 2299199.0749999983,
+      "field": "peak_margin_rupees",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 2312832.4749999996,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 72.38493723849372,
+      "field": "success_rate_pct",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 69.79166666666666,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 239,
+      "field": "portfolio_closed_trade_count",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 192,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 173,
+      "field": "portfolio_closed_win_count",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 134,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 72.38493723849372,
+      "field": "portfolio_closed_success_rate_pct",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 69.79166666666666,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 396,
+      "field": "all_qualified_signal_trade_count",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 308,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 272,
+      "field": "all_qualified_signal_win_count",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 203,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 68.68686868686868,
+      "field": "all_qualified_signal_success_rate_pct",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "live": 65.9090909090909,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "canonical": 1,
+      "field": "open_positions",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 0,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 203,
+      "field": "closed_trades",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 154,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 149,
+      "field": "wins",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 105,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 54,
+      "field": "losses",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 49,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 47382.06080873689,
+      "field": "total_net_rupees",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": -29089.88386430047,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 47382.06080873689,
+      "field": "realized_net_rupees",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": -29089.88386430047,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 483688.45,
+      "field": "current_margin_rupees",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 0,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 2288406.7,
+      "field": "peak_margin_rupees",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 2280316.7125,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 73.39901477832512,
+      "field": "success_rate_pct",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 68.18181818181817,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 203,
+      "field": "portfolio_closed_trade_count",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 154,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 149,
+      "field": "portfolio_closed_win_count",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 105,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 73.39901477832512,
+      "field": "portfolio_closed_success_rate_pct",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 68.18181818181817,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 302,
+      "field": "all_qualified_signal_trade_count",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 238,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 211,
+      "field": "all_qualified_signal_win_count",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 158,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "canonical": 69.86754966887418,
+      "field": "all_qualified_signal_success_rate_pct",
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "live": 66.38655462184873,
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    }
+  ],
+  "summary_ok": false,
+  "transaction_rows_ok": false
+}
