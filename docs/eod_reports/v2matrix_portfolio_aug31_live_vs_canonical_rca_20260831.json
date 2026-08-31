@@ -1,0 +1,569 @@
+{
+  "aug31_warmup_cache": {
+    "cache_key_count": null,
+    "exists": true,
+    "minute_quote_rows": 150756,
+    "missing_key_scan_count": 213,
+    "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/research_cache/t2_quote_index/2026-08-31_0436c94dbe12b1baef75.quote_index_meta.json",
+    "required_key_count": 620,
+    "source": {
+      "mtime_ns": 1788170401411384914,
+      "path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/target_stream/2026-08-31/target_quotes_2026-08-31.jsonl",
+      "resolved_path": "/opt/cloud-deploy-candidates/obv-futures-portable-v2/state/target_stream/2026-08-31/target_quotes_2026-08-31.jsonl",
+      "size_bytes": 2041267141
+    },
+    "warmed_key_count": null
+  },
+  "backup_to_current_deltas": [
+    {
+      "backup_closed": 45,
+      "backup_open": 2,
+      "backup_total_net_rupees": 58502.223840013045,
+      "changed_fields": {
+        "closed_trades": {
+          "delta": 9,
+          "from": 45,
+          "to": 54
+        },
+        "current_margin_rupees": {
+          "delta": 214541.95000000007,
+          "from": 722279.8999999999,
+          "to": 936821.85
+        },
+        "open_positions": {
+          "delta": 1,
+          "from": 2,
+          "to": 3
+        },
+        "portfolio_closed_success_rate_pct": {
+          "delta": -5.555555555555543,
+          "from": 88.88888888888889,
+          "to": 83.33333333333334
+        },
+        "portfolio_closed_trade_count": {
+          "delta": 9,
+          "from": 45,
+          "to": 54
+        },
+        "realized_net_rupees": {
+          "delta": -71325.64934050049,
+          "from": 114875.69681153612,
+          "to": 43550.047471035636
+        },
+        "return_on_peak_margin_pct": {
+          "delta": -5.0013473952832825,
+          "from": 8.055072366561603,
+          "to": 3.0537249712783203
+        },
+        "total_net_rupees": {
+          "delta": -46440.412981394256,
+          "from": 58502.223840013045,
+          "to": 12061.810858618788
+        },
+        "unrealized_net_rupees": {
+          "delta": 24885.23635910623,
+          "from": -56373.47297152308,
+          "to": -31488.236612416847
+        }
+      },
+      "current_closed": 54,
+      "current_open": 3,
+      "current_total_net_rupees": 12061.810858618788,
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / first only",
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80"
+    },
+    {
+      "backup_closed": 54,
+      "backup_open": 3,
+      "backup_total_net_rupees": 25624.699058730126,
+      "changed_fields": {
+        "closed_trades": {
+          "delta": 11,
+          "from": 54,
+          "to": 65
+        },
+        "current_margin_rupees": {
+          "delta": -615817.3999999999,
+          "from": 1131525.65,
+          "to": 515708.25
+        },
+        "open_positions": {
+          "delta": -1,
+          "from": 3,
+          "to": 2
+        },
+        "portfolio_closed_success_rate_pct": {
+          "delta": -2.1082621082621102,
+          "from": 85.18518518518519,
+          "to": 83.07692307692308
+        },
+        "portfolio_closed_trade_count": {
+          "delta": 11,
+          "from": 54,
+          "to": 65
+        },
+        "realized_net_rupees": {
+          "delta": -72595.9268470217,
+          "from": 75215.52522060617,
+          "to": 2619.598373584462
+        },
+        "return_on_peak_margin_pct": {
+          "delta": -5.090419126943206,
+          "from": 5.274105102795593,
+          "to": 0.1836859758523867
+        },
+        "total_net_rupees": {
+          "delta": -45430.21918958287,
+          "from": 25624.699058730126,
+          "to": -19805.520130852747
+        },
+        "unrealized_net_rupees": {
+          "delta": 27165.707657438837,
+          "from": -49590.826161876044,
+          "to": -22425.118504437207
+        }
+      },
+      "current_closed": 65,
+      "current_open": 2,
+      "current_total_net_rupees": -19805.520130852747,
+      "label": "Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3"
+    },
+    {
+      "backup_closed": 47,
+      "backup_open": 2,
+      "backup_total_net_rupees": 77111.20706100286,
+      "changed_fields": {
+        "closed_trades": {
+          "delta": 5,
+          "from": 47,
+          "to": 52
+        },
+        "current_margin_rupees": {
+          "delta": 214541.95000000007,
+          "from": 722279.8999999999,
+          "to": 936821.85
+        },
+        "open_positions": {
+          "delta": 1,
+          "from": 2,
+          "to": 3
+        },
+        "peak_margin_rupees": {
+          "delta": 5767.774999999907,
+          "from": 1426128.6749999998,
+          "to": 1431896.4499999997
+        },
+        "portfolio_closed_success_rate_pct": {
+          "delta": -4.337152209492629,
+          "from": 85.1063829787234,
+          "to": 80.76923076923077
+        },
+        "portfolio_closed_trade_count": {
+          "delta": 5,
+          "from": 47,
+          "to": 52
+        },
+        "realized_net_rupees": {
+          "delta": -133694.67580024246,
+          "from": 133484.68003252594,
+          "to": -209.995767716533
+        },
+        "return_on_peak_margin_pct": {
+          "delta": -9.374597977506946,
+          "from": 9.359932408099567,
+          "to": -0.0146655694073781
+        },
+        "total_net_rupees": {
+          "delta": -108809.43944113624,
+          "from": 77111.20706100286,
+          "to": -31698.23238013338
+        },
+        "unrealized_net_rupees": {
+          "delta": 24885.23635910623,
+          "from": -56373.47297152308,
+          "to": -31488.236612416847
+        }
+      },
+      "current_closed": 52,
+      "current_open": 3,
+      "current_total_net_rupees": -31698.23238013338,
+      "label": "Profit25 / age60 / max3 / no stop / first only",
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    },
+    {
+      "backup_closed": 50,
+      "backup_open": 3,
+      "backup_total_net_rupees": 266.96657795696956,
+      "changed_fields": {
+        "closed_trades": {
+          "delta": 10,
+          "from": 50,
+          "to": 60
+        },
+        "current_margin_rupees": {
+          "delta": -615817.3999999999,
+          "from": 1131525.65,
+          "to": 515708.25
+        },
+        "open_positions": {
+          "delta": -1,
+          "from": 3,
+          "to": 2
+        },
+        "peak_margin_rupees": {
+          "delta": -1241.0,
+          "from": 1427369.6749999998,
+          "to": 1426128.6749999998
+        },
+        "portfolio_closed_success_rate_pct": {
+          "delta": 4.0,
+          "from": 76.0,
+          "to": 80.0
+        },
+        "portfolio_closed_trade_count": {
+          "delta": 10,
+          "from": 50,
+          "to": 60
+        },
+        "realized_net_rupees": {
+          "delta": -129032.08053453267,
+          "from": 45877.50624817692,
+          "to": -83154.57428635575
+        },
+        "return_on_peak_margin_pct": {
+          "delta": -9.044919680233217,
+          "from": 3.214129251287122,
+          "to": -5.830790428946095
+        },
+        "total_net_rupees": {
+          "delta": -105846.65936874994,
+          "from": 266.96657795696956,
+          "to": -105579.69279079296
+        },
+        "unrealized_net_rupees": {
+          "delta": 23185.421165782744,
+          "from": -45610.53967021995,
+          "to": -22425.118504437207
+        }
+      },
+      "current_closed": 60,
+      "current_open": 2,
+      "current_total_net_rupees": -105579.69279079296,
+      "label": "Profit25 / age60 / max3 / no stop / requalify cd0 max3",
+      "portfolio_id": "fixed5L_no_replacement_max3_smooth_survivor_profit25_age60_max3_requal_cd0_max3"
+    },
+    {
+      "backup_closed": 198,
+      "backup_open": 0,
+      "backup_total_net_rupees": 233954.0799873352,
+      "changed_fields": {
+        "closed_trades": {
+          "delta": 19,
+          "from": 198,
+          "to": 217
+        },
+        "current_margin_rupees": {
+          "delta": 1368764.7,
+          "from": 0,
+          "to": 1368764.7
+        },
+        "open_positions": {
+          "delta": 3,
+          "from": 0,
+          "to": 3
+        },
+        "peak_margin_rupees": {
+          "delta": -19104.162500000093,
+          "from": 2299420.875,
+          "to": 2280316.7125
+        },
+        "portfolio_closed_success_rate_pct": {
+          "delta": -9.398128752967452,
+          "from": 75.75757575757575,
+          "to": 66.3594470046083
+        },
+        "portfolio_closed_trade_count": {
+          "delta": 19,
+          "from": 198,
+          "to": 217
+        },
+        "realized_net_rupees": {
+          "delta": -638750.2760230205,
+          "from": 233954.0799873352,
+          "to": -404796.1960356853
+        },
+        "return_on_peak_margin_pct": {
+          "delta": -27.926231634727614,
+          "from": 10.174478388491416,
+          "to": -17.7517532462362
+        },
+        "total_net_rupees": {
+          "delta": -665089.7214355285,
+          "from": 233954.0799873352,
+          "to": -431135.64144819335
+        },
+        "unrealized_net_rupees": {
+          "delta": -26339.445412508052,
+          "from": 0.0,
+          "to": -26339.445412508052
+        }
+      },
+      "current_closed": 217,
+      "current_open": 3,
+      "current_total_net_rupees": -431135.64144819335,
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd0 max3",
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "backup_closed": 158,
+      "backup_open": 0,
+      "backup_total_net_rupees": 184102.7203200055,
+      "changed_fields": {
+        "closed_trades": {
+          "delta": 41,
+          "from": 158,
+          "to": 199
+        },
+        "current_margin_rupees": {
+          "delta": 885888.45,
+          "from": 0,
+          "to": 885888.45
+        },
+        "open_positions": {
+          "delta": 2,
+          "from": 0,
+          "to": 2
+        },
+        "peak_margin_rupees": {
+          "delta": 19460.331249998417,
+          "from": 2286662.96875,
+          "to": 2306123.2999999984
+        },
+        "portfolio_closed_success_rate_pct": {
+          "delta": -4.573500413459712,
+          "from": 73.41772151898735,
+          "to": 68.84422110552764
+        },
+        "portfolio_closed_trade_count": {
+          "delta": 41,
+          "from": 158,
+          "to": 199
+        },
+        "realized_net_rupees": {
+          "delta": -531685.981500742,
+          "from": 184102.7203200055,
+          "to": -347583.2611807366
+        },
+        "return_on_peak_margin_pct": {
+          "delta": -23.123341341973838,
+          "from": 8.051152392634622,
+          "to": -15.072188949339216
+        },
+        "total_net_rupees": {
+          "delta": -548181.2511920722,
+          "from": 184102.7203200055,
+          "to": -364078.5308720667
+        },
+        "unrealized_net_rupees": {
+          "delta": -16495.26969133011,
+          "from": 0.0,
+          "to": -16495.26969133011
+        }
+      },
+      "current_closed": 199,
+      "current_open": 2,
+      "current_total_net_rupees": -364078.5308720667,
+      "label": "Armed20 Floor80 / age0 / max5 / stop100 / requalify cd15 max2",
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2"
+    },
+    {
+      "backup_closed": 192,
+      "backup_open": 0,
+      "backup_total_net_rupees": -29045.411457708462,
+      "changed_fields": {
+        "closed_trades": {
+          "delta": 40,
+          "from": 192,
+          "to": 232
+        },
+        "current_margin_rupees": {
+          "delta": 1317827.48,
+          "from": 0,
+          "to": 1317827.48
+        },
+        "open_positions": {
+          "delta": 3,
+          "from": 0,
+          "to": 3
+        },
+        "peak_margin_rupees": {
+          "delta": -43383.66249999963,
+          "from": 2312832.4749999996,
+          "to": 2269448.8125
+        },
+        "portfolio_closed_success_rate_pct": {
+          "delta": -5.998563218390792,
+          "from": 69.79166666666666,
+          "to": 63.793103448275865
+        },
+        "portfolio_closed_trade_count": {
+          "delta": 40,
+          "from": 192,
+          "to": 232
+        },
+        "realized_net_rupees": {
+          "delta": -682266.0595824611,
+          "from": -29045.411457708462,
+          "to": -711311.4710401696
+        },
+        "return_on_peak_margin_pct": {
+          "delta": -30.087080352293523,
+          "from": -1.255837237312593,
+          "to": -31.342917589606117
+        },
+        "total_net_rupees": {
+          "delta": -702352.785515462,
+          "from": -29045.411457708462,
+          "to": -731398.1969731705
+        },
+        "unrealized_net_rupees": {
+          "delta": -20086.72593300094,
+          "from": 0.0,
+          "to": -20086.72593300094
+        }
+      },
+      "current_closed": 232,
+      "current_open": 3,
+      "current_total_net_rupees": -731398.1969731705,
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd0 max3",
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3"
+    },
+    {
+      "backup_closed": 154,
+      "backup_open": 0,
+      "backup_total_net_rupees": -29089.88386430047,
+      "changed_fields": {
+        "closed_trades": {
+          "delta": 40,
+          "from": 154,
+          "to": 194
+        },
+        "current_margin_rupees": {
+          "delta": 1318639.68,
+          "from": 0,
+          "to": 1318639.68
+        },
+        "open_positions": {
+          "delta": 3,
+          "from": 0,
+          "to": 3
+        },
+        "peak_margin_rupees": {
+          "delta": 2745.1749999998137,
+          "from": 2280316.7125,
+          "to": 2283061.8874999997
+        },
+        "portfolio_closed_success_rate_pct": {
+          "delta": -2.2024367385192107,
+          "from": 68.18181818181817,
+          "to": 65.97938144329896
+        },
+        "portfolio_closed_trade_count": {
+          "delta": 40,
+          "from": 154,
+          "to": 194
+        },
+        "realized_net_rupees": {
+          "delta": -441632.9040984246,
+          "from": -29089.88386430047,
+          "to": -470722.7879627251
+        },
+        "return_on_peak_margin_pct": {
+          "delta": -19.342352761391066,
+          "from": -1.2756948938206087,
+          "to": -20.618047655211676
+        },
+        "total_net_rupees": {
+          "delta": -461164.2298756847,
+          "from": -29089.88386430047,
+          "to": -490254.1137399852
+        },
+        "unrealized_net_rupees": {
+          "delta": -19531.32577726013,
+          "from": 0.0,
+          "to": -19531.32577726013
+        }
+      },
+      "current_closed": 194,
+      "current_open": 3,
+      "current_total_net_rupees": -490254.1137399852,
+      "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+      "portfolio_id": "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    }
+  ],
+  "canonical_tmp_state": "/tmp/v2matrix_aug31_history_backfill_sudo_install_20260831_140017/state/portfolio_state.json",
+  "created_at_ist": "2026-08-31T15:57:08+0000",
+  "current_state": "/opt/cloud-deploy-candidates/v2matrix/state/portfolio_state.json",
+  "history_install": {
+    "backup_dir": "/opt/cloud-deploy-candidates/v2matrix/state/backups/pre_history_backfill_20260831_193451",
+    "created_at_ist": "2026-08-31T19:34:49.824805+05:30",
+    "end_date": "2026-08-31",
+    "installed": true,
+    "matrix_event_count": 170,
+    "matrix_symbol_count": 74,
+    "start_date": "2026-08-10"
+  },
+  "input_report_summary": {
+    "cache_rows_loaded": 3487377,
+    "minute_quote_rows": 3487377,
+    "quote_keys_loaded": 620,
+    "raw_scan_rows_loaded": 0,
+    "required_key_count": 620,
+    "required_key_hash": "0436c94dbe12b1baef75"
+  },
+  "matrix_missing_metadata_counts": {
+    "matrix_events.jsonl": 0,
+    "matrix_state.json": 0
+  },
+  "mode": "dry_audit_plus_small_safe_fixes_no_reseed_no_large_job",
+  "portfolio_entry_missing_metadata_count": 0,
+  "portfolio_order_matches_user_contract": true,
+  "portfolio_semantic_matches_canonical_tmp": true,
+  "pre_install_backup_state": "/opt/cloud-deploy-candidates/v2matrix/state/backups/pre_history_backfill_20260831_193451/portfolio_state.json",
+  "rca": [
+    {
+      "cause": "live-forward state before the install had not been generated under the fully corrected canonical history contract and variant/requalification path; the post-install state is canonical for Aug10-Aug31",
+      "fix": "current state kept from canonical install; no reseed performed in this audit",
+      "issue": "pre_install_live_forward_state_differed_from canonical Aug10-Aug31 install across all 8 portfolios"
+    },
+    {
+      "cause": "live PORTFOLIO_DEFINITIONS order placed Profit25 first-only before Armed20 requalifier, contrary to the requested UI order",
+      "fix": "definition order, current portfolio state order, and regression assertion corrected",
+      "issue": "portfolio page/order contract drift"
+    },
+    {
+      "cause": "matrix payload creation used current candidate metadata and did not fall back to the original overlay entry metadata when the exit clock had no fresh feature row",
+      "fix": "live payload fallback and installer payload fallback added; current matrix_events/matrix_state filled from overlay entry metadata",
+      "issue": "some v2Matrix historical exit rows had null quote-history/RAM60 metadata"
+    },
+    {
+      "cause": "installed historical rows are from the research full-session quote index while live uses bounded prior-session warmup",
+      "fix": "recorded as EOD parity item; semantic decisions are equivalent if RAM windows use only latest 60 quote rows, but exact mode label should be compared tonight/tomorrow before any future reseed",
+      "issue": "historical portfolio quote_history_mode label differs from tomorrow live contract label"
+    }
+  ],
+  "safe_fixes_applied": [
+    "portfolio definition/order contract",
+    "portfolio_state and overlay_state order only",
+    "matrix payload metadata fallback",
+    "installer payload metadata fallback",
+    "matrix_events/matrix_state metadata fill from overlay entry metadata"
+  ],
+  "schema": "obvfutport_v2.v2matrix_portfolio_aug31_eod_audit.v2",
+  "scope": "v2Matrix/v2Matrix Portfolios only",
+  "tests": [
+    "py_compile target scripts passed",
+    "pytest tests/test_v2matrix_overlay_research_parity.py tests/test_v2matrix_portfolios_page.py passed 14/14"
+  ]
+}

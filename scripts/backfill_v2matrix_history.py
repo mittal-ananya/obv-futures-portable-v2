@@ -449,12 +449,20 @@ def simulate_overlay_history(
                     continue
                 active_overlay.pop(key, None)
                 completed_overlay.add(key)
+                live_overlay.record_completed_overlay(
+                    state,
+                    variant=position.variant,
+                    row_id=position.row_id,
+                    key=key,
+                    exit_epoch=clock_epoch,
+                    exit_reason=exit_reason,
+                )
                 event = {
                     "schema": live_overlay.SCHEMA,
                     "event": "overlay_exit",
                     "overlay_key": key,
                     "variant": position.variant,
-                    "policy": live_overlay.POLICY.name,
+                    "policy": live_overlay.variant_policy(position.variant).name,
                     "source_t2_position_id": leg.position_id,
                     "row_id": leg.row_id,
                     "symbol": leg.symbol,
@@ -501,24 +509,37 @@ def simulate_overlay_history(
                         )
                     )
 
-            eligible = [feature for feature in features.values() if live_overlay.candidate_passes(feature)]
-            eligible.sort(
-                key=lambda row: (
-                    float(row.get("portfolio_score") or -1.0),
-                    str(row.get("symbol") or ""),
-                    str(row.get("row_id") or ""),
-                ),
-                reverse=True,
-            )
-            for feature in eligible:
-                row_id = str(feature["row_id"])
-                leg = legs.get(row_id)
-                if leg is None:
-                    continue
-                for variant in live_overlay.PORTFOLIO_VARIANTS:
-                    key = live_overlay.overlay_key(variant, row_id)
-                    if key in active_overlay or key in completed_overlay:
+            for variant in live_overlay.PORTFOLIO_VARIANTS:
+                definition = live_overlay.portfolio_def(variant)
+                eligible = [
+                    feature
+                    for feature in features.values()
+                    if live_overlay.candidate_passes(feature, definition.policy)
+                ]
+                eligible.sort(
+                    key=lambda row: (
+                        float(row.get("portfolio_score") or -1.0),
+                        str(row.get("symbol") or ""),
+                        str(row.get("row_id") or ""),
+                    ),
+                    reverse=True,
+                )
+                for feature in eligible:
+                    row_id = str(feature["row_id"])
+                    leg = legs.get(row_id)
+                    if leg is None:
                         continue
+                    can_open, _skip_reason = live_overlay.can_open_overlay(
+                        state,
+                        variant=variant,
+                        row_id=row_id,
+                        clock_epoch=clock_epoch,
+                        active_overlay=active_overlay,
+                        completed_overlay=completed_overlay,
+                    )
+                    if not can_open:
+                        continue
+                    key = live_overlay.overlay_key(variant, row_id, clock_epoch)
                     fill = live_overlay.execution_fill(index, v1_portfolio, leg, clock_epoch, phase="entry")  # type: ignore[arg-type]
                     if fill is None:
                         continue
@@ -560,7 +581,7 @@ def simulate_overlay_history(
                         "event": "overlay_entry",
                         "overlay_key": key,
                         "variant": variant,
-                        "policy": live_overlay.POLICY.name,
+                        "policy": definition.policy.name,
                         "source_t2_position_id": leg.position_id,
                         "row_id": row_id,
                         "symbol": leg.symbol,
@@ -580,7 +601,13 @@ def simulate_overlay_history(
                     overlay_events.append(event)
                     portfolio = portfolios.get(live_overlay.portfolio_key(variant))
                     if isinstance(portfolio, dict):
-                        live_overlay.open_portfolio_holding(portfolio=portfolio, variant=variant, position=position, leg=leg)
+                        live_overlay.open_portfolio_holding(
+                            portfolio=portfolio,
+                            variant=variant,
+                            overlay_key_value=key,
+                            position=position,
+                            leg=leg,
+                        )
                     if variant == live_overlay.PRIMARY_VARIANT:
                         matrix_payloads.append(
                             live_overlay.matrix_payload(

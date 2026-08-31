@@ -117,17 +117,26 @@ PORTFOLIO_DEFINITIONS: dict[str, PortfolioVariantDefinition] = {
         policy=POLICY,
         overlay=armed20_floor80_overlay(),
     ),
+    "smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3": PortfolioVariantDefinition(
+        name="smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3",
+        label="Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+        policy=POLICY,
+        overlay=armed20_floor80_overlay(),
+        requalify=True,
+        cooldown_minutes=0,
+        max_entries_per_t2_leg=3,
+    ),
     "smooth_survivor_profit25": PortfolioVariantDefinition(
         name="smooth_survivor_profit25",
         label="Profit25 / age60 / max3 / no stop / first only",
         policy=POLICY,
         overlay=profit25_overlay(),
     ),
-    "smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3": PortfolioVariantDefinition(
-        name="smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3",
-        label="Armed20 Floor80 / age60 / max3 / no stop / requalify cd0 max3",
+    "smooth_survivor_profit25_age60_max3_requal_cd0_max3": PortfolioVariantDefinition(
+        name="smooth_survivor_profit25_age60_max3_requal_cd0_max3",
+        label="Profit25 / age60 / max3 / no stop / requalify cd0 max3",
         policy=POLICY,
-        overlay=armed20_floor80_overlay(),
+        overlay=profit25_overlay(),
         requalify=True,
         cooldown_minutes=0,
         max_entries_per_t2_leg=3,
@@ -151,15 +160,6 @@ PORTFOLIO_DEFINITIONS: dict[str, PortfolioVariantDefinition] = {
         requalify=True,
         cooldown_minutes=15,
         max_entries_per_t2_leg=2,
-    ),
-    "smooth_survivor_profit25_age60_max3_requal_cd0_max3": PortfolioVariantDefinition(
-        name="smooth_survivor_profit25_age60_max3_requal_cd0_max3",
-        label="Profit25 / age60 / max3 / no stop / requalify cd0 max3",
-        policy=POLICY,
-        overlay=profit25_overlay(),
-        requalify=True,
-        cooldown_minutes=0,
-        max_entries_per_t2_leg=3,
     ),
     "smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3": PortfolioVariantDefinition(
         name="smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3",
@@ -1466,6 +1466,7 @@ def matrix_payload(
 ) -> dict[str, Any]:
     regime_side = "long" if leg.side == "long" else "short"
     entry_display_price, entry_display_source, entry_display_key = entry_display_reference(position)
+    event_features = features if features is not None else dict(position.entry_features or {})
     return {
         "event_id": f"V2MATRIX:{variant}:{event_type}:{leg.position_id}:{event_epoch_value}",
         "source_strategy": "OBVFUTPORT_V2_T2_SMOOTH_SURVIVOR",
@@ -1492,12 +1493,12 @@ def matrix_payload(
         "matrix_selection_rule": variant,
         "overlay_variant": variant,
         "overlay_policy": variant_policy(variant).name,
-        "overlay_score": position.entry_score if features is None else features.get("portfolio_score"),
-        "overlay_entry_features": features,
-        "quote_history_mode": (features or {}).get("quote_history_mode"),
-        "quote_history_key_scope": (features or {}).get("quote_history_key_scope"),
-        "ram_60_available_from_epoch": parse_epoch((features or {}).get("ram_60_available_from_epoch")),
-        "ram_60_available_from": (features or {}).get("ram_60_available_from"),
+        "overlay_score": position.entry_score if features is None else event_features.get("portfolio_score"),
+        "overlay_entry_features": event_features,
+        "quote_history_mode": event_features.get("quote_history_mode"),
+        "quote_history_key_scope": event_features.get("quote_history_key_scope"),
+        "ram_60_available_from_epoch": parse_epoch(event_features.get("ram_60_available_from_epoch")),
+        "ram_60_available_from": event_features.get("ram_60_available_from"),
         "overlay_row_id": leg.row_id,
         "position_id": f"{variant}:{leg.position_id}",
         "signal_id": leg.position_id,

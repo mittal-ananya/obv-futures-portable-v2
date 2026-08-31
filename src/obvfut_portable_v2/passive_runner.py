@@ -1782,20 +1782,23 @@ class OnlineObvState:
         self.sorted_spread_z = array("d", sorted(self.sorted_spread_z))
         self.spread_z_values_sorted = True
 
-    def set_second_row_retention(self, retention_seconds: int | None) -> None:
+    def set_second_row_retention(self, retention_seconds: int | None) -> int:
+        before_rows = len(self.second_rows)
         self.second_row_retention_seconds = retention_seconds
-        self.trim_second_rows()
+        trimmed = self.trim_second_rows()
+        return max(trimmed, before_rows - len(self.second_rows))
 
-    def trim_second_rows(self, *, current_epoch: int | None = None) -> None:
+    def trim_second_rows(self, *, current_epoch: int | None = None) -> int:
         retention = self.second_row_retention_seconds
         if retention is None:
-            return
+            return 0
         if retention <= 0:
+            trimmed = len(self.second_rows)
             self.second_rows.clear()
-            return
+            return trimmed
         anchor = current_epoch or self.last_finalized_second
         if anchor is None:
-            return
+            return 0
         cutoff = int(anchor) - int(retention)
         drop = 0
         for row in self.second_rows:
@@ -1804,6 +1807,7 @@ class OnlineObvState:
             drop += 1
         if drop:
             del self.second_rows[:drop]
+        return drop
 
     def process_row(self, row: dict[str, Any]) -> None:
         epoch_second = int(row["epoch_second"])
@@ -2448,6 +2452,7 @@ class PassiveV2Runner:
             if self.config.get("memory_pressure_shadow_lifecycle_second_row_retention_seconds") is not None
             else 900
         )
+        self.memory_pressure_release_seconds = float(self.config.get("memory_pressure_release_seconds") or 30.0)
         self.compute_non_clock_percentiles = bool(self.config.get("compute_non_clock_percentiles", True))
         self.clock_start = str(self.config.get("clock_start_ist") or "09:20")
         self.clock_end = str(self.config.get("clock_end_ist") or "15:20")
@@ -2505,6 +2510,7 @@ class PassiveV2Runner:
         self._last_active_trade_state_eval_monotonic = 0.0
         self._last_suppressed_decision_telemetry_monotonic = 0.0
         self._last_catchup_defer_telemetry_monotonic = 0.0
+        self._last_memory_pressure_release_monotonic = 0.0
         if self.should_defer_bootstrap_for_partial_live_start():
             self.partial_live_start = True
             self.partial_live_start_trade_date = now_ist().date().isoformat()
@@ -3147,18 +3153,31 @@ class PassiveV2Runner:
         for key, state in self.states.items():
             next_retention = desired.get(key, self.flat_second_row_retention_seconds)
             if state.second_row_retention_seconds != next_retention:
-                state.set_second_row_retention(next_retention)
+                trimmed += state.set_second_row_retention(next_retention)
                 changed += 1
             elif next_retention is not None:
-                before_rows = len(state.second_rows)
-                state.trim_second_rows()
-                if len(state.second_rows) < before_rows:
-                    trimmed += before_rows - len(state.second_rows)
+                trimmed += state.trim_second_rows()
             if next_retention is None:
                 unlimited += 1
+        release_reason = None
+        release_interval = max(0.0, float(self.memory_pressure_release_seconds))
+        now_mono = time.monotonic()
+        pressure_release_due = bool(memory_pressure.get("active")) and (
+            release_interval <= 0.0
+            or now_mono - self._last_memory_pressure_release_monotonic >= release_interval
+        )
         if changed or trimmed:
+            release_reason = "retention_changed_or_trimmed"
+        elif pressure_release_due:
+            release_reason = "memory_pressure_allocator_trim"
+        released_process_memory = release_reason is not None
+        rss_after_release = None
+        if released_process_memory:
             release_unused_process_memory()
+            self._last_memory_pressure_release_monotonic = now_mono
+            rss_after_release = current_process_rss_mb()
         self.latest_memory_pressure_report = memory_pressure
+        rss_before = as_float(memory_pressure.get("rss_mb"))
         return {
             "changed": changed,
             "trimmed_second_rows": trimmed,
@@ -3170,6 +3189,15 @@ class PassiveV2Runner:
             "effective_shadow_lifecycle_retention_seconds": self.effective_shadow_lifecycle_retention_seconds(memory_pressure),
             "transition_retention_seconds": self.transition_second_row_retention_seconds,
             "memory_pressure": memory_pressure,
+            "released_process_memory": released_process_memory,
+            "release_reason": release_reason,
+            "memory_pressure_release_seconds": self.memory_pressure_release_seconds,
+            "rss_after_release_mb": rss_after_release,
+            "rss_reclaimed_mb": (
+                round(float(rss_before) - float(rss_after_release), 3)
+                if rss_before is not None and rss_after_release is not None
+                else None
+            ),
         }
 
     def append_trade_state_events(self, trade_date: str, symbol: str, events: list[dict[str, Any]]) -> None:

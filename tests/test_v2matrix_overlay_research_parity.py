@@ -242,6 +242,38 @@ def test_live_entry_contract_is_stored_on_payload_and_portfolio_holding() -> Non
     assert tx["ram_60_available_from"] == live.epoch_ist_iso(epoch_at(10, 20))
 
 
+def test_matrix_payload_falls_back_to_position_entry_metadata_for_exit() -> None:
+    clock = epoch_at(11, 15)
+    leg = make_leg()
+    position = make_position()
+    position.entry_features = {
+        "portfolio_score": 0.91,
+        "quote_history_mode": live.QUOTE_HISTORY_MODE,
+        "quote_history_key_scope": live.QUOTE_HISTORY_KEY_SCOPE,
+        "ram_60_available_from_epoch": epoch_at(10, 20),
+        "ram_60_available_from": live.epoch_ist_iso(epoch_at(10, 20)),
+    }
+
+    payload = live.matrix_payload(
+        event_type="paper_exit",
+        variant=position.variant,
+        leg=leg,
+        position=position,
+        event_epoch_value=clock,
+        trigger_price=101.0,
+        trigger_source="unit_test",
+        features=None,
+        exit_reason="armed_peak_floor",
+        position_closed=True,
+    )
+
+    assert payload["overlay_entry_features"]["quote_history_mode"] == live.QUOTE_HISTORY_MODE
+    assert payload["quote_history_mode"] == live.QUOTE_HISTORY_MODE
+    assert payload["quote_history_key_scope"] == live.QUOTE_HISTORY_KEY_SCOPE
+    assert payload["ram_60_available_from_epoch"] == epoch_at(10, 20)
+    assert payload["ram_60_available_from"] == live.epoch_ist_iso(epoch_at(10, 20))
+
+
 def research_exit(config: dict, returns: list[float], *, start_hour: int = 9, start_minute: int = 30) -> dict:
     start = epoch_at(start_hour, start_minute)
     window = pd.DataFrame(
@@ -267,17 +299,19 @@ def research_exit(config: dict, returns: list[float], *, start_hour: int = 9, st
 
 def test_live_policy_and_variants_match_research_definitions() -> None:
     selected = {name: (policy_name, config) for name, policy_name, config in research_portfolios.portfolio_variants()}
-
-    assert {
+    expected_order = (
         "smooth_survivor_armed20_floor80",
-        "smooth_survivor_profit25",
         "smooth_survivor_armed20_floor80_age60_max3_requal_cd0_max3",
+        "smooth_survivor_profit25",
+        "smooth_survivor_profit25_age60_max3_requal_cd0_max3",
         "smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd0_max3",
         "smooth_survivor_armed20_floor80_age0_max5_stop100_requal_cd15_max2",
-        "smooth_survivor_profit25_age60_max3_requal_cd0_max3",
         "smooth_survivor_profit25_age0_max5_stop100_requal_cd0_max3",
         "smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2",
-    } == set(live.PORTFOLIO_VARIANTS)
+    )
+
+    assert expected_order == live.PORTFOLIO_VARIANTS
+    assert set(expected_order) == set(live.PORTFOLIO_VARIANTS)
     for variant in ("smooth_survivor_armed20_floor80", "smooth_survivor_profit25"):
         policy_name, config = selected[variant]
         assert policy_name == live.POLICY.name
@@ -628,3 +662,39 @@ def test_open_at_period_end_candidate_remains_active_in_installed_state() -> Non
     assert len(state["active_overlay"]) == 1
     assert [row["event"] for row in overlay_events] == ["overlay_entry"]
     assert [row["event_type"] for row in matrix_payloads] == ["paper_entry"]
+
+
+def test_installer_matrix_payload_falls_back_to_position_entry_metadata_for_exit() -> None:
+    candidate = make_research_candidate(exit_reason="armed_peak_floor")
+    position = live.OverlayPosition(
+        variant=candidate.variant,
+        row_id="TEST|T2|pos-1|1",
+        position_id="pos-1",
+        symbol=candidate.symbol,
+        side=candidate.side,
+        entry_epoch=int(candidate.entry_epoch),
+        entry_time=live.epoch_ist_iso(candidate.entry_epoch),
+        entry_fill_price=float(candidate.entry_fill_price),
+        entry_ltp_price=float(candidate.entry_fill_price),
+        entry_score=float(candidate.score),
+        entry_features={
+            "quote_history_mode": "research_full_session_quote_index",
+            "quote_history_key_scope": "all_candidate_keys",
+            "ram_60_available_from_epoch": epoch_at(13, 50),
+            "ram_60_available_from": live.epoch_ist_iso(epoch_at(13, 50)),
+        },
+    )
+
+    payload = installer.matrix_payload_from_candidate(
+        candidate=candidate,
+        event_type="paper_exit",
+        event_epoch=int(candidate.exit_epoch),
+        event_price=float(candidate.exit_fill_price),
+        position=position,
+        exit_reason=candidate.exit_reason,
+    )
+
+    assert payload["quote_history_mode"] == "research_full_session_quote_index"
+    assert payload["quote_history_key_scope"] == "all_candidate_keys"
+    assert payload["ram_60_available_from_epoch"] == epoch_at(13, 50)
+    assert payload["ram_60_available_from"] == live.epoch_ist_iso(epoch_at(13, 50))

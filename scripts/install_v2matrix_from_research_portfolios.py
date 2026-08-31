@@ -333,6 +333,9 @@ def matrix_payload_from_candidate(
     position_id = source_position_id(candidate.row_id)
     side = "long" if str(candidate.side).lower() == "long" else "short"
     metadata = candidate_entry_metadata(candidate)
+    entry_metadata = position.entry_features if isinstance(position.entry_features, dict) else {}
+    if entry_metadata:
+        metadata = {**entry_metadata, **metadata}
     return {
         "event_id": f"V2MATRIX:{candidate.variant}:{event_type}:{position_id}:{event_epoch}",
         "source_strategy": "OBVFUTPORT_V2_T2_SMOOTH_SURVIVOR",

@@ -248,6 +248,76 @@ def test_memory_pressure_caps_shadow_lifecycle_retention() -> None:
     assert runner.effective_shadow_lifecycle_retention_seconds({"active": True}) == 900
 
 
+def _minimal_retention_runner() -> PassiveV2Runner:
+    runner = object.__new__(PassiveV2Runner)
+    runner.targets = ["NSE:TEST"]
+    runner.instruments = {}
+    runner.model_states = {}
+    runner.states = {
+        "NSE:TEST": OnlineObvState(
+            key="NSE:TEST",
+            clock_epochs=set(),
+            second_row_retention_seconds=300,
+        )
+    }
+    runner.flat_second_row_retention_seconds = 300
+    runner.pending_second_row_retention_seconds = 900
+    runner.active_second_row_retention_seconds = 18_000
+    runner.shadow_lifecycle_second_row_retention_seconds = 27_000
+    runner.memory_pressure_shadow_lifecycle_second_row_retention_seconds = 900
+    runner.transition_second_row_retention_seconds = 18_000
+    runner.memory_retention_soft_limit_mb = 999_999.0
+    runner.memory_pressure_release_seconds = 30.0
+    runner.latest_memory_pressure_report = {}
+    runner._last_memory_pressure_release_monotonic = 0.0
+    return runner
+
+
+def test_dynamic_retention_counts_rows_trimmed_by_retention_change(tmp_path: Path) -> None:
+    runner = _minimal_retention_runner()
+    key = "NSE:TEST"
+    state = runner.states[key]
+    anchor = int(datetime(2026, 8, 17, 12, 0, tzinfo=IST).timestamp())
+    state.last_finalized_second = anchor
+    state.second_row_retention_seconds = None
+    state.second_rows = [
+        _execution_second(anchor - 1_000, 100.0, anchor - 1_000),
+        _execution_second(anchor, 101.0, anchor),
+    ]
+
+    report = runner.refresh_dynamic_retention()
+
+    assert report["trimmed_second_rows"] >= 1
+    assert len(state.second_rows) == 1
+    assert state.second_rows[0]["epoch_second"] == anchor
+
+
+def test_memory_pressure_releases_allocator_without_row_trim(tmp_path: Path, monkeypatch) -> None:
+    runner = _minimal_retention_runner()
+    runner.memory_retention_soft_limit_mb = 100.0
+    runner.memory_pressure_shadow_lifecycle_second_row_retention_seconds = (
+        runner.shadow_lifecycle_second_row_retention_seconds
+    )
+    runner.memory_pressure_release_seconds = 30.0
+    runner._last_memory_pressure_release_monotonic = 0.0
+    for state in runner.states.values():
+        state.second_rows.clear()
+
+    rss_values = iter([9_000.0, 9_000.0, 8_500.0])
+    release_calls: list[bool] = []
+    monkeypatch.setattr(passive_runner_module, "current_process_rss_mb", lambda: next(rss_values))
+    monkeypatch.setattr(passive_runner_module, "release_unused_process_memory", lambda: release_calls.append(True))
+
+    report = runner.refresh_dynamic_retention()
+
+    assert report["trimmed_second_rows"] == 0
+    assert report["released_process_memory"] is True
+    assert report["release_reason"] == "memory_pressure_allocator_trim"
+    assert report["rss_after_release_mb"] == 8_500.0
+    assert report["rss_reclaimed_mb"] == 500.0
+    assert release_calls == [True]
+
+
 def test_normalise_record_uses_exchange_time_and_depth() -> None:
     row = normalise_record(
         {
