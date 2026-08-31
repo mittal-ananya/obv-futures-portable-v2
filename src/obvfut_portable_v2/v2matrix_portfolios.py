@@ -75,26 +75,108 @@ def head(label: str) -> str:
     return f'<th scope="col"><button type="button" class="sort-button">{escape(label)}<span class="sort-mark" aria-hidden="true"></span></button></th>'
 
 
+def portfolio_source(portfolio: dict[str, Any] | None = None, summary: dict[str, Any] | None = None) -> dict[str, Any]:
+    source: dict[str, Any] = {}
+    if isinstance(portfolio, dict):
+        source.update(portfolio)
+    if isinstance(summary, dict):
+        source.update(summary)
+    return source
+
+
 def portfolio_display_name(portfolio_id: str, portfolio: dict[str, Any] | None = None, summary: dict[str, Any] | None = None) -> str:
-    source = summary if isinstance(summary, dict) and summary else portfolio if isinstance(portfolio, dict) else {}
+    source = portfolio_source(portfolio, summary)
     label = source.get("label") or source.get("rule") or source.get("variant")
-    return f"{portfolio_id} - {label}" if label else portfolio_id
+    return str(label) if label else portfolio_id
+
+
+def portfolio_max_positions(portfolio_id: str, source: dict[str, Any]) -> str:
+    value = source.get("max_positions")
+    if value not in {None, ""}:
+        return str(value)
+    haystack = " ".join(str(source.get(key) or "") for key in ("label", "rule", "variant"))
+    haystack = f"{haystack} {portfolio_id}".lower()
+    for size in (3, 4, 5, 6, 7, 8, 10):
+        if f"max{size}" in haystack or f"max {size}" in haystack:
+            return str(size)
+    return ""
+
+
+def portfolio_badges(portfolio_id: str, source: dict[str, Any]) -> list[str]:
+    labelish = " ".join(str(source.get(key) or "") for key in ("label", "rule", "variant", "portfolio_id"))
+    labelish = f"{labelish} {portfolio_id}".lower()
+    badges = []
+    fixed_margin = source.get("fixed_entry_margin_rupees")
+    if fixed_margin not in {None, ""}:
+        badges.append(f"{money(fixed_margin)}/entry")
+    max_positions = portfolio_max_positions(portfolio_id, source)
+    if max_positions:
+        badges.append(f"Max {max_positions}")
+    if "age0" in labelish or "age 0" in labelish:
+        badges.append("Age 0")
+    elif "age60" in labelish or "age 60" in labelish:
+        badges.append("Age 60")
+    if "stop100" in labelish or "stop 100" in labelish:
+        badges.append("Stop 100 bps")
+    elif "no stop" in labelish:
+        badges.append("No stop")
+    if source.get("requalify") is True:
+        cooldown = source.get("cooldown_minutes")
+        max_entries = source.get("max_entries_per_t2_leg")
+        bits = ["Requalify"]
+        if cooldown not in {None, ""}:
+            bits.append(f"cd{cooldown}m")
+        if max_entries not in {None, ""}:
+            bits.append(f"max{max_entries}/leg")
+        badges.append(" ".join(bits))
+    elif source.get("requalify") is False:
+        badges.append("First only")
+    return badges
+
+
+def render_badges(badges: list[str]) -> str:
+    return "".join(f'<span class="badge">{escape(str(badge))}</span>' for badge in badges)
 
 
 def render_portfolio_filter(portfolios: dict[str, Any], summaries: list[dict[str, Any]]) -> str:
     summary_by_id = {str(row.get("portfolio_id") or ""): row for row in summaries if isinstance(row, dict)}
-    portfolio_ids = sorted({str(key) for key in portfolios} | {key for key in summary_by_id if key})
+    portfolio_ids = sorted(
+        {str(key) for key in portfolios} | {key for key in summary_by_id if key},
+        key=lambda item: (
+            portfolio_max_positions(item, portfolio_source(portfolios.get(item) if isinstance(portfolios.get(item), dict) else {}, summary_by_id.get(item))),
+            portfolio_display_name(item, portfolios.get(item) if isinstance(portfolios.get(item), dict) else {}, summary_by_id.get(item)).lower(),
+            item,
+        ),
+    )
+    max_values = sorted(
+        {
+            portfolio_max_positions(portfolio_id, portfolio_source(portfolios.get(portfolio_id) if isinstance(portfolios.get(portfolio_id), dict) else {}, summary_by_id.get(portfolio_id)))
+            for portfolio_id in portfolio_ids
+        }
+        - {""},
+        key=lambda value: int(value),
+    )
     options = ['<option value="">All Portfolios</option>']
     for portfolio_id in portfolio_ids:
         portfolio = portfolios.get(portfolio_id) if isinstance(portfolios.get(portfolio_id), dict) else {}
         label = portfolio_display_name(portfolio_id, portfolio, summary_by_id.get(portfolio_id))
         options.append(f'<option value="{sort_attr(portfolio_id)}">{escape(label)}</option>')
+    max_options = ['<option value="">All Max Sizes</option>']
+    max_options.extend(f'<option value="{sort_attr(value)}">Max {escape(value)}</option>' for value in max_values)
     return f"""
       <div class="filters">
-        <label for="portfolioFilter">Portfolio</label>
-        <select id="portfolioFilter">
-          {''.join(options)}
-        </select>
+        <div class="filter-field">
+          <label for="portfolioFilter">Portfolio</label>
+          <select id="portfolioFilter">
+            {''.join(options)}
+          </select>
+        </div>
+        <div class="filter-field compact">
+          <label for="maxFilter">Max Positions</label>
+          <select id="maxFilter">
+            {''.join(max_options)}
+          </select>
+        </div>
       </div>
     """
 
@@ -135,10 +217,18 @@ async def api_stream() -> StreamingResponse:
 def render_summary_cards(summaries: list[dict[str, Any]]) -> str:
     cards = []
     for summary in summaries:
+        portfolio_id = str(summary.get("portfolio_id") or "")
+        label = portfolio_display_name(portfolio_id, summary=summary)
+        badges = render_badges(portfolio_badges(portfolio_id, summary))
         cards.append(
             f"""
             <section class="summary">
               <div class="kicker">{text(summary.get('variant'))}</div>
+              <div class="summary-title">
+                <h2>{escape(label)}</h2>
+                <span class="id-chip">{escape(portfolio_id)}</span>
+              </div>
+              <div class="badge-row">{badges}</div>
               <h2>{text(summary.get('open_positions', 0))} Open / {text(summary.get('closed_trades', 0))} Closed</h2>
               <div class="metrics">
                 <span>Net <strong>{money(summary.get('total_net_rupees'))}</strong></span>
@@ -159,13 +249,15 @@ def render_holdings(portfolios: dict[str, Any]) -> str:
     for portfolio_id, portfolio in sorted(portfolios.items()):
         if not isinstance(portfolio, dict):
             continue
+        label = portfolio_display_name(str(portfolio_id), portfolio)
+        max_positions = portfolio_max_positions(str(portfolio_id), portfolio)
         for holding in (portfolio.get("holdings") or {}).values():
             if not isinstance(holding, dict):
                 continue
             rows.append(
                 f"""
-                <tr data-portfolio-id="{sort_attr(portfolio_id)}" data-portfolio-variant="{sort_attr(portfolio.get('variant'))}">
-                  {cell(portfolio_id)}
+                <tr data-portfolio-id="{sort_attr(portfolio_id)}" data-portfolio-variant="{sort_attr(portfolio.get('variant'))}" data-portfolio-max="{sort_attr(max_positions)}">
+                  {cell(label, label)}
                   {cell(holding.get('symbol'))}
                   {cell(holding.get('side'))}
                   {cell(holding.get('lots'), holding.get('lots'))}
@@ -183,12 +275,14 @@ def render_transactions(portfolios: dict[str, Any]) -> str:
     for portfolio_id, portfolio in sorted(portfolios.items()):
         if not isinstance(portfolio, dict):
             continue
+        label = portfolio_display_name(str(portfolio_id), portfolio)
+        max_positions = portfolio_max_positions(str(portfolio_id), portfolio)
         txs = [row for row in (portfolio.get("transactions") or []) if isinstance(row, dict)]
         for row in reversed(txs[-120:]):
             rows.append(
                 f"""
-                <tr data-portfolio-id="{sort_attr(portfolio_id)}" data-portfolio-variant="{sort_attr(portfolio.get('variant'))}">
-                  {cell(portfolio_id)}
+                <tr data-portfolio-id="{sort_attr(portfolio_id)}" data-portfolio-variant="{sort_attr(portfolio.get('variant'))}" data-portfolio-max="{sort_attr(max_positions)}">
+                  {cell(label, label)}
                   {cell(row.get('event'))}
                   {cell(row.get('symbol'))}
                   {cell(row.get('side'))}
@@ -289,6 +383,39 @@ def page() -> HTMLResponse:
       letter-spacing: .08em;
       margin-bottom: 6px;
     }}
+    .summary-title {{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+    }}
+    .summary-title h2 {{
+      font-size: 17px;
+      line-height: 1.25;
+    }}
+    .id-chip {{
+      max-width: 320px;
+      color: var(--muted);
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }}
+    .badge-row {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 10px;
+    }}
+    .badge {{
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #0c111a;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 4px 8px;
+      white-space: nowrap;
+    }}
     .metrics {{
       display: grid;
       grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -354,20 +481,29 @@ def page() -> HTMLResponse:
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
       padding: 10px 12px;
       margin: 8px 0 14px;
     }}
-    .filters label {{
+    .filter-field {{
+      display: grid;
+      gap: 6px;
+      min-width: min(760px, 100%);
+    }}
+    .filter-field.compact {{
+      min-width: 180px;
+    }}
+    .filter-field label {{
       color: var(--muted);
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: .06em;
     }}
-    .filters select {{
-      min-width: min(760px, 100%);
+    .filter-field select {{
+      min-width: 0;
       border: 1px solid var(--line);
       border-radius: 6px;
       background: #0c111a;
@@ -388,7 +524,7 @@ def page() -> HTMLResponse:
     <header>
       <div>
         <h1>v2Matrix Portfolios</h1>
-        <div class="sub">Fixed Rs 5L per entry, no replacement, max 3 positions per paper portfolio.</div>
+        <div class="sub">Fixed Rs 5L per entry, no replacement, with max 3 or max 5 positions by selected variant.</div>
       </div>
       <div class="status">
         <span class="pill">Overlay ok: {text(overlay_status.get('ok'))}</span>
@@ -466,17 +602,22 @@ def page() -> HTMLResponse:
       }});
     }});
     const portfolioFilter = document.getElementById("portfolioFilter");
+    const maxFilter = document.getElementById("maxFilter");
     const applyPortfolioFilter = () => {{
       const selected = portfolioFilter ? portfolioFilter.value : "";
+      const selectedMax = maxFilter ? maxFilter.value : "";
       document.querySelectorAll("tbody tr[data-portfolio-id]").forEach((row) => {{
-        const visible = !selected || row.dataset.portfolioId === selected;
+        const portfolioMatches = !selected || row.dataset.portfolioId === selected;
+        const maxMatches = !selectedMax || row.dataset.portfolioMax === selectedMax;
+        const visible = portfolioMatches && maxMatches;
         row.style.display = visible ? "" : "none";
       }});
     }};
     if (portfolioFilter) {{
       portfolioFilter.addEventListener("change", applyPortfolioFilter);
-      applyPortfolioFilter();
     }}
+    if (maxFilter) maxFilter.addEventListener("change", applyPortfolioFilter);
+    applyPortfolioFilter();
   </script>
 </body>
 </html>

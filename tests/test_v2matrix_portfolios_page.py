@@ -141,3 +141,77 @@ def test_portfolio_page_renders_sortable_tables(tmp_path: Path, monkeypatch) -> 
     assert "Portfolio Closed Success" in html
     assert "All Qualified Signal Success" in html
     assert "75.00%" in html
+
+
+def test_portfolio_page_uses_readable_variant_labels_and_max_filters(tmp_path: Path, monkeypatch) -> None:
+    v2matrix_portfolios = load_portfolios_module(monkeypatch)
+    state_path = tmp_path / "portfolio_state.json"
+    status_path = tmp_path / "overlay_status.json"
+    max3_id = "fixed5L_no_replacement_max3_smooth_survivor_profit25"
+    max5_id = "fixed5L_no_replacement_max5_smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2"
+    state_path.write_text(
+        json.dumps(
+            {
+                "updated_at_ist": "2026-08-31T12:00:00+05:30",
+                "summaries": [
+                    {
+                        "portfolio_id": max3_id,
+                        "variant": "smooth_survivor_profit25",
+                        "label": "Profit25 / age60 / max3 / no stop / first only",
+                        "max_positions": 3,
+                        "fixed_entry_margin_rupees": 500000,
+                        "requalify": False,
+                        "open_positions": 1,
+                        "closed_trades": 10,
+                    },
+                    {
+                        "portfolio_id": max5_id,
+                        "variant": "smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2",
+                        "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+                        "max_positions": 5,
+                        "fixed_entry_margin_rupees": 500000,
+                        "requalify": True,
+                        "cooldown_minutes": 15,
+                        "max_entries_per_t2_leg": 2,
+                        "open_positions": 2,
+                        "closed_trades": 20,
+                    },
+                ],
+                "portfolios": {
+                    max3_id: {
+                        "label": "Profit25 / age60 / max3 / no stop / first only",
+                        "variant": "smooth_survivor_profit25",
+                        "max_positions": 3,
+                        "holdings": {
+                            "ABC": {"symbol": "ABC", "side": "long", "lots": 1, "entry_epoch": 1}
+                        },
+                        "transactions": [],
+                    },
+                    max5_id: {
+                        "label": "Profit25 / age0 / max5 / stop100 / requalify cd15 max2",
+                        "variant": "smooth_survivor_profit25_age0_max5_stop100_requal_cd15_max2",
+                        "max_positions": 5,
+                        "holdings": {
+                            "XYZ": {"symbol": "XYZ", "side": "short", "lots": 1, "entry_epoch": 2}
+                        },
+                        "transactions": [],
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    status_path.write_text(json.dumps({"ok": True, "clock": {}}), encoding="utf-8")
+    monkeypatch.setattr(v2matrix_portfolios, "STATE_PATH", state_path)
+    monkeypatch.setattr(v2matrix_portfolios, "STATUS_PATH", status_path)
+
+    html = v2matrix_portfolios.page().body.decode("utf-8")
+
+    assert "max 3 or max 5 positions" in html
+    assert 'id="maxFilter"' in html
+    assert ">Max 5<" in html
+    assert "Profit25 / age0 / max5 / stop100 / requalify cd15 max2" in html
+    assert "Rs 5.00L/entry" in html
+    assert "Requalify cd15m max2/leg" in html
+    assert 'data-portfolio-max="5"' in html
+    assert f'<option value="{max5_id}">Profit25 / age0 / max5 / stop100 / requalify cd15 max2</option>' in html
