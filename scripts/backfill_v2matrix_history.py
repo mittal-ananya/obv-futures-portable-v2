@@ -705,7 +705,17 @@ def main() -> int:
     parser.add_argument("--scan-yield-every-lines", type=int, default=250000)
     parser.add_argument("--scan-yield-seconds", type=float, default=0.02)
     parser.add_argument("--install", action="store_true")
+    parser.add_argument(
+        "--allow-full-history-install",
+        action="store_true",
+        help="Permit --install to rewrite v2Matrix history after explicit approval.",
+    )
     args = parser.parse_args()
+    if args.install and not args.allow_full_history_install:
+        raise SystemExit(
+            "--install rewrites v2Matrix portfolio history. Use incremental EOD append by default; "
+            "pass --allow-full-history-install only after explicit approval for a controlled reseed."
+        )
 
     root = args.root
     overlay_root = args.overlay_root

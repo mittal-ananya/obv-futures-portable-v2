@@ -10,6 +10,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pandas as pd
+import pytest
 
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
@@ -17,6 +18,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 import backtest_tranche_portfolio_overlay as base  # noqa: E402
+import backfill_v2matrix_history as history_backfill  # noqa: E402
 import install_v2matrix_from_research_portfolios as installer  # noqa: E402
 import research_t2_overlay_portfolios as research_portfolios  # noqa: E402
 import research_t2_overlay_variant_compare as research_compare  # noqa: E402
@@ -83,6 +85,24 @@ def make_index(prices_by_epoch: dict[int, float]) -> live.QuoteRingIndex:
         index.add("NFO:TEST_FUT", epoch, price, price - 0.01, price + 0.01)
     index.finalize()
     return index
+
+
+def test_history_backfill_install_requires_explicit_full_history_approval(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "backfill_v2matrix_history.py",
+            "--output-dir",
+            str(tmp_path),
+            "--install",
+        ],
+    )
+
+    with pytest.raises(SystemExit) as exc:
+        history_backfill.main()
+
+    assert "--allow-full-history-install" in str(exc.value)
 
 
 def test_potential_t2_required_keys_include_manifest_universe_before_leg_is_active(tmp_path: Path) -> None:

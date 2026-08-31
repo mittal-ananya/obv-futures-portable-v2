@@ -1,0 +1,19 @@
+{
+  "backed_up_files": [
+    "overlay_state.json",
+    "overlay_events.jsonl",
+    "portfolio_state.json",
+    "overlay_status.json"
+  ],
+  "created_at_utc": "2026-08-31T16:48:16.659887Z",
+  "current_bad_backup": "/opt/cloud-deploy-candidates/v2matrix/state/backups/pre_restore_from_bad_backfill_20260831_164816",
+  "reason": "restore immediate pre-history-backfill portfolio state after full backfill rewrote historical portfolio economics",
+  "restored_files": [
+    "overlay_state.json",
+    "overlay_events.jsonl",
+    "portfolio_state.json",
+    "overlay_status.json"
+  ],
+  "schema": "v2matrix.portfolio_restore.v1",
+  "source_backup": "/opt/cloud-deploy-candidates/v2matrix/state/backups/pre_history_backfill_20260831_193451"
+}
