@@ -20,6 +20,7 @@ if str(SCRIPTS_DIR) not in sys.path:
 import backtest_tranche_portfolio_overlay as base  # noqa: E402
 import backfill_v2matrix_history as history_backfill  # noqa: E402
 import install_v2matrix_from_research_portfolios as installer  # noqa: E402
+import audit_t2_candidate_deployment_readiness as readiness  # noqa: E402
 import research_t2_mfe_first_profit_capture as mfe_research  # noqa: E402
 import research_t2_overlay_portfolios as research_portfolios  # noqa: E402
 import research_t2_overlay_variant_compare as research_compare  # noqa: E402
@@ -735,6 +736,154 @@ def test_research_path_lookup_keeps_quote_history_metadata_for_candidates() -> N
     assert window.iloc[0]["quote_history_mode"] == "research_full_session_quote_index"
     assert window.iloc[0]["quote_history_key_scope"] == "all_t2_ledger_keys"
     assert window.iloc[0]["ram_60_available_from_epoch"] == entry
+
+
+def test_readiness_open_carry_contract_tracks_resume_fields_and_closed_success_only() -> None:
+    row = {
+        "candidate": "unit",
+        "policy_name": "unit_policy",
+        "exit": "armed20_floor80",
+        "row_id": "TEST|T2|pos-1|1",
+        "symbol": "TEST",
+        "side": "long",
+        "source_t2_position_id": "pos-1",
+        "entry_epoch": epoch_at(10, 0),
+        "entry_time": live.epoch_ist_iso(epoch_at(10, 0)),
+        "entry_fill_price": 100.0,
+        "peak_return": 0.003,
+        "armed": True,
+        "quote_history_mode": "bounded_prior_session_potential_t2_universe",
+        "quote_history_key_scope": "potential_t2_universe",
+        "ram_60_available_from_epoch": epoch_at(9, 45),
+        "ram_60_available_from": live.epoch_ist_iso(epoch_at(9, 45)),
+        "exit_time": live.epoch_ist_iso(epoch_at(15, 30)),
+        "exit_reason": "open_at_period_end",
+        "net_rupees_per_lot": 250.0,
+        "net_return_on_margin_pct": 0.25,
+        "open_at_period_end": True,
+    }
+
+    summary = readiness.summarize_trades([row])
+    open_rows = readiness.open_carry_rows([row])
+    coverage = readiness.open_carry_state_coverage(open_rows)
+
+    assert summary["closed_count"] == 0
+    assert summary["success_rate_pct"] is None
+    assert summary["marked_success_rate_pct"] == 100.0
+    assert open_rows[0]["entry_epoch"] == row["entry_epoch"]
+    assert open_rows[0]["peak_return"] == row["peak_return"]
+    assert coverage["rows_with_missing_required_fields"] == 0
+
+
+def test_readiness_open_carry_contract_reports_missing_resume_fields() -> None:
+    coverage = readiness.open_carry_state_coverage(
+        [
+            {
+                "candidate": "unit",
+                "row_id": "TEST|T2|pos-1|1",
+                "entry_epoch": epoch_at(10, 0),
+                "entry_fill_price": 100.0,
+            }
+        ]
+    )
+
+    assert coverage["rows_with_missing_required_fields"] == 1
+    assert coverage["missing_by_field"]["peak_return"] == 1
+    assert coverage["missing_by_field"]["quote_history_mode"] == 1
+
+
+def test_readiness_frozen_provenance_hashes_sources_and_thresholds(tmp_path: Path) -> None:
+    root = tmp_path
+    (root / "config").mkdir(parents=True)
+    (root / "state" / "adaptive_calibration").mkdir(parents=True)
+    export_dir = root / "state" / "canonical_exports" / "obvfutport_v2_20260810_20260901"
+    export_dir.mkdir(parents=True)
+    runtime = {
+        "adaptive_calibration_path": str(root / "state" / "adaptive_calibration" / "v2_symbol_overrides_latest.json"),
+        "hurst_universe_manifest_path": str(root / "config" / "hurst_manifest.json"),
+    }
+    (root / "config" / "runtime.json").write_text(json.dumps(runtime), encoding="utf-8")
+    (root / "config" / "obvfutport_v2_contract_chain_manifest.json").write_text(json.dumps({"symbols": {}}), encoding="utf-8")
+    (root / "config" / "hurst_manifest.json").write_text(json.dumps({"symbols": ["TEST", "SYN"]}), encoding="utf-8")
+    (root / "state" / "adaptive_calibration" / "v2_symbol_overrides_latest.json").write_text(
+        json.dumps({"TEST": {"combo_label": "unit"}}),
+        encoding="utf-8",
+    )
+    ledger = export_dir / "obvfutport_v2_t2_ledger_20260810_20260901.jsonl"
+    ledger.write_text(
+        "\n".join(
+            [
+                json.dumps(
+                    {
+                        "event_type": "paper_entry",
+                        "symbol": "TEST",
+                        "threshold_source": "v1_runtime",
+                        "threshold_synthesized": False,
+                        "primary_obv_short_abs_threshold": 1.5,
+                        "hard_sl_points": 7.0,
+                        "trail_activation_points": 18.0,
+                    }
+                ),
+                json.dumps(
+                    {
+                        "event_type": "paper_entry",
+                        "symbol": "SYN",
+                        "threshold_synthesized": True,
+                        "primary_obv_short_abs_threshold": 2.0,
+                        "hard_sl_points": 6.0,
+                    }
+                ),
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    open_state = export_dir / "obvfutport_v2_t2_open_state_20260901.json"
+    open_state.write_text(json.dumps({"open": []}), encoding="utf-8")
+    manifest = export_dir / "manifest.json"
+    manifest.write_text(json.dumps({"t2_ledger": str(ledger), "t2_open_state": str(open_state)}), encoding="utf-8")
+    opportunity = root / "opportunity.parquet"
+    opportunity.write_text("unit-opportunity", encoding="utf-8")
+    phase = root / "phase.json"
+    phase.write_text(json.dumps({"phase": "unit"}), encoding="utf-8")
+    policies = {policy.name: policy for policy in readiness.continuation.continuation_policy_grid()}
+
+    provenance = readiness.build_frozen_provenance(
+        root=root,
+        opportunity_frame=opportunity,
+        phase_report=phase,
+        candidates=[readiness.CANDIDATES[0]],
+        policies=policies,
+    )
+
+    assert provenance["missing_required_sources"] == []
+    assert provenance["sources"]["t2_ledger"]["sha256"]
+    assert provenance["sources"]["adaptive_override"]["sha256"]
+    assert provenance["thresholds"]["effective_symbol_count"] == 2
+    assert provenance["thresholds"]["symbol_threshold_source_counts"] == {
+        "hurst_manifest_synthesized": 1,
+        "v1_runtime": 1,
+    }
+    assert provenance["thresholds"]["hard_sl_exact_80_count"] == 0
+    assert provenance["candidate_rules"]["hash"]
+    assert provenance["script_hash"]
+
+
+def test_readiness_frozen_provenance_compare_detects_source_changes() -> None:
+    expected = {
+        "hash": "root-a",
+        "candidate_rules": {"hash": "rules-a"},
+        "thresholds": {"effective_by_symbol_hash": "threshold-a"},
+        "script_hash": "script-a",
+        "sources": {"t2_ledger": {"sha256": "ledger-a"}},
+    }
+    current = json.loads(json.dumps(expected))
+
+    assert readiness.compare_frozen_provenance(current, expected) == []
+    current["sources"]["t2_ledger"]["sha256"] = "ledger-b"
+    mismatches = readiness.compare_frozen_provenance(current, expected)
+
+    assert any(row["field"] == "sources.t2_ledger.sha256" for row in mismatches)
 
 
 def test_open_at_period_end_candidate_remains_active_in_installed_state() -> None:
